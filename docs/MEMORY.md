@@ -15,15 +15,16 @@ _Last updated: 2026-09-27_
 - The first full version of the app is built and tested in headless Chromium (no console errors):
   log, programs, exercises, progress/settings, timers.
 - Branch: `claude/gymkeeper-app-pq7o0u`.
-- **The push to GitHub is blocked (HTTP 403).** The Claude GitHub App has no access to `breenskillz-ctrl/GymApp`.
-  The user needs to connect GitHub at https://claude.ai/connect-github and install the app on the repo.
-  The commits are only local until that is fixed. Check `git log origin/claude/gymkeeper-app-pq7o0u..` at the start
-  of a session.
+- Pushed to GitHub (2026-09-27) after the user granted the Claude GitHub App access to the repo.
+  If a push returns 403 again, check the app's repository access at
+  https://github.com/apps/claude/installations/select_target.
+- The repo's default branch is still empty. All work is on the feature branch; no pull request yet.
 - The app is not deployed anywhere yet.
 
 ## Next steps / ideas (not yet requested unless noted)
 
-- [ ] Push once GitHub access works (requested).
+- [x] Push once GitHub access works (done 2026-09-27).
+- [ ] Merge to the default branch / open a PR (only if the user asks).
 - [ ] Deploy to GitHub Pages so the user can install the app on their phone (offered, not yet confirmed).
 - [ ] Optional: commit an automated Playwright smoke test under `tests/`.
 - [ ] Optional ideas: exercise illustrations, supersets, plate calculator, workout duration, cloud sync
