@@ -1,4 +1,4 @@
-// Timere: hviletimer, nedtelling, Tabata-intervaller og stoppeklokke.
+// Timers: rest timer, countdown, Tabata intervals and stopwatch.
 import { state, save } from '../store.js';
 import { icon, fmtTime, beep, vibrate, pad } from '../utils.js';
 import { startRest } from '../timer.js';
@@ -9,7 +9,7 @@ let ticker = null;
 
 const sound = (...a) => { if (state.settings.sound) beep(...a); };
 
-// ---------- Nedtelling ----------
+// ---------- Countdown ----------
 const cd = { duration: 60, left: 60, endAt: 0, running: false };
 
 // ---------- Tabata ----------
@@ -26,15 +26,15 @@ const tb = {
 function buildPhases() {
   const { prep, work, rest, rounds } = tb.cfg;
   const p = [];
-  if (prep) p.push({ kind: 'prep', label: 'Gjør deg klar', dur: prep });
+  if (prep) p.push({ kind: 'prep', label: 'Get ready', dur: prep });
   for (let r = 1; r <= rounds; r++) {
-    p.push({ kind: 'work', label: 'Jobb!', dur: work, round: r });
-    if (rest && r < rounds) p.push({ kind: 'rest', label: 'Hvile', dur: rest, round: r });
+    p.push({ kind: 'work', label: 'Work!', dur: work, round: r });
+    if (rest && r < rounds) p.push({ kind: 'rest', label: 'Rest', dur: rest, round: r });
   }
   return p;
 }
 
-// ---------- Stoppeklokke ----------
+// ---------- Stopwatch ----------
 const sw = { startAt: 0, acc: 0, running: false, laps: [] };
 const swElapsed = () => sw.acc + (sw.running ? Date.now() - sw.startAt : 0);
 
@@ -43,7 +43,7 @@ function fmtMs(ms) {
   return `${fmtTime(Math.floor(ms / 1000))}<small>.${pad(cs)}</small>`;
 }
 
-// ---------- Felles tikk ----------
+// ---------- Shared tick ----------
 function ensureTicker() {
   if (ticker) return;
   ticker = setInterval(tick, 100);
@@ -105,15 +105,15 @@ function updateDisplay() {
     const ph = tb.phases[tb.idx];
     const box = q('#tb-box');
     box.dataset.kind = tb.started ? ph.kind : 'idle';
-    q('#tb-phase').textContent = tb.started ? ph.label : 'Klar';
-    q('#tb-round').textContent = tb.started && ph.round ? `Runde ${ph.round} av ${tb.cfg.rounds}` : `${tb.cfg.rounds} runder · ${fmtTime(totalTabata())} totalt`;
+    q('#tb-phase').textContent = tb.started ? ph.label : 'Ready';
+    q('#tb-round').textContent = tb.started && ph.round ? `Round ${ph.round} of ${tb.cfg.rounds}` : `${tb.cfg.rounds} rounds · ${fmtTime(totalTabata())} total`;
     q('#tb-time').textContent = fmtTime(Math.ceil(tb.started ? tb.left : tb.cfg.work));
-    q('#tb-toggle').innerHTML = tb.running ? `${icon('pause')} Pause` : `${icon('play')} ${tb.started ? 'Fortsett' : 'Start'}`;
+    q('#tb-toggle').innerHTML = tb.running ? `${icon('pause')} Pause` : `${icon('play')} ${tb.started ? 'Resume' : 'Start'}`;
   }
   if (tab === 'stopwatch' && q('#sw-time')) {
     q('#sw-time').innerHTML = fmtMs(swElapsed());
-    q('#sw-toggle').innerHTML = sw.running ? `${icon('pause')} Stopp` : `${icon('play')} Start`;
-    q('#sw-lap').textContent = sw.running ? 'Runde' : 'Nullstill';
+    q('#sw-toggle').innerHTML = sw.running ? `${icon('pause')} Stop` : `${icon('play')} Start`;
+    q('#sw-lap').textContent = sw.running ? 'Lap' : 'Reset';
   }
 }
 
@@ -121,16 +121,16 @@ function totalTabata() {
   return buildPhases().reduce((a, p) => a + p.dur, 0);
 }
 
-// ---------- Visning ----------
+// ---------- View ----------
 function body() {
   if (tab === 'rest') {
     const presets = [30, 45, 60, 90, 120, 180, 240, 300];
     return `
-      <p class="muted center">Hviletimeren vises nederst på skjermen mens du logger sett.</p>
+      <p class="muted center">The rest timer appears at the bottom of the screen while you log sets.</p>
       <div class="preset-grid">
         ${presets.map((s) => `<button class="preset" data-rest="${s}">${fmtTime(s)}</button>`).join('')}
       </div>
-      <label class="form">Standard hviletid (sekunder)
+      <label class="form">Default rest time (seconds)
         <input class="input" type="number" min="5" step="5" id="rest-default" value="${state.settings.rest}">
       </label>`;
   }
@@ -143,21 +143,21 @@ function body() {
         <button class="btn primary big" id="cd-toggle"></button>
         <button class="btn ghost" data-cd="10">+10s</button>
       </div>
-      <button class="btn ghost block" data-cd="reset">${icon('repeat')} Nullstill</button>
+      <button class="btn ghost block" data-cd="reset">${icon('repeat')} Reset</button>
       <div class="preset-grid">
         ${presets.map((s) => `<button class="preset" data-cdset="${s}">${fmtTime(s)}</button>`).join('')}
       </div>
       <div class="row gap">
-        <input class="input grow" id="cd-custom" placeholder="Egen tid, f.eks. 2:30" inputmode="numeric">
-        <button class="btn ghost" data-cd="custom">Sett</button>
+        <input class="input grow" id="cd-custom" placeholder="Custom time, e.g. 2:30" inputmode="numeric">
+        <button class="btn ghost" data-cd="custom">Set</button>
       </div>`;
   }
   if (tab === 'tabata') {
     const f = (k, l) => `
       <div class="stepper"><span>${l}</span>
-        <button class="icon-btn sm" data-tb="${k}" data-d="-1" aria-label="Mindre">−</button>
+        <button class="icon-btn sm" data-tb="${k}" data-d="-1" aria-label="Less">−</button>
         <strong>${k === 'rounds' ? tb.cfg[k] : fmtTime(tb.cfg[k])}</strong>
-        <button class="icon-btn sm" data-tb="${k}" data-d="1" aria-label="Mer">+</button></div>`;
+        <button class="icon-btn sm" data-tb="${k}" data-d="1" aria-label="More">+</button></div>`;
     return `
       <div class="tabata-box" id="tb-box">
         <div id="tb-phase" class="tb-phase"></div>
@@ -169,7 +169,7 @@ function body() {
         <button class="btn ghost" data-tbc="reset">${icon('repeat')}</button>
       </div>
       <div class="card steppers ${tb.started ? 'disabled' : ''}">
-        ${f('prep', 'Forberedelse')}${f('work', 'Jobb')}${f('rest', 'Hvile')}${f('rounds', 'Runder')}
+        ${f('prep', 'Prepare')}${f('work', 'Work')}${f('rest', 'Rest')}${f('rounds', 'Rounds')}
       </div>`;
   }
   return `
@@ -179,12 +179,12 @@ function body() {
       <button class="btn primary big" id="sw-toggle"></button>
     </div>
     <div class="laps">${sw.laps.map((l, i) => `
-      <div class="lap"><span>Runde ${sw.laps.length - i}</span><span>${fmtMs(l.split)}</span><span class="muted">${fmtMs(l.total)}</span></div>`).join('')}</div>`;
+      <div class="lap"><span>Lap ${sw.laps.length - i}</span><span>${fmtMs(l.split)}</span><span class="muted">${fmtMs(l.total)}</span></div>`).join('')}</div>`;
 }
 
 export function renderTimers(root) {
   rootEl = root;
-  const tabs = [['rest', 'Hvile'], ['countdown', 'Nedtelling'], ['tabata', 'Tabata'], ['stopwatch', 'Stoppeklokke']];
+  const tabs = [['rest', 'Rest'], ['countdown', 'Countdown'], ['tabata', 'Tabata'], ['stopwatch', 'Stopwatch']];
   root.innerHTML = `
     <header class="page-head"><h1>Timer</h1></header>
     <div class="seg wide" data-tabs>${tabs.map(([k, l]) => `<button class="${tab === k ? 'active' : ''}" data-tab="${k}">${l}</button>`).join('')}</div>

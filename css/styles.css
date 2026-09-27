@@ -68,7 +68,7 @@ h3 { font-size: 16px; font-weight: 700; }
   padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(var(--nav-h) + var(--safe-b) + 90px);
 }
 
-/* ---------- Navigasjon ---------- */
+/* ---------- Navigation ---------- */
 .nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
   display: flex; justify-content: space-around;
@@ -84,7 +84,7 @@ h3 { font-size: 16px; font-weight: 700; }
 .nav button .ico { width: 23px; height: 23px; }
 .nav button.active { color: var(--accent); }
 
-/* ---------- Knapper ---------- */
+/* ---------- Buttons ---------- */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   padding: 11px 16px; border-radius: 12px; font-weight: 650;
@@ -109,7 +109,7 @@ h3 { font-size: 16px; font-weight: 700; }
 .icon-btn.sm .ico { width: 16px; height: 16px; }
 .danger-text { color: var(--red) !important; }
 
-/* ---------- Felt ---------- */
+/* ---------- Inputs ---------- */
 .input {
   width: 100%; padding: 11px 13px; border-radius: 11px;
   background: var(--card2); border: 1px solid transparent; outline: none;
@@ -124,7 +124,7 @@ textarea.input { resize: vertical; }
 .switch input { width: 20px; height: 20px; accent-color: var(--accent); }
 .file-btn { cursor: pointer; color: var(--text) !important; font-size: 15px !important; }
 
-/* ---------- Kort og lister ---------- */
+/* ---------- Cards and lists ---------- */
 .card { background: var(--card); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; border: 1px solid var(--line); }
 .card > h3 { margin-bottom: 10px; }
 .page-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 6px 0 8px; }
@@ -182,7 +182,7 @@ textarea.input { resize: vertical; }
 .hbar-fill { display: block; height: 100%; border-radius: 99px; background: var(--accent); }
 .hbar-val { width: 28px; text-align: right; font-weight: 700; }
 
-/* ---------- Logg ---------- */
+/* ---------- Log ---------- */
 .day-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .day-title { text-align: center; padding: 4px 12px; border-radius: 12px; }
 .day-title .title { font-size: 22px; font-weight: 800; }
@@ -232,7 +232,7 @@ textarea.input { resize: vertical; }
 .pr { font-size: 10px; font-weight: 900; color: var(--gold); }
 .entry-foot { display: flex; justify-content: center; padding-top: 6px; }
 
-/* ---------- Kalender ---------- */
+/* ---------- Calendar ---------- */
 .cal-head { display: flex; align-items: center; justify-content: space-between; text-align: center; margin-bottom: 8px; }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
 .cal-grid.wk span { font-size: 11px; font-weight: 700; color: var(--muted); padding: 4px 0; }
@@ -241,7 +241,7 @@ textarea.input { resize: vertical; }
 .cal-day.today { outline: 2px solid var(--muted); outline-offset: -2px; }
 .cal-day.sel { background: var(--accent); color: var(--accent-ink); }
 
-/* ---------- Programmer ---------- */
+/* ---------- Programs ---------- */
 .prog-card { display: block; width: 100%; text-align: left; }
 .prog-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .prog-top .title { font-size: 17px; }
@@ -259,7 +259,7 @@ textarea.input { resize: vertical; }
 .workout > .row { margin-bottom: 6px; }
 .workout > .btn { margin-top: 8px; }
 
-/* ---------- Historikk ---------- */
+/* ---------- History ---------- */
 .hist-item { padding: 10px 0; border-bottom: 1px solid var(--line); }
 .hist-date { font-weight: 650; font-size: 13px; margin-bottom: 4px; }
 
@@ -293,7 +293,7 @@ textarea.input { resize: vertical; }
   .modal.tall { height: 80vh; }
 }
 
-/* ---------- Hviletimer-bar ---------- */
+/* ---------- Rest timer bar ---------- */
 .restbar {
   position: fixed; left: 50%; bottom: calc(var(--nav-h) + var(--safe-b) + 10px); z-index: 30;
   width: min(640px, calc(100% - 20px)); transform: translate(-50%, 150%);
@@ -309,7 +309,7 @@ textarea.input { resize: vertical; }
 .rest-btn { padding: 7px 10px; border-radius: 9px; background: var(--card); font-weight: 700; font-size: 13px; }
 .rest-btn.skip { background: var(--accent); color: var(--accent-ink); }
 
-/* ---------- Timere ---------- */
+/* ---------- Timers ---------- */
 .big-time { font-size: 64px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; text-align: center; line-height: 1; }
 .big-time small { font-size: .45em; color: var(--muted); }
 .sw { margin: 40px 0 10px; }

@@ -1,4 +1,4 @@
-// Fremgang: statistikk, grafer, rekorder, kroppsvekt og innstillinger.
+// Progress: statistics, charts, records, body weight and settings.
 import { GROUPS } from '../data.js';
 import {
   state, save, dayHasWork, getExercise, records, setVolume, replaceState, resetState,
@@ -21,7 +21,7 @@ function stats() {
   for (const k of days) {
     if (k < month || k > today) continue;
     for (const e of state.log[k].entries) {
-      const g = getExercise(e.ex).group || 'Annet';
+      const g = getExercise(e.ex).group || 'Other';
       for (const s of e.sets) {
         if (!s.done) continue;
         sets30++;
@@ -31,14 +31,14 @@ function stats() {
     }
   }
 
-  // Uker på rad med minst én økt
+  // Consecutive weeks with at least one workout
   const weeks = new Set(days.map(weekStart));
   let streak = 0;
   let w = thisWeek;
   if (!weeks.has(w)) w = addDays(w, -7);
   while (weeks.has(w)) { streak++; w = addDays(w, -7); }
 
-  // Økter per uke, siste 12 uker
+  // Workouts per week, last 12 weeks
   const perWeek = [];
   for (let i = 11; i >= 0; i--) {
     const ws = addDays(thisWeek, -7 * i);
@@ -68,7 +68,7 @@ function topRecords() {
     if (ex.type === 'wr' && r.maxW) out.push({ id, name: ex.name, val: `${fmtNum(r.maxW.v, 2)} ${state.settings.unit} × ${r.maxW.r ?? '–'}`, date: r.maxW.date, sort: r.best1rm?.v || 0 });
     else if (ex.type === 'r' && r.maxR) out.push({ id, name: ex.name, val: `${r.maxR.v} reps`, date: r.maxR.date, sort: 0 });
   }
-  return out.sort((a, b) => b.sort - a.sort || a.name.localeCompare(b.name, 'nb'));
+  return out.sort((a, b) => b.sort - a.sort || a.name.localeCompare(b.name, 'en'));
 }
 
 export function renderProgress(root) {
@@ -78,51 +78,51 @@ export function renderProgress(root) {
   const body = [...state.body].sort((a, b) => a.date.localeCompare(b.date));
   const lastBody = body[body.length - 1];
   const maxGroup = Math.max(1, ...Object.values(s.groupSets));
-  const groupsSorted = GROUPS.concat('Annet').filter((g) => s.groupSets[g]).sort((a, b) => s.groupSets[b] - s.groupSets[a]);
+  const groupsSorted = GROUPS.concat('Other').filter((g) => s.groupSets[g]).sort((a, b) => s.groupSets[b] - s.groupSets[a]);
 
   root.innerHTML = `
-    <header class="page-head"><h1>Fremgang</h1>
-      <button class="icon-btn" data-act="settings" aria-label="Innstillinger">${icon('settings')}</button></header>
+    <header class="page-head"><h1>Progress</h1>
+      <button class="icon-btn" data-act="settings" aria-label="Settings">${icon('settings')}</button></header>
 
     <div class="tiles four">
-      <div class="tile"><span class="tile-val">${s.total}</span><span class="tile-label">Økter totalt</span></div>
-      <div class="tile"><span class="tile-val">${s.week}</span><span class="tile-label">Denne uka</span></div>
-      <div class="tile"><span class="tile-val">${s.streak}</span><span class="tile-label">Uker på rad</span></div>
-      <div class="tile"><span class="tile-val">${s.vol30 >= 10000 ? fmtNum(s.vol30 / 1000, 1) + 't' : fmtNum(s.vol30, 0)}</span><span class="tile-label">${u} siste 30 d</span></div>
+      <div class="tile"><span class="tile-val">${s.total}</span><span class="tile-label">Total workouts</span></div>
+      <div class="tile"><span class="tile-val">${s.week}</span><span class="tile-label">This week</span></div>
+      <div class="tile"><span class="tile-val">${s.streak}</span><span class="tile-label">Week streak</span></div>
+      <div class="tile"><span class="tile-val">${s.vol30 >= 10000 ? fmtNum(s.vol30 / 1000, 1) + 't' : fmtNum(s.vol30, 0)}</span><span class="tile-label">${u} last 30 days</span></div>
     </div>
 
     <section class="card">
-      <h3>Økter per uke</h3>
+      <h3>Workouts per week</h3>
       <div class="chart-box"><canvas id="c-weeks"></canvas></div>
     </section>
 
     <section class="card">
-      <h3>Sett per muskelgruppe <span class="muted">(30 dager)</span></h3>
+      <h3>Sets per muscle group <span class="muted">(30 days)</span></h3>
       ${groupsSorted.length ? groupsSorted.map((g) => `
         <div class="hbar"><span class="hbar-label">${esc(g)}</span>
           <span class="hbar-track"><span class="hbar-fill" style="width:${(s.groupSets[g] / maxGroup) * 100}%"></span></span>
-          <span class="hbar-val">${s.groupSets[g]}</span></div>`).join('') : '<p class="empty">Fullfør noen sett for å se fordelingen.</p>'}
+          <span class="hbar-val">${s.groupSets[g]}</span></div>`).join('') : '<p class="empty">Complete some sets to see the breakdown.</p>'}
     </section>
 
     <section class="card">
-      <div class="row between"><h3>Kroppsvekt</h3>
+      <div class="row between"><h3>Body weight</h3>
         ${lastBody ? `<span class="muted">${fmtNum(lastBody.weight)} ${u} · ${fmtDate(lastBody.date, false)}</span>` : ''}</div>
       <form class="row gap body-form">
-        <input class="input grow" name="w" inputmode="decimal" placeholder="Vekt i dag (${u})">
-        <button class="btn primary" type="submit">Lagre</button>
+        <input class="input grow" name="w" inputmode="decimal" placeholder="Today's weight (${u})">
+        <button class="btn primary" type="submit">Save</button>
       </form>
       <div class="chart-box"><canvas id="c-body"></canvas></div>
-      ${body.length ? `<button class="btn ghost sm" data-act="body-list">Vis alle målinger</button>` : ''}
+      ${body.length ? `<button class="btn ghost sm" data-act="body-list">Show all entries</button>` : ''}
     </section>
 
     <section class="card">
-      <h3>Personlige rekorder</h3>
+      <h3>Personal records</h3>
       ${recs.length ? `<div class="list">${recs.map((r) => `
         <button class="list-item" data-ex="${esc(r.id)}">
           <span class="avatar gold">${icon('trophy')}</span>
           <span class="grow"><span class="title">${esc(r.name)}</span><span class="sub">${fmtDate(r.date, false)}</span></span>
           <strong>${r.val}</strong>
-        </button>`).join('')}</div>` : '<p class="empty">Rekordene dine dukker opp her når du begynner å logge.</p>'}
+        </button>`).join('')}</div>` : '<p class="empty">Your records will appear here once you start logging.</p>'}
     </section>`;
 
   requestAnimationFrame(() => {
@@ -141,7 +141,7 @@ export function renderProgress(root) {
     state.body = state.body.filter((b) => b.date !== today);
     state.body.push({ date: today, weight: w });
     save();
-    toast('Kroppsvekt lagret');
+    toast('Body weight saved');
     renderProgress(root);
   };
 
@@ -158,8 +158,8 @@ function openBodyList(onChange) {
   const u = state.settings.unit;
   const list = () => [...state.body].sort((a, b) => b.date.localeCompare(a.date));
   openModal(`
-    <div class="modal-head"><h2>Kroppsvekt</h2>
-      <button class="icon-btn" data-close aria-label="Lukk">${icon('close')}</button></div>
+    <div class="modal-head"><h2>Body weight</h2>
+      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
     <div class="list scroll"></div>`, {
     className: 'tall',
     onMount(m) {
@@ -168,8 +168,8 @@ function openBodyList(onChange) {
         box.innerHTML = list().map((b) => `
           <div class="list-item static"><span class="grow">${fmtDate(b.date)}</span>
           <strong>${fmtNum(b.weight)} ${u}</strong>
-          <button class="icon-btn sm" data-del="${b.date}" aria-label="Slett">${icon('trash')}</button></div>`).join('')
-          || '<p class="empty">Ingen målinger.</p>';
+          <button class="icon-btn sm" data-del="${b.date}" aria-label="Delete">${icon('trash')}</button></div>`).join('')
+          || '<p class="empty">No entries.</p>';
       };
       box.addEventListener('click', (e) => {
         const d = e.target.closest('[data-del]');
@@ -187,23 +187,23 @@ function openBodyList(onChange) {
 export function openSettings(onChange) {
   const st = state.settings;
   openModal(`
-    <div class="modal-head"><h2>Innstillinger</h2>
-      <button class="icon-btn" data-close aria-label="Lukk">${icon('close')}</button></div>
+    <div class="modal-head"><h2>Settings</h2>
+      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
     <div class="scroll form">
-      <label>Vektenhet
+      <label>Weight unit
         <div class="seg" data-unit>
           <button class="${st.unit === 'kg' ? 'active' : ''}" data-v="kg">kg</button>
           <button class="${st.unit === 'lb' ? 'active' : ''}" data-v="lb">lb</button>
         </div>
       </label>
-      <label>Standard hviletid (sekunder)<input class="input" type="number" min="5" step="5" data-rest value="${st.rest}"></label>
-      <label class="switch"><input type="checkbox" data-auto ${st.autoRest ? 'checked' : ''}> Start hviletimer automatisk når et sett fullføres</label>
-      <label class="switch"><input type="checkbox" data-sound ${st.sound ? 'checked' : ''}> Lyd når timeren er ferdig</label>
+      <label>Default rest time (seconds)<input class="input" type="number" min="5" step="5" data-rest value="${st.rest}"></label>
+      <label class="switch"><input type="checkbox" data-auto ${st.autoRest ? 'checked' : ''}> Start rest timer automatically when a set is completed</label>
+      <label class="switch"><input type="checkbox" data-sound ${st.sound ? 'checked' : ''}> Play a sound when the timer finishes</label>
       <h3 class="section-title">Data</h3>
-      <p class="muted small">All data lagres kun på denne enheten. Ta sikkerhetskopi jevnlig.</p>
-      <button class="btn ghost block" data-export>${icon('download')} Eksporter sikkerhetskopi</button>
-      <label class="btn ghost block file-btn">${icon('upload')} Importer sikkerhetskopi<input type="file" accept="application/json,.json" data-import hidden></label>
-      <button class="btn danger block" data-reset>${icon('trash')} Slett all data</button>
+      <p class="muted small">All data is stored only on this device. Back it up regularly.</p>
+      <button class="btn ghost block" data-export>${icon('download')} Export backup</button>
+      <label class="btn ghost block file-btn">${icon('upload')} Import backup<input type="file" accept="application/json,.json" data-import hidden></label>
+      <button class="btn danger block" data-reset>${icon('trash')} Delete all data</button>
     </div>`, {
     className: 'tall',
     onMount(m, close) {
@@ -232,18 +232,18 @@ export function openSettings(onChange) {
         if (!file) return;
         try {
           const data = JSON.parse(await file.text());
-          if (typeof data !== 'object' || !data.log) throw new Error('Ugyldig fil');
-          if (!await confirmDialog('Dette erstatter all nåværende data med sikkerhetskopien. Fortsette?', 'Importer')) return;
+          if (typeof data !== 'object' || !data.log) throw new Error('Invalid file');
+          if (!await confirmDialog('This replaces all current data with the backup. Continue?', 'Import')) return;
           replaceState(data);
           close();
-          toast('Data importert');
+          toast('Data imported');
           location.reload();
         } catch {
-          toast('Kunne ikke lese filen');
+          toast('Could not read the file');
         }
       });
       m.querySelector('[data-reset]').addEventListener('click', async () => {
-        if (await confirmDialog('Slette all treningsdata, egne øvelser og programmer? Dette kan ikke angres.', 'Slett alt')) {
+        if (await confirmDialog('Delete all workout data, custom exercises and programs? This cannot be undone.', 'Delete all')) {
           resetState();
           close();
           location.reload();

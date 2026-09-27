@@ -1,4 +1,4 @@
-// Treningsdagbok: én side per dag med øvelser og sett.
+// Training log: one page per day with exercises and sets.
 import {
   state, save, getDay, cleanupDay, addEntry, getExercise, lastSets, allPrograms, dayHasWork, isPR, setVolume, setHasData,
 } from '../store.js';
@@ -22,8 +22,8 @@ export function goToDate(key) {
 const COLS = {
   wr: [['w', () => state.settings.unit], ['r', () => 'reps']],
   r: [['r', () => 'reps']],
-  t: [['t', () => 'tid']],
-  dt: [['d', () => 'km'], ['t', () => 'tid']],
+  t: [['t', () => 'time']],
+  dt: [['d', () => 'km'], ['t', () => 'time']],
 };
 
 function inputHtml(field, value) {
@@ -39,10 +39,10 @@ function setRowHtml(ex, s, i, prev) {
   const pr = s.done && isPR(ex.id, logState.date, s);
   return `
     <div class="set-row ${s.done ? 'done' : ''}" data-set="${i}">
-      <button class="set-num" data-act="set-menu" title="Slett sett">${pr ? '<span class="pr">PR</span>' : i + 1}</button>
+      <button class="set-num" data-act="set-menu" title="Delete set">${pr ? '<span class="pr">PR</span>' : i + 1}</button>
       <span class="set-prev" data-act="copy-prev">${prev ? esc(setText(ex, prev)) : '–'}</span>
       ${cols.map(([f]) => inputHtml(f, s[f])).join('')}
-      <button class="set-check" data-act="toggle" aria-label="Fullført">${icon('check')}</button>
+      <button class="set-check" data-act="toggle" aria-label="Done">${icon('check')}</button>
     </div>`;
 }
 
@@ -56,18 +56,18 @@ function entryHtml(entry) {
       <div class="entry-head">
         <button class="entry-title" data-act="info">
           <span class="title">${esc(ex.name)}</span>
-          <span class="sub">${esc(ex.group)} · ${done}/${entry.sets.length} sett</span>
+          <span class="sub">${esc(ex.group)} · ${done}/${entry.sets.length} sets</span>
         </button>
-        <button class="icon-btn" data-act="entry-menu" aria-label="Meny">${icon('more')}</button>
+        <button class="icon-btn" data-act="entry-menu" aria-label="Menu">${icon('more')}</button>
       </div>
       <div class="set-row head">
-        <span>Sett</span><span>Forrige</span>
+        <span>Set</span><span>Previous</span>
         ${cols.map(([, l]) => `<span>${l()}</span>`).join('')}
         <span>${icon('check')}</span>
       </div>
       ${entry.sets.map((s, i) => setRowHtml(ex, s, i, prev[i])).join('')}
       <div class="entry-foot">
-        <button class="btn ghost sm" data-act="add-set">${icon('plus')} Legg til sett</button>
+        <button class="btn ghost sm" data-act="add-set">${icon('plus')} Add set</button>
       </div>
     </section>`;
 }
@@ -81,7 +81,7 @@ function summary(day) {
       if (s.done) { sets++; vol += setVolume(s); }
     }
   }
-  return `${day.entries.length} øvelse${day.entries.length > 1 ? 'r' : ''} · ${sets} fullførte sett${vol ? ` · ${fmtNum(vol, 0)} ${state.settings.unit} løftet` : ''}`;
+  return `${day.entries.length} exercise${day.entries.length > 1 ? 's' : ''} · ${sets} set${sets === 1 ? '' : 's'} done${vol ? ` · ${fmtNum(vol, 0)} ${state.settings.unit} lifted` : ''}`;
 }
 
 export function renderLog(root) {
@@ -92,31 +92,31 @@ export function renderLog(root) {
 
   root.innerHTML = `
     <header class="day-nav">
-      <button class="icon-btn" data-act="prev" aria-label="Forrige dag">${icon('left')}</button>
+      <button class="icon-btn" data-act="prev" aria-label="Previous day">${icon('left')}</button>
       <button class="day-title" data-act="calendar">
         <span class="title">${relDay(key)} ${icon('calendar')}</span>
         <span class="sub">${fmtDate(key, false)}</span>
       </button>
-      <button class="icon-btn" data-act="next" aria-label="Neste dag">${icon('right')}</button>
+      <button class="icon-btn" data-act="next" aria-label="Next day">${icon('right')}</button>
     </header>
-    ${key !== dateKey() ? `<button class="today-link" data-act="today">Gå til i dag</button>` : ''}
+    ${key !== dateKey() ? `<button class="today-link" data-act="today">Go to today</button>` : ''}
     ${day?.title ? `<div class="day-label">${icon('dumbbell')} ${esc(day.title)}</div>` : ''}
     <p class="day-summary">${summary(day)}</p>
     <div class="entries">
       ${entries.length ? entries.map((e) => entryHtml(e)).join('') : `
         <div class="empty-state">
           <div class="empty-icon">${icon('dumbbell')}</div>
-          <h2>Ingen trening loggført</h2>
-          <p>Legg til øvelser, eller start en økt fra et program. Sveip til sidene for å bytte dag.</p>
+          <h2>No workout logged</h2>
+          <p>Add exercises or start a workout from a program. Swipe sideways to change day.</p>
         </div>`}
     </div>
     <div class="day-actions">
-      <button class="btn primary" data-act="add">${icon('plus')} Legg til øvelse</button>
-      <button class="btn ghost" data-act="program">${icon('list')} Start fra program</button>
-      ${entries.length ? '' : `<button class="btn ghost" data-act="repeat">${icon('repeat')} Gjenta tidligere økt</button>`}
+      <button class="btn primary" data-act="add">${icon('plus')} Add exercise</button>
+      <button class="btn ghost" data-act="program">${icon('list')} Start from program</button>
+      ${entries.length ? '' : `<button class="btn ghost" data-act="repeat">${icon('repeat')} Repeat past workout</button>`}
     </div>
-    <label class="note-label">Notat
-      <textarea class="input note" rows="2" placeholder="Hvordan føltes økta?">${esc(day?.note || '')}</textarea>
+    <label class="note-label">Notes
+      <textarea class="input note" rows="2" placeholder="How did the workout feel?">${esc(day?.note || '')}</textarea>
     </label>`;
 
   bind(root);
@@ -169,7 +169,7 @@ function bind(root) {
       }
       case 'toggle': {
         const s = entry.sets[si];
-        // Fyll inn fra forrige gang hvis feltene er tomme
+        // Fill in from last time if the fields are empty
         if (!s.done && !setHasData(s)) {
           const prev = (lastSets(entry.ex, logState.date) || [])[si];
           if (prev) Object.assign(s, { w: prev.w, r: prev.r, t: prev.t, d: prev.d });
@@ -178,7 +178,7 @@ function bind(root) {
         save();
         rerenderEntry(root, entry);
         if (s.done) {
-          if (isPR(entry.ex, logState.date, s)) toast('🏆 Ny personlig rekord!');
+          if (isPR(entry.ex, logState.date, s)) toast('🏆 New personal record!');
           if (state.settings.autoRest && logState.date === dateKey()) startRest();
         }
         return;
@@ -192,10 +192,10 @@ function bind(root) {
       }
       case 'set-menu': {
         if (entry.sets.length === 1) {
-          if (await confirmDialog('Fjerne øvelsen fra dagen?', 'Fjern')) removeEntry(entry);
+          if (await confirmDialog('Remove this exercise from the day?', 'Remove')) removeEntry(entry);
           return;
         }
-        if (!await confirmDialog(`Slette sett ${si + 1}?`)) return;
+        if (!await confirmDialog(`Delete set ${si + 1}?`)) return;
         entry.sets.splice(si, 1);
         save();
         return rerenderEntry(root, entry);
@@ -241,13 +241,13 @@ function openEntryMenu(entry) {
   const idx = day.entries.indexOf(entry);
   openModal(`
     <div class="modal-head"><h2>${esc(ex.name)}</h2>
-      <button class="icon-btn" data-close aria-label="Lukk">${icon('close')}</button></div>
+      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
     <div class="menu">
-      <button data-m="info">${icon('chart')} Historikk og rekorder</button>
-      ${idx > 0 ? `<button data-m="up">${icon('up')} Flytt opp</button>` : ''}
-      ${idx < day.entries.length - 1 ? `<button data-m="down">${icon('down')} Flytt ned</button>` : ''}
-      <button data-m="swap">${icon('repeat')} Bytt øvelse</button>
-      <button data-m="del" class="danger-text">${icon('trash')} Fjern fra dagen</button>
+      <button data-m="info">${icon('chart')} History and records</button>
+      ${idx > 0 ? `<button data-m="up">${icon('up')} Move up</button>` : ''}
+      ${idx < day.entries.length - 1 ? `<button data-m="down">${icon('down')} Move down</button>` : ''}
+      <button data-m="swap">${icon('repeat')} Replace exercise</button>
+      <button data-m="del" class="danger-text">${icon('trash')} Remove from day</button>
     </div>`, {
     className: 'small',
     onMount(m, close) {
@@ -265,7 +265,7 @@ function openEntryMenu(entry) {
         }
         if (a === 'swap') {
           openExercisePicker({
-            title: 'Bytt til øvelse',
+            title: 'Replace with',
             multi: false,
             onPick([id]) {
               entry.ex = id;
@@ -274,7 +274,7 @@ function openEntryMenu(entry) {
             },
           });
         }
-        if (a === 'del' && await confirmDialog(`Fjerne ${ex.name} fra dagen?`, 'Fjern')) removeEntry(entry);
+        if (a === 'del' && await confirmDialog(`Remove ${ex.name} from the day?`, 'Remove')) removeEntry(entry);
       });
     },
   });
@@ -290,8 +290,8 @@ export function startWorkout(program, workout, key = logState.date) {
 function openProgramStarter() {
   const programs = allPrograms();
   openModal(`
-    <div class="modal-head"><h2>Start fra program</h2>
-      <button class="icon-btn" data-close aria-label="Lukk">${icon('close')}</button></div>
+    <div class="modal-head"><h2>Start from program</h2>
+      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
     <div class="scroll">
       ${programs.map((p) => `
         <div class="prog-group">
@@ -314,7 +314,7 @@ function openProgramStarter() {
         startWorkout(p, w);
         close();
         renderLog(rootEl);
-        toast('Økt lagt til – lykke til!');
+        toast('Workout added – good luck!');
       });
     },
   });
@@ -323,8 +323,8 @@ function openProgramStarter() {
 function openRepeat() {
   const dates = Object.keys(state.log).filter((k) => k !== logState.date && dayHasWork(k)).sort().reverse().slice(0, 30);
   openModal(`
-    <div class="modal-head"><h2>Gjenta tidligere økt</h2>
-      <button class="icon-btn" data-close aria-label="Lukk">${icon('close')}</button></div>
+    <div class="modal-head"><h2>Repeat past workout</h2>
+      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
     <div class="list scroll">
       ${dates.length ? dates.map((k) => {
         const d = state.log[k];
@@ -332,7 +332,7 @@ function openRepeat() {
           <span class="grow"><span class="title">${esc(d.title || fmtDate(k))}</span>
           <span class="sub">${d.title ? fmtDate(k) + ' · ' : ''}${d.entries.map((x) => esc(getExercise(x.ex).name)).join(', ')}</span></span>
           ${icon('right')}</button>`;
-      }).join('') : '<p class="empty">Du har ingen tidligere økter ennå.</p>'}
+      }).join('') : '<p class="empty">You have no past workouts yet.</p>'}
     </div>`, {
     className: 'tall',
     onMount(m, close) {
@@ -372,16 +372,16 @@ function openCalendar() {
     }
     return `
       <div class="cal-head">
-        <button class="icon-btn" data-mo="-1" aria-label="Forrige måned">${icon('left')}</button>
-        <div><strong>${MONTHS[mo][0].toUpperCase() + MONTHS[mo].slice(1)} ${y}</strong>
-        <div class="sub">${count} treningsdag${count === 1 ? '' : 'er'}</div></div>
-        <button class="icon-btn" data-mo="1" aria-label="Neste måned">${icon('right')}</button>
+        <button class="icon-btn" data-mo="-1" aria-label="Previous month">${icon('left')}</button>
+        <div><strong>${MONTHS[mo]} ${y}</strong>
+        <div class="sub">${count} workout day${count === 1 ? '' : 's'}</div></div>
+        <button class="icon-btn" data-mo="1" aria-label="Next month">${icon('right')}</button>
       </div>
-      <div class="cal-grid wk">${['Ma', 'Ti', 'On', 'To', 'Fr', 'Lø', 'Sø'].map((d) => `<span>${d}</span>`).join('')}</div>
+      <div class="cal-grid wk">${['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((d) => `<span>${d}</span>`).join('')}</div>
       <div class="cal-grid">${cells}</div>`;
   };
 
-  openModal('<div class="cal"></div><button class="btn ghost block" data-close>Lukk</button>', {
+  openModal('<div class="cal"></div><button class="btn ghost block" data-close>Close</button>', {
     className: 'small',
     onMount(m, close) {
       const cal = m.querySelector('.cal');
@@ -397,7 +397,7 @@ function openCalendar() {
   });
 }
 
-// Sveip til venstre/høyre for å bytte dag
+// Swipe left/right to change day
 export function enableSwipe(el, isActive) {
   let x0 = null;
   let y0 = null;

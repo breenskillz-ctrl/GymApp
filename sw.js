@@ -1,5 +1,5 @@
-// Service worker: gjør appen tilgjengelig uten nett.
-const CACHE = 'gymapp-v1';
+// Service worker: makes the app available offline.
+const CACHE = 'gymapp-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -34,7 +34,7 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Nettverk først, med cache som reserve når du er offline
+// Network first, falling back to the cache when offline
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(

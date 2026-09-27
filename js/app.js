@@ -1,4 +1,4 @@
-// Oppstart og navigasjon mellom fanene.
+// Startup and navigation between tabs.
 import { load } from './store.js';
 import { initRestBar } from './timer.js';
 import { renderLog, enableSwipe } from './views/log.js';
@@ -39,7 +39,7 @@ nav.addEventListener('click', (e) => {
 enableSwipe(main, () => current === 'log');
 initRestBar();
 
-// Tegn grafer på nytt når skjermstørrelsen endres
+// Redraw charts when the screen size changes
 let resizeT;
 window.addEventListener('resize', () => {
   clearTimeout(resizeT);

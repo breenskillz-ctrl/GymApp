@@ -1,4 +1,4 @@
-// Enkle grafer tegnet på <canvas>, uten eksterne biblioteker.
+// Simple charts drawn on <canvas>, with no external libraries.
 
 function css(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -36,7 +36,7 @@ export function lineChart(canvas, points, { height = 200, format: fmt = (v) => v
   let format = fmt;
   const { ctx, w, h } = setup(canvas, height);
   if (points.length < 2) {
-    empty(ctx, w, h, points.length ? 'Trenger minst to økter for graf' : 'Ingen data ennå');
+    empty(ctx, w, h, points.length ? 'Log at least two sessions to see a chart' : 'No data yet');
     return;
   }
   const pad = { l: 44, r: 12, t: 12, b: 26 };
@@ -50,11 +50,11 @@ export function lineChart(canvas, points, { height = 200, format: fmt = (v) => v
   const cw = w - pad.l - pad.r;
   const ch = h - pad.t - pad.b;
   const labels = [0, 1, 2, 3, 4].map((i) => format(min + ((max - min) * i) / 4));
-  if (new Set(labels).size < 5) format = (v) => Number(v.toFixed(1)).toLocaleString('nb-NO');
+  if (new Set(labels).size < 5) format = (v) => Number(v.toFixed(1)).toLocaleString('en-GB');
   const x = (i) => pad.l + (cw * i) / (points.length - 1);
   const y = (v) => pad.t + ch - ((v - min) / (max - min)) * ch;
 
-  // Rutenett
+  // Grid
   ctx.strokeStyle = css('--line');
   ctx.fillStyle = css('--muted');
   ctx.font = '11px system-ui, sans-serif';
@@ -71,7 +71,7 @@ export function lineChart(canvas, points, { height = 200, format: fmt = (v) => v
     ctx.fillText(format(v), pad.l - 6, yy);
   }
 
-  // Etiketter på x-aksen
+  // X-axis labels
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
   const step = Math.ceil(points.length / Math.max(2, Math.floor(cw / 60)));
@@ -79,7 +79,7 @@ export function lineChart(canvas, points, { height = 200, format: fmt = (v) => v
     if (i % step === 0 || i === points.length - 1) ctx.fillText(p.label, x(i), h - pad.b + 8);
   });
 
-  // Fyll under linja
+  // Fill under the line
   const accent = css('--accent');
   const grad = ctx.createLinearGradient(0, pad.t, 0, h - pad.b);
   grad.addColorStop(0, accent + '55');
@@ -93,7 +93,7 @@ export function lineChart(canvas, points, { height = 200, format: fmt = (v) => v
   ctx.fillStyle = grad;
   ctx.fill();
 
-  // Linje
+  // Line
   ctx.beginPath();
   points.forEach((p, i) => (i ? ctx.lineTo(x(i), y(p.value)) : ctx.moveTo(x(i), y(p.value))));
   ctx.strokeStyle = accent;
@@ -101,7 +101,7 @@ export function lineChart(canvas, points, { height = 200, format: fmt = (v) => v
   ctx.lineJoin = 'round';
   ctx.stroke();
 
-  // Punkter
+  // Points
   ctx.fillStyle = accent;
   points.forEach((p, i) => {
     ctx.beginPath();

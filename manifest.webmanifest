@@ -1,8 +1,8 @@
 {
-  "name": "GymApp – Treningsdagbok",
+  "name": "GymApp – Workout Log",
   "short_name": "GymApp",
-  "description": "Logg treningsøkter, følg programmer, se fremgang og bruk timere.",
-  "lang": "nb",
+  "description": "Log workouts, follow programs, track progress and use timers.",
+  "lang": "en",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

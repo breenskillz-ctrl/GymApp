@@ -1,4 +1,4 @@
-// Lagring av all brukerdata i localStorage.
+// Stores all user data in localStorage.
 import { EXERCISES, PROGRAMS } from './data.js';
 import { uid, e1rm } from './utils.js';
 
@@ -30,7 +30,7 @@ export function save() {
   try {
     localStorage.setItem(KEY, JSON.stringify(state));
   } catch (e) {
-    console.error('Kunne ikke lagre', e);
+    console.error('Could not save', e);
   }
 }
 
@@ -44,15 +44,15 @@ export function resetState() {
   save();
 }
 
-// ---------- Øvelser ----------
+// ---------- Exercises ----------
 export function allExercises() {
-  return [...EXERCISES, ...state.customExercises].sort((a, b) => a.name.localeCompare(b.name, 'nb'));
+  return [...EXERCISES, ...state.customExercises].sort((a, b) => a.name.localeCompare(b.name, 'en'));
 }
 
 export function getExercise(id) {
   return state.customExercises.find((e) => e.id === id)
     || EXERCISES.find((e) => e.id === id)
-    || { id, name: 'Ukjent øvelse', group: '', equip: '', type: 'wr', desc: '' };
+    || { id, name: 'Unknown exercise', group: '', equip: '', type: 'wr', desc: '' };
 }
 
 export function saveExercise(ex) {
@@ -68,7 +68,7 @@ export function deleteExercise(id) {
   save();
 }
 
-// ---------- Programmer ----------
+// ---------- Programs ----------
 export function allPrograms() {
   return [...state.customPrograms, ...PROGRAMS];
 }
@@ -92,7 +92,7 @@ export function deleteProgram(id) {
   save();
 }
 
-// ---------- Logg ----------
+// ---------- Log ----------
 export function getDay(key, create = false) {
   if (!state.log[key] && create) state.log[key] = { entries: [], note: '', title: '' };
   return state.log[key];
@@ -110,7 +110,7 @@ export function dayHasWork(key) {
 
 export const setHasData = (s) => [s.w, s.r, s.t, s.d].some((v) => v != null && v !== '');
 
-// Alle tidligere økter med en øvelse, nyeste først: [{ date, sets }]
+// All previous sessions with an exercise, newest first: [{ date, sets }]
 export function history(exId, beforeKey = null) {
   const out = [];
   for (const date of Object.keys(state.log).sort().reverse()) {
@@ -127,7 +127,7 @@ export function lastSets(exId, beforeKey) {
   return history(exId, beforeKey)[0]?.sets || null;
 }
 
-// Lag sett for en ny øvelse, fylt ut fra forrige gang (smart autofyll)
+// Create sets for a new exercise, pre-filled from last time (smart autofill)
 export function makeSets(exId, beforeKey, target) {
   const prev = lastSets(exId, beforeKey);
   if (prev) return prev.map((s) => ({ w: s.w ?? null, r: s.r ?? null, t: s.t ?? null, d: s.d ?? null, done: false }));
@@ -150,7 +150,7 @@ export function addEntry(key, exId, target) {
   return entry;
 }
 
-// ---------- Statistikk ----------
+// ---------- Statistics ----------
 export function setVolume(s) {
   return (s.w || 0) * (s.r || 0);
 }
@@ -175,7 +175,7 @@ export function records(exId) {
   return rec;
 }
 
-// Er dette settet en ny personlig rekord (tyngste vekt eller beste 1RM) sammenlignet med tidligere dager?
+// Is this set a new personal record compared with previous days?
 export function isPR(exId, key, set) {
   if (!set.w && !set.r && !set.t && !set.d) return false;
   const prev = history(exId, key);

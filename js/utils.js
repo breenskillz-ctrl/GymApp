@@ -1,4 +1,4 @@
-// Små hjelpefunksjoner som brukes i hele appen.
+// Small helpers used throughout the app.
 
 export const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
@@ -23,26 +23,25 @@ export function addDays(key, n) {
   return dateKey(d);
 }
 
-export const MONTHS = ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'];
-export const WEEKDAYS = ['søndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag'];
+export const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+export const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export function fmtDate(key, withWeekday = true) {
   const d = parseKey(key);
-  const s = `${d.getDate()}. ${MONTHS[d.getMonth()]}`;
+  const s = `${d.getDate()} ${MONTHS[d.getMonth()]}`;
   const y = d.getFullYear() !== new Date().getFullYear() ? ` ${d.getFullYear()}` : '';
-  return (withWeekday ? `${WEEKDAYS[d.getDay()]} ` : '') + s + y;
+  return (withWeekday ? `${WEEKDAYS[d.getDay()]}, ` : '') + s + y;
 }
 
 export function relDay(key) {
   const today = dateKey();
-  if (key === today) return 'I dag';
-  if (key === addDays(today, -1)) return 'I går';
-  if (key === addDays(today, 1)) return 'I morgen';
-  const s = WEEKDAYS[parseKey(key).getDay()];
-  return s[0].toUpperCase() + s.slice(1);
+  if (key === today) return 'Today';
+  if (key === addDays(today, -1)) return 'Yesterday';
+  if (key === addDays(today, 1)) return 'Tomorrow';
+  return WEEKDAYS[parseKey(key).getDay()];
 }
 
-// Mandag i uka datoen tilhører
+// Monday of the week the date belongs to
 export function weekStart(key) {
   const d = parseKey(key);
   const diff = (d.getDay() + 6) % 7;
@@ -74,13 +73,13 @@ export const num = (v) => {
 
 export const fmtNum = (n, digits = 1) => {
   if (n == null) return '–';
-  return Number(n.toFixed(digits)).toLocaleString('nb-NO');
+  return Number(n.toFixed(digits)).toLocaleString('en-GB');
 };
 
-// Estimert 1RM (Epley)
+// Estimated 1RM (Epley)
 export const e1rm = (w, r) => (w && r ? (r === 1 ? w : w * (1 + r / 30)) : 0);
 
-// ---------- Lyd og vibrasjon ----------
+// ---------- Sound and vibration ----------
 let audioCtx;
 export function beep(freq = 880, ms = 150, times = 1) {
   try {
@@ -98,11 +97,11 @@ export function beep(freq = 880, ms = 150, times = 1) {
       o.start(t);
       o.stop(t + ms / 1000 + 0.02);
     }
-  } catch { /* lyd ikke tilgjengelig */ }
+  } catch { /* audio unavailable */ }
 }
 
 export function vibrate(pattern = 200) {
-  try { navigator.vibrate?.(pattern); } catch { /* ignorer */ }
+  try { navigator.vibrate?.(pattern); } catch { /* ignore */ }
 }
 
 // ---------- Toast ----------
@@ -143,12 +142,12 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && modalStack.length) modalStack[modalStack.length - 1]();
 });
 
-export function confirmDialog(message, okLabel = 'Slett') {
+export function confirmDialog(message, okLabel = 'Delete') {
   return new Promise((resolve) => {
     openModal(`
       <p class="confirm-text">${esc(message)}</p>
       <div class="row gap end">
-        <button class="btn ghost" data-close>Avbryt</button>
+        <button class="btn ghost" data-close>Cancel</button>
         <button class="btn danger" data-ok>${esc(okLabel)}</button>
       </div>`, {
       className: 'small',

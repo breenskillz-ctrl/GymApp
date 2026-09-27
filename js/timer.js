@@ -1,4 +1,4 @@
-// Global hviletimer som vises nederst på skjermen uansett hvilken fane du er på.
+// Global rest timer shown at the bottom of the screen whichever tab you are on.
 import { state } from './store.js';
 import { beep, vibrate, fmtTime } from './utils.js';
 

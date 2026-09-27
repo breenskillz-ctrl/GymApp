@@ -1,4 +1,4 @@
-// Øvelsesbibliotek: søk, filtrering, detaljer med historikk, rekorder og graf, samt egne øvelser.
+// Exercise library: search, filtering, details with history, records and chart, plus custom exercises.
 import { GROUPS, EQUIPMENT, TYPES } from '../data.js';
 import { state, getExercise, saveExercise, deleteExercise, history, records, setVolume } from '../store.js';
 import { esc, openModal, confirmDialog, icon, fmtDate, fmtNum, fmtTime, e1rm, toast, parseKey } from '../utils.js';
@@ -11,10 +11,10 @@ let group = '';
 export function renderExercises(root) {
   root.innerHTML = `
     <header class="page-head">
-      <h1>Øvelser</h1>
-      <button class="btn primary sm" data-act="new">${icon('plus')} Egen øvelse</button>
+      <h1>Exercises</h1>
+      <button class="btn primary sm" data-act="new">${icon('plus')} Custom exercise</button>
     </header>
-    <input class="input search" type="search" placeholder="Søk blant ${filterExercises('', '').length} øvelser…" value="${esc(query)}">
+    <input class="input search" type="search" placeholder="Search ${filterExercises('', '').length} exercises…" value="${esc(query)}">
     <div class="chip-wrap">${groupChips(group)}</div>
     <div class="list"></div>`;
 
@@ -36,7 +36,7 @@ export function renderExercises(root) {
   draw();
 }
 
-// Beskriv et sett som tekst, f.eks. "60 kg × 10"
+// Describe a set as text, e.g. "60 kg × 10"
 export function setText(ex, s) {
   const u = state.settings.unit;
   switch (ex.type) {
@@ -67,10 +67,10 @@ function chartSeries(ex, hist, metric) {
 }
 
 const METRICS = {
-  wr: [['1rm', 'Est. 1RM'], ['w', 'Tyngste vekt'], ['vol', 'Volum']],
-  r: [['r', 'Flest reps'], ['rsum', 'Totalt reps']],
-  t: [['t', 'Lengste tid']],
-  dt: [['d', 'Lengste distanse'], ['t', 'Lengste tid']],
+  wr: [['1rm', 'Est. 1RM'], ['w', 'Heaviest'], ['vol', 'Volume']],
+  r: [['r', 'Most reps'], ['rsum', 'Total reps']],
+  t: [['t', 'Longest time']],
+  dt: [['d', 'Longest distance'], ['t', 'Longest time']],
 };
 
 export function openExerciseDetail(id, onChange) {
@@ -84,17 +84,17 @@ export function openExerciseDetail(id, onChange) {
   const recTiles = [];
   if (ex.type === 'wr') {
     recTiles.push(['Est. 1RM', rec.best1rm ? `${fmtNum(rec.best1rm.v)} ${u}` : '–']);
-    recTiles.push(['Tyngste', rec.maxW ? `${fmtNum(rec.maxW.v, 2)} ${u}` : '–']);
-    recTiles.push(['Mest volum', rec.maxVol ? `${fmtNum(rec.maxVol.v, 0)} ${u}` : '–']);
+    recTiles.push(['Heaviest', rec.maxW ? `${fmtNum(rec.maxW.v, 2)} ${u}` : '–']);
+    recTiles.push(['Best volume', rec.maxVol ? `${fmtNum(rec.maxVol.v, 0)} ${u}` : '–']);
   } else if (ex.type === 'r') {
-    recTiles.push(['Flest reps', rec.maxR ? rec.maxR.v : '–']);
+    recTiles.push(['Most reps', rec.maxR ? rec.maxR.v : '–']);
   } else if (ex.type === 't') {
-    recTiles.push(['Lengste tid', rec.maxT ? fmtTime(rec.maxT.v) : '–']);
+    recTiles.push(['Longest time', rec.maxT ? fmtTime(rec.maxT.v) : '–']);
   } else {
-    recTiles.push(['Lengst', rec.maxD ? `${fmtNum(rec.maxD.v, 2)} km` : '–']);
-    recTiles.push(['Lengste tid', rec.maxT ? fmtTime(rec.maxT.v) : '–']);
+    recTiles.push(['Longest', rec.maxD ? `${fmtNum(rec.maxD.v, 2)} km` : '–']);
+    recTiles.push(['Longest time', rec.maxT ? fmtTime(rec.maxT.v) : '–']);
   }
-  recTiles.push(['Økter', rec.sessions]);
+  recTiles.push(['Sessions', rec.sessions]);
 
   openModal(`
     <div class="modal-head">
@@ -102,25 +102,25 @@ export function openExerciseDetail(id, onChange) {
         <h2>${esc(ex.name)}</h2>
         <p class="sub">${esc(ex.group)} · ${esc(ex.equip)} · ${esc(TYPES[ex.type])}</p>
       </div>
-      <button class="icon-btn" data-close aria-label="Lukk">${icon('close')}</button>
+      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button>
     </div>
     <div class="scroll">
       ${ex.desc ? `<p class="desc">${esc(ex.desc)}</p>` : ''}
-      <h3 class="section-title">Personlige rekorder</h3>
+      <h3 class="section-title">Personal records</h3>
       <div class="tiles">${recTiles.map(([l, v]) => `<div class="tile"><span class="tile-val">${v}</span><span class="tile-label">${l}</span></div>`).join('')}</div>
-      <h3 class="section-title">Fremgang</h3>
+      <h3 class="section-title">Progress</h3>
       <div class="seg" data-metrics>${metrics.map(([k, l], i) => `<button class="${i ? '' : 'active'}" data-metric="${k}">${l}</button>`).join('')}</div>
       <div class="chart-box"><canvas></canvas></div>
-      <h3 class="section-title">Historikk</h3>
+      <h3 class="section-title">History</h3>
       ${hist.length ? hist.slice(0, 30).map((h) => `
         <div class="hist-item">
           <div class="hist-date">${fmtDate(h.date)}</div>
           <div class="hist-sets">${h.sets.map((s) => `<span class="pill">${setText(ex, s)}</span>`).join('')}</div>
-        </div>`).join('') : '<p class="empty">Ingen økter registrert ennå.</p>'}
+        </div>`).join('') : '<p class="empty">No sessions logged yet.</p>'}
       ${ex.builtin ? '' : `
         <div class="row gap mt">
-          <button class="btn ghost grow" data-edit>${icon('edit')} Rediger</button>
-          <button class="btn danger grow" data-del>${icon('trash')} Slett</button>
+          <button class="btn ghost grow" data-edit>${icon('edit')} Edit</button>
+          <button class="btn danger grow" data-del>${icon('trash')} Delete</button>
         </div>`}
     </div>
   `, {
@@ -143,10 +143,10 @@ export function openExerciseDetail(id, onChange) {
         openExerciseEditor(ex, onChange);
       });
       m.querySelector('[data-del]')?.addEventListener('click', async () => {
-        if (await confirmDialog(`Slette «${ex.name}»? Loggførte sett beholdes, men vises som ukjent øvelse.`)) {
+        if (await confirmDialog(`Delete "${ex.name}"? Logged sets are kept but will show as an unknown exercise.`)) {
           deleteExercise(ex.id);
           close();
-          toast('Øvelse slettet');
+          toast('Exercise deleted');
           onChange?.();
         }
       });
@@ -159,18 +159,18 @@ export function openExerciseEditor(ex, onSave) {
   const opts = (arr, v) => arr.map((x) => `<option ${x === v ? 'selected' : ''}>${esc(x)}</option>`).join('');
   openModal(`
     <div class="modal-head">
-      <h2>${ex ? 'Rediger øvelse' : 'Ny øvelse'}</h2>
-      <button class="icon-btn" data-close aria-label="Lukk">${icon('close')}</button>
+      <h2>${ex ? 'Edit exercise' : 'New exercise'}</h2>
+      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button>
     </div>
     <form class="form">
-      <label>Navn<input class="input" name="name" required value="${esc(e.name)}" placeholder="F.eks. Skråbenk i smithmaskin"></label>
-      <label>Muskelgruppe<select class="input" name="group">${opts(GROUPS, e.group)}</select></label>
-      <label>Utstyr<select class="input" name="equip">${opts(EQUIPMENT, e.equip)}</select></label>
-      <label>Type registrering<select class="input" name="type">
+      <label>Name<input class="input" name="name" required value="${esc(e.name)}" placeholder="E.g. Smith Machine Incline Press"></label>
+      <label>Muscle group<select class="input" name="group">${opts(GROUPS, e.group)}</select></label>
+      <label>Equipment<select class="input" name="equip">${opts(EQUIPMENT, e.equip)}</select></label>
+      <label>Tracking type<select class="input" name="type">
         ${Object.entries(TYPES).map(([k, v]) => `<option value="${k}" ${k === e.type ? 'selected' : ''}>${v}</option>`).join('')}
       </select></label>
-      <label>Beskrivelse<textarea class="input" name="desc" rows="3" placeholder="Valgfritt">${esc(e.desc)}</textarea></label>
-      <button class="btn primary block" type="submit">Lagre</button>
+      <label>Description<textarea class="input" name="desc" rows="3" placeholder="Optional">${esc(e.desc)}</textarea></label>
+      <button class="btn primary block" type="submit">Save</button>
     </form>
   `, {
     onMount(m, close) {
@@ -181,7 +181,7 @@ export function openExerciseEditor(ex, onSave) {
         if (!name) return;
         saveExercise({ ...e, name, group: f.get('group'), equip: f.get('equip'), type: f.get('type'), desc: f.get('desc').trim(), builtin: false });
         close();
-        toast('Øvelse lagret');
+        toast('Exercise saved');
         onSave?.();
       });
     },
