@@ -5,6 +5,20 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #9 · 2026-09-27 · Hosting on GitHub Pages via Actions
+**Decision:** A workflow (`.github/workflows/pages.yml`) deploys the app files to GitHub Pages on every push to `main`.
+Only `index.html`, `manifest.webmanifest`, `sw.js`, `css/`, `js/` and `icons/` are published.
+**Reason:** The user wanted to install the app on their phone. Pages is free for public repos and needs no secrets
+(the workflow uses the built-in `GITHUB_TOKEN`).
+**Status:** Active
+
+## #8 · 2026-09-27 · `main` is the base branch; work is merged through PRs
+**Decision:** Created `main` from an empty signed "Initial commit" and rebased the feature branch onto it
+(force-push to the feature branch approved by the user), so the whole app lands on `main` via a pull request.
+**Reason:** The repo was empty, so the first pushed branch became the default branch. A PR needs a base branch with shared history.
+Note: never create commits with `git commit-tree`. It skips signing, and GitHub then shows the commit as Unverified.
+**Status:** Active
+
 ## #7 · 2026-09-27 · Memory is kept in Markdown files in the repo
 **Decision:** Project knowledge lives in `CLAUDE.md` (rules and conventions), `docs/DECISIONS.md` (this log) and
 `docs/MEMORY.md` (status, preferences, next steps).

@@ -28,8 +28,13 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-To use it on your phone, publish the folder on e.g. GitHub Pages, Netlify or Vercel, open the page in your
-browser and choose "Add to Home Screen" to install it as an app.
+## Deployment
+
+Every push to `main` deploys the app to GitHub Pages via `.github/workflows/pages.yml`
+(one-time setup: **Settings → Pages → Source: GitHub Actions**). No secrets are needed.
+
+Live URL: https://breenskillz-ctrl.github.io/GymApp/ — on your phone, open it and choose
+"Add to Home Screen" to install it as an app.
 
 ## Secrets and API keys
 

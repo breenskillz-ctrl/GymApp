@@ -18,14 +18,18 @@ _Last updated: 2026-09-27_
 - Pushed to GitHub (2026-09-27) after the user granted the Claude GitHub App access to the repo.
   If a push returns 403 again, check the app's repository access at
   https://github.com/apps/claude/installations/select_target.
-- The repo's default branch is still empty. All work is on the feature branch; no pull request yet.
-- The app is not deployed anywhere yet.
+- The repo is public. `main` exists (an empty signed initial commit) and a PR from the feature branch to `main` is open.
+- The GitHub Pages workflow is in the PR. It deploys when the PR is merged, **after** the user has set
+  Settings → Pages → Source = "GitHub Actions". Expected URL: https://breenskillz-ctrl.github.io/GymApp/
+- The user should also switch the default branch to `main` (Settings → General → Default branch).
 
 ## Next steps / ideas (not yet requested unless noted)
 
 - [x] Push once GitHub access works (done 2026-09-27).
-- [ ] Merge to the default branch / open a PR (only if the user asks).
-- [ ] Deploy to GitHub Pages so the user can install the app on their phone (offered, not yet confirmed).
+- [x] Open a PR to `main` (requested, done 2026-09-27).
+- [x] Add a GitHub Pages deploy workflow (requested, done 2026-09-27).
+- [ ] User: enable Pages (Source: GitHub Actions), set `main` as the default branch, then merge the PR.
+- [ ] Verify that the deployed site works once it is live.
 - [ ] Optional: commit an automated Playwright smoke test under `tests/`.
 - [ ] Optional ideas: exercise illustrations, supersets, plate calculator, workout duration, cloud sync
       (cloud sync would need a backend and secrets → GitHub Secrets / server-side only).
