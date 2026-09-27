@@ -18,7 +18,7 @@ _Last updated: 2026-09-27_
 - Pushed to GitHub (2026-09-27) after the user granted the Claude GitHub App access to the repo.
   If a push returns 403 again, check the app's repository access at
   https://github.com/apps/claude/installations/select_target.
-- The repo is public. `main` exists (an empty signed initial commit) and a PR from the feature branch to `main` is open.
+- The repo is public. `main` exists (an empty signed initial commit) and PR #1 (https://github.com/breenskillz-ctrl/GymApp/pull/1) from the feature branch to `main` is open.
 - The GitHub Pages workflow is in the PR. It deploys when the PR is merged, **after** the user has set
   Settings → Pages → Source = "GitHub Actions". Expected URL: https://breenskillz-ctrl.github.io/GymApp/
 - The user should also switch the default branch to `main` (Settings → General → Default branch).
