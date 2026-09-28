@@ -40,6 +40,9 @@ _Last updated: 2026-09-28 (redesign)_
 - [x] Exercise photos added: 198/231 from free-exercise-db (public domain), 2026-09-28 (DECISIONS #19).
 - [x] Progressive overload suggestions: +1 rep per working set, warm-ups unchanged (2026-09-28, DECISIONS #20).
 - [x] Per-exercise rep ranges with double progression (2026-09-28, DECISIONS #21). User's ranges: DL 1–5, bench 1–12, triceps 10–30.
+- [x] "Last time → Suggestion" deltas on cards and in the set editor (2026-09-28, DECISIONS #22).
+- [ ] **Block training (in design, waiting for the user's answers):** %1RM-based blocks, e.g. the Russian Squat Program
+      (6 weeks × 3 days, 80–105 % of 1RM). The proposal and open questions were sent to the user on 2026-09-28. See the notes below.
 - [ ] Possible later: the user buys Gym visual illustrations (the GymKeeper look). Swap files in img/ex/, and check the licence re: public repo.
 - [ ] 33 exercises still have no photo (list in docs/photo-sources.json → ids not in map).
 - [ ] Not yet seen: GymKeeper lists for Back, Legs, Core and Other. Ask for screenshots if the user wants those matched too.
@@ -56,3 +59,21 @@ _Last updated: 2026-09-28 (redesign)_
 - Data lives only in the browser's localStorage. Clearing browser data deletes it, so export a backup first.
 - No unit conversion: switching kg ↔ lb changes only the label, not the stored numbers.
 - The service worker is network-first. Bump `CACHE` in `sw.js` when cached files change.
+
+## Block training notes (2026-09-28)
+
+The user's example is the Russian Squat Program (from ExRx's calculator, 1RM = 150 kg). The percentages are ours to encode, not copied text:
+
+| Week | Day 1 | Day 2 | Day 3 |
+|---|---|---|---|
+| 1 | 80 % 6×2 | 80 % 6×3 | 80 % 6×2 |
+| 2 | 80 % 6×4 | 80 % 6×2 | 80 % 6×5 |
+| 3 | 80 % 6×2 | 80 % 6×6 | 80 % 6×2 |
+| 4 | 85 % 5×5 | 80 % 6×2 | 90 % 4×4 |
+| 5 | 80 % 6×2 | 95 % 3×3 | 80 % 6×2 |
+| 6 | 100 % 2×2 | 80 % 6×2 | 105 % 1×1 (test) |
+
+Proposed design: the block is a program type with weeks × days and a prescription per exercise (sets × reps @ %1RM, a fixed kg, or
+"normal progression" for accessories). The user enters a 1RM per main lift; weights are rounded to the plate step. The app tracks
+the position ("Week 2 · Day 3"), so "Next workout" adds the right day. While a block is active, it overrides rep-range suggestions for
+its lifts. At the end, it offers to update the 1RM from the test.

@@ -186,6 +186,7 @@ export function setProgression(exId, p) {
 // Warm-up sets are repeated unchanged. Timed exercises get +5 s.
 export function progressSet(s, ex) {
   const next = { w: s.w ?? null, r: s.r ?? null, t: s.t ?? null, d: s.d ?? null, done: false, lvl: s.lvl };
+  next.last = { w: next.w, r: next.r, t: next.t, d: next.d }; // shown as "Last time" next to the suggestion
   const p = getProgression(ex.id);
   if (s.lvl === 'warmup' || !p.auto) return next;
   if (ex.type === 't') {

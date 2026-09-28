@@ -19,6 +19,18 @@ function fieldsFor(type) {
 const show = (f, v) => (v == null || v === '' ? '' : f === 't' ? fmtTime(v) : String(v));
 const read = (f, s) => (f === 't' ? parseTime(s) : num(s));
 
+// Short description of how a suggestion differs from last time, e.g. "+1 rep" or "+2.5 kg"
+export function suggestionDelta(s) {
+  const l = s.last;
+  if (!l || s.done) return '';
+  const u = state.settings.unit;
+  const parts = [];
+  if (s.w != null && l.w != null && s.w !== l.w) parts.push(`${s.w > l.w ? '+' : '−'}${fmtNum(Math.abs(s.w - l.w), 2)} ${u}`);
+  else if (s.r != null && l.r != null && s.r !== l.r) parts.push(`${s.r > l.r ? '+' : '−'}${Math.abs(s.r - l.r)} rep`);
+  if (s.t != null && l.t != null && s.t !== l.t) parts.push(`${s.t > l.t ? '+' : '−'}${Math.abs(s.t - l.t)} s`);
+  return parts.join(' ');
+}
+
 export const levelColor = (id) => LEVELS.find((l) => l.id === id)?.color;
 export const exLabel = (ex) => (ex.equip && !['Other', 'Bodyweight'].includes(ex.equip) ? `${ex.name} · ${ex.equip}` : ex.name);
 
@@ -88,6 +100,10 @@ export function openSetEditor(date, entry, index, onDone) {
           <button type="button" class="icon-btn" data-tool="history" aria-label="History">${icon('history')}</button>
         </div>
       </div>
+      ${existing && !existing.done && existing.last ? `<table class="se-compare">
+        <tr><th>Last time</th><th>Suggestion</th></tr>
+        <tr><td>${esc(setText(ex, existing.last))}</td><td>${esc(setText(ex, existing))}${suggestionDelta(existing) ? ` <span class="delta">${esc(suggestionDelta(existing))}</span>` : ''}</td></tr>
+      </table>` : ''}
       <div class="se-tool-panel" hidden></div>
       ${fields.map(([f, label], i) => `
         <div class="se-row" data-f="${f}">

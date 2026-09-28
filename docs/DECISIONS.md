@@ -5,6 +5,12 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #22 · 2026-09-28 · Show "Last time → Suggestion" in the app
+**Decision:** Suggested sets keep last session's values (`set.last`). The card shows the change under each suggested set
+(green "+1 rep" / "+2.5 kg"), and the set editor shows a "Last time | Suggestion" table for that set. Logged sets don't store `last`.
+**Reason:** The user liked the "Sist / Forslag" table from the chat and wanted it in the app.
+**Status:** Active
+
 ## #21 · 2026-09-28 · Per-exercise rep ranges with double progression
 **Decision:** Each exercise has a rep range (min–max), a weight step and an on/off switch (`state.progression[exId]`,
 defaults in `getProgression()`). Suggestions per working set:

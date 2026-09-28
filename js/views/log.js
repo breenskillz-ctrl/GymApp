@@ -10,7 +10,7 @@ import {
 import { exerciseThumb, sleepArt } from '../icons.js';
 import { openExercisePicker } from './picker.js';
 import { openExerciseDetail, openProgressionDialog, hasRange, progressionText } from './exercises.js';
-import { openSetEditor, levelColor, exLabel } from './seteditor.js';
+import { openSetEditor, levelColor, exLabel, suggestionDelta } from './seteditor.js';
 import { openAddSheet } from './addsheet.js';
 
 export const logState = { date: dateKey() };
@@ -51,6 +51,7 @@ function setColHtml(ex, s, i) {
     ${color ? `<span class="dot ${s.done ? '' : 'hollow'}" style="--c:${color}"></span>` : ''}
     <span class="line">${l1}</span>${l2 ? `<span class="line">${l2}</span>` : ''}
     ${s.c ? `<span class="set-note">${esc(s.c)}</span>` : ''}
+    ${suggestionDelta(s) ? `<span class="set-delta">${esc(suggestionDelta(s))}</span>` : ''}
   </button>`;
 }
 

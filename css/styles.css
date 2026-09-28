@@ -222,6 +222,11 @@ textarea.input { resize: vertical; }
 .set-col .u { font-size: 10px; font-weight: 700; color: #6d6d6d; text-transform: uppercase; margin-left: 2px; }
 .set-col.planned .v { color: #6f6f6f; }
 .set-col.pr .v { color: var(--gold); }
+.set-delta { display: block; font-size: 10.5px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+.se-compare { width: 100%; border-collapse: collapse; margin: 0 0 10px; background: var(--card2); border-radius: 10px; overflow: hidden; font-size: 14px; }
+.se-compare th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; padding: 8px 12px 2px; }
+.se-compare td { padding: 2px 12px 9px; font-weight: 600; }
+.se-compare .delta { color: var(--accent); font-size: 12px; font-weight: 700; margin-left: 4px; }
 .set-note { display: block; font-size: 11px; color: var(--muted); max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .empty-day { text-align: center; padding: 20vh 16px 0; }
