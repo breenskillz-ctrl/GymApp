@@ -45,9 +45,10 @@ function setColHtml(ex, s, i) {
     l2 = val(s.r, 'rep', String);
   }
   const pr = s.done && isPR(ex.id, logState.date, s);
-  const color = s.done ? levelColor(s.lvl || 'normal') : null;
+  // Filled dot = done; hollow dot = suggested set with the level it had last time
+  const color = s.done ? levelColor(s.lvl || 'normal') : s.lvl ? levelColor(s.lvl) : null;
   return `<button class="set-col ${s.done ? '' : 'planned'} ${pr ? 'pr' : ''}" data-act="edit-set" data-set="${i}">
-    ${color ? `<span class="dot" style="background:${color}"></span>` : ''}
+    ${color ? `<span class="dot ${s.done ? '' : 'hollow'}" style="--c:${color}"></span>` : ''}
     <span class="line">${l1}</span>${l2 ? `<span class="line">${l2}</span>` : ''}
     ${s.c ? `<span class="set-note">${esc(s.c)}</span>` : ''}
   </button>`;
@@ -130,7 +131,9 @@ function onClick(e) {
     case 'add':
       return openAddSheet(date, (added) => {
         rerender();
-        if (added) openSetEditor(date, added, null, rerender);
+        // With history the card already has suggested sets to tap; otherwise start logging the first set
+        if (added && !added.sets.length) openSetEditor(date, added, null, rerender);
+        else if (added) toast('Suggested from last time – tap a set to log it');
       });
     case 'info': return openExerciseDetail(entry.ex);
     case 'entry-menu': return openEntryMenu(entry);
@@ -172,7 +175,7 @@ async function openDayMenu() {
     const today = dateKey();
     const target = getDay(today, true);
     if (!target.title && day.title) target.title = day.title;
-    for (const x of day.entries) addEntry(today, x.ex).sets = asPlanned(x.sets);
+    for (const x of day.entries) addEntry(today, x.ex, null, false).sets = asPlanned(x.sets);
     save();
     goToDate(today);
     toast('Copied to today – tap a set to log it');

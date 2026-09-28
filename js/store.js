@@ -159,10 +159,27 @@ export function lastSets(exId, beforeKey) {
 }
 
 // Create sets for a new exercise, pre-filled from last time (smart autofill)
+// Suggested next set (progressive overload, DECISIONS #20): same weight, +1 rep (or +5 s for timed exercises).
+// Warm-up sets are repeated unchanged.
+export function progressSet(s, type) {
+  const warmup = s.lvl === 'warmup';
+  return {
+    w: s.w ?? null,
+    r: s.r != null && !warmup ? s.r + 1 : s.r ?? null,
+    t: s.t != null && !warmup && type === 't' ? s.t + 5 : s.t ?? null,
+    d: s.d ?? null,
+    done: false,
+    lvl: s.lvl,
+  };
+}
+
+// Planned sets for an exercise: the last session's sets with progression, else the program target.
+// Returns [] when there is neither (the card then starts empty and the set editor opens).
 export function makeSets(exId, beforeKey, target) {
-  const prev = lastSets(exId, beforeKey);
-  if (prev) return prev.map((s) => ({ w: s.w ?? null, r: s.r ?? null, t: s.t ?? null, d: s.d ?? null, done: false, lvl: s.lvl }));
   const ex = getExercise(exId);
+  const prev = lastSets(exId, beforeKey);
+  if (prev) return prev.map((s) => progressSet(s, ex.type));
+  if (!target) return [];
   const n = target?.sets || 3;
   return Array.from({ length: n }, () => ({
     w: null,
@@ -173,9 +190,9 @@ export function makeSets(exId, beforeKey, target) {
   }));
 }
 
-// Add an exercise to a day. With `target` (from a program) or `withPlan` the card gets planned sets;
-// otherwise it starts empty and sets are added with the set editor.
-export function addEntry(key, exId, target, withPlan = !!target) {
+// Add an exercise to a day. By default the card gets suggested sets from the last session (or the program target);
+// pass withPlan = false for an empty card (e.g. when the caller copies sets itself).
+export function addEntry(key, exId, target, withPlan = true) {
   const day = getDay(key, true);
   const entry = { id: uid(), ex: exId, sets: withPlan ? makeSets(exId, key, target) : [] };
   day.entries.push(entry);

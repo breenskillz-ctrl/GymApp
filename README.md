@@ -13,7 +13,8 @@ The look and flow follow GymKeeper: a black and green theme, a side menu, and a 
 - **Set editor.** KG and REP fields with −/+ buttons, a comment per set, and six intensity levels shown as coloured dots:
   warm-up (grey), easy (green), normal (yellow), hard (red), failure (purple) and drop (blue).
   It also has buttons for exercise history, a 1RM calculator and a plate calculator.
-- **Smart autofill.** New sets are pre-filled from the previous set or from your last session.
+- **Progressive overload suggestions.** When you add an exercise you have done before, it is pre-filled with last session's
+  sets: same weight, +1 rep on each working set. Warm-up sets stay the same. Tap a suggested set to log it.
 - **Add from:** a program, another day, recent exercises, or muscle groups, which show how many days since you last trained each one.
 - **100+ exercises** in 9 muscle groups. You can also add your own exercises.
 - **Programs** as a card grid with level badges. Give your own programs nicknames, edit them, copy them, and import or export them as files.

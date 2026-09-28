@@ -232,7 +232,7 @@ function openCopyDay(date, onDone) {
         const day = getDay(date, true);
         if (!day.title && src.title) day.title = src.title;
         for (const x of src.entries) {
-          const entry = addEntry(date, x.ex);
+          const entry = addEntry(date, x.ex, null, false);
           entry.sets = x.sets.filter((s) => s.done).map((s) => ({ w: s.w ?? null, r: s.r ?? null, t: s.t ?? null, d: s.d ?? null, done: false, lvl: s.lvl }));
         }
         save();

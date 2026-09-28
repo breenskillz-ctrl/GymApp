@@ -44,7 +44,8 @@ css/styles.css        All styles: GymKeeper-like black/green dark theme (DECISIO
 js/app.js             Startup, navigation (navigate(view); views call go(view) from utils), drawer
 js/data.js            EXERCISES (231, curated order, with sub + equip), PROGRAMS, GROUPS (9) + GROUP_COLORS, SUBGROUPS,
                       LEVELS (set intensity), EQUIPMENT, TYPES
-js/store.js           State, load/save + migrate(), CRUD, history(), records(), isPR(), daySummary(), daysSinceGroups()
+js/store.js           State, load/save + migrate(), CRUD, history(), records(), isPR(), daySummary(), daysSinceGroups(),
+                      makeSets()/progressSet(): suggested sets = last session +1 rep, warm-ups unchanged (DECISIONS #20)
 js/utils.js           Dates, formatting, esc(), openModal(), confirmDialog(), promptDialog(), menuDialog(), topBar(), toast()
 js/icons.js           Our own SVG art: groupIcon(), exerciseThumb() (uses a photo if one exists), programArt(), sleepArt
 js/photos.js          PHOTOS: ids that have photos in img/ex/<id>-t.jpg, -0.jpg, -1.jpg (public domain, DECISIONS #19)

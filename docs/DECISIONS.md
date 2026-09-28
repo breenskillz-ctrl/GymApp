@@ -5,6 +5,15 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #20 · 2026-09-28 · Progressive overload suggestions
+**Decision:** When an exercise is added manually or from a program and it has history, the card gets *suggested* (planned) sets
+copied from the last session with progression: **same weight, same number of sets, +1 rep** on every working set (+5 s for timed
+exercises; distance unchanged). **Warm-up sets (grey) are repeated unchanged.** Suggested sets show a hollow dot in last time's
+level colour; tapping one opens the editor pre-filled, and saving marks it done. Exercises without history still open the set
+editor directly. "From another day" and "Copy to today" copy sets exactly, without progression. The logic is in `progressSet()` / `makeSets()` in `store.js`.
+**Reason:** The user asked for it. Example: last time 3 × 110 kg × 3 → suggestion 3 × 110 kg × 4.
+**Status:** Active
+
 ## #19 · 2026-09-28 · Exercise photos from free-exercise-db (public domain) for now
 **Decision:** 198 of 231 exercises show photos from free-exercise-db (Unlicense / public domain): a 144px thumbnail and
 two 420×280 frames (start and end position) that alternate in the detail view. The rest keep our pictograms. The mapping is in

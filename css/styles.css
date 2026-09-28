@@ -213,7 +213,8 @@ textarea.input { resize: vertical; }
 .sets { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 2px; }
 .set-col { min-width: 54px; text-align: left; position: relative; padding: 12px 2px 0; border-radius: 8px; }
 .set-col:active { background: var(--card2); }
-.set-col .dot { position: absolute; top: 2px; left: 3px; width: 7px; height: 7px; border-radius: 50%; }
+.set-col .dot { position: absolute; top: 2px; left: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.set-col .dot.hollow { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); }
 .set-col .line { display: block; white-space: nowrap; line-height: 1.35; }
 .set-col .v { font-size: 16px; font-weight: 700; color: #d8d8d8; }
 .set-col .u { font-size: 10px; font-weight: 700; color: #6d6d6d; text-transform: uppercase; margin-left: 2px; }
