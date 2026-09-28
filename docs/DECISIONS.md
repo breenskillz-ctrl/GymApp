@@ -5,6 +5,14 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #38 · 2026-09-28 · Failure holds the weight until every set matches
+**Decision:** `progressSets()` in store.js: if any working set at a weight ended in failure last time, every working set at that
+weight is suggested at the same weight with the best reps done there (110×4, 110×4, 110×3 F → 110×4 ×3). Only when they are all
+done without failure does normal double progression (+1 rep, then more weight) continue. Warm-up and drop sets are not affected;
+applies to weight+reps and reps-only exercises with suggestions on.
+**Reason:** The user's rule (2026-09-28): "110×4, 110×4 and 110×4 before you move on to 110×5".
+**Status:** Active. RIR/RPE (suggested at the same time) waits for the user's answers.
+
 ## #37 · 2026-09-28 · Phone back button stays inside the app
 **Decision:** app.js keeps one "guard" history entry above the app's own entry. Back pops it; the app then closes the drawer or the
 top dialog, or goes from any page to History, and pushes the guard again. On History with nothing open it shows "Press back again

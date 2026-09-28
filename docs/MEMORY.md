@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-09-28 (v19: History start page, back button)_
+_Last updated: 2026-09-28 (v21: failure rule)_
 
 ## About the user
 
@@ -10,6 +10,7 @@ _Last updated: 2026-09-28 (v19: History start page, back button)_
 - Security-conscious: no secrets in GitHub, ever (see DECISIONS #6).
 - Wants Claude to keep notes and decisions in these Markdown files.
 - Loves being able to create programs with their own nicknames in GymKeeper. Keep that front and centre.
+- Progression rule: after a failure set, fill all sets up to the same reps at the same weight before adding reps or weight.
 - Trains with wide, exercise-specific rep ranges (deadlift 1–5, sometimes 10 at lighter weight; bench 1–12; triceps 10–30).
 - Blocks: Russian Squat (and Smolov) must use 100 % of the real 1RM, not a 90 % training max (the user corrected this 2026-09-28).
 - Likes a compact History list (Strong-style cards) as the start screen; the Android back button must never close the app by surprise.
@@ -55,6 +56,9 @@ _Last updated: 2026-09-28 (v19: History start page, back button)_
 - [ ] Imported custom exercises have guessed groups/equipment; the user may want to fix some (e.g. Bayesian Curls → Cable).
 - [x] Left/right arm and thigh (v16, DECISIONS #33). Progress photos with compare (v17, DECISIONS #34).
 - [x] Export/import of progress photos (v18, DECISIONS #35).
+- [x] Failure rule: failure at a weight → all sets there repeat at the best reps before progressing (v21, DECISIONS #38).
+- [ ] RIR/RPE: proposed (RIR 0–5+ buttons in the set editor, RPE as an alternative scale, "@2" tag, RIR 0 = failure, RIR ≥3 → bigger
+      step, RIR in the e1RM). Waiting for the user: RIR or RPE by default, and should it change the suggestions?
 - [x] History page as the start screen + "Start workout", and the phone back button no longer closes the app (v19, DECISIONS #36, #37).
 - [ ] Ideas for blocks (not requested): RPE-based prescriptions, exporting/sharing block templates, a warm-up set generator.
 - [ ] Possible later: the user buys Gym visual illustrations (the GymKeeper look). Swap files in img/ex/, and check the licence re: public repo.

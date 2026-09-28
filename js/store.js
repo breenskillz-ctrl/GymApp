@@ -234,12 +234,33 @@ export function progressSet(s, ex) {
   return next;
 }
 
+// Progression for a whole session (DECISIONS #38). If a working set at a weight ended in failure, no set at that weight
+// progresses: every set there gets the best reps done at that weight last time (110×4, 110×4, 110×3 failure → 110×4 ×3).
+// Once all of them reach it without failure, the normal +1 rep / more weight rules apply again.
+export function progressSets(prev, ex) {
+  const next = prev.map((s) => progressSet(s, ex));
+  if (!['wr', 'r'].includes(ex.type) || !getProgression(ex.id).auto) return next;
+  const groups = new Map(); // weight → indexes of working sets
+  prev.forEach((s, i) => {
+    if (s.lvl === 'warmup' || s.lvl === 'drop' || s.r == null) return;
+    const k = s.w || 0;
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(i);
+  });
+  for (const idx of groups.values()) {
+    if (!idx.some((i) => prev[i].lvl === 'failure')) continue;
+    const top = Math.max(...idx.map((i) => prev[i].r));
+    for (const i of idx) Object.assign(next[i], { w: prev[i].w ?? null, r: top });
+  }
+  return next;
+}
+
 // Planned sets for an exercise: the last session's sets with progression, else the program target.
 // Returns [] when there is neither (the card then starts empty and the set editor opens).
 export function makeSets(exId, beforeKey, target) {
   const ex = getExercise(exId);
   const prev = lastSets(exId, beforeKey);
-  if (prev) return prev.map((s) => progressSet(s, ex));
+  if (prev) return progressSets(prev, ex);
   if (!target) return [];
   const n = target?.sets || 3;
   return Array.from({ length: n }, () => ({
