@@ -1,5 +1,5 @@
 // Service worker: makes the app available offline.
-const CACHE = 'gymapp-v3';
+const CACHE = 'gymapp-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -26,7 +26,8 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // `cache: 'reload'` bypasses the browser's HTTP cache so the offline copy is always the new version
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
@@ -37,11 +38,13 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Network first, falling back to the cache when offline
+// Network first, falling back to the cache when offline.
+// `cache: 'no-cache'` makes the browser check with the server every time (cheap 304 responses), so a new
+// version never mixes with files from the browser's HTTP cache (GitHub Pages caches files for 10 minutes).
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request.url, { cache: 'no-cache', credentials: 'same-origin' })
       .then((res) => {
         const copy = res.clone();
         caches.open(CACHE).then((c) => c.put(e.request, copy));

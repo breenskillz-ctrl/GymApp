@@ -78,8 +78,11 @@ For `t` exercises in programs, `reps` means seconds.
 - Icons: add a `<symbol id="i-name">` to `index.html` and use `icon('name')`.
 - Built-in exercise and program **ids must never change**, because saved logs reference them. Add new ones instead.
 - If the state shape changes, keep `load()` backward compatible (merge with defaults, migrate old data).
-- When you add or rename a file under `js/`, `css/` or `icons/`, add it to `ASSETS` in `sw.js` and
-  **bump `CACHE`** (e.g. `gymapp-v2` → `gymapp-v3`). Bump it on any release that changes cached files.
+- **On every release that changes cached files: bump `CACHE` in `sw.js` AND the `?v=` on `styles.css` and `app.js` in
+  `index.html` (keep them the same number).** When you add or rename a file, add it to `ASSETS` in `sw.js`.
+  Reason: GitHub Pages lets browsers cache files for 10 minutes. Without this, a phone once loaded a new index.html with
+  an old stylesheet and app.js, and showed an unstyled, broken page (2026-09-28). The service worker fetches with
+  `cache: 'no-cache'` and reloads once when a new version takes over.
 - Match the existing style: 2-space indent, single quotes, semicolons, short comments only where they help.
 
 ## Running and testing

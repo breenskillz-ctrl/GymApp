@@ -42,6 +42,9 @@ _Last updated: 2026-09-28 (redesign)_
 
 ## Known limitations
 
+- 2026-09-28: right after the redesign, the user's phone showed a broken page (a mix of new and old cached files). Fixed in
+  `sw.js` (no-cache fetch, reload on update) and with `?v=` in index.html. See the CLAUDE.md release rule.
+
 - Data lives only in the browser's localStorage. Clearing browser data deletes it, so export a backup first.
 - No unit conversion: switching kg ↔ lb changes only the label, not the stored numbers.
 - The service worker is network-first. Bump `CACHE` in `sw.js` when cached files change.
