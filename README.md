@@ -19,6 +19,9 @@ The look and flow follow GymKeeper: a black and green theme, a side menu, and a 
 - **Add from:** a program, another day, recent exercises, or muscle groups, which show how many days since you last trained each one.
 - **100+ exercises** in 9 muscle groups. You can also add your own exercises.
 - **Programs** as a card grid with level badges. Give your own programs nicknames, edit them, copy them, and import or export them as files.
+- **Block training.** Russian Squat Program, 5/3/1 and Smolov Jr. templates, or build your own (weeks × days × sets × reps @ %).
+  Weights come from your 1RM and a base % (default 90 % training max). "Add next workout" puts the right day in your log, and a
+  schedule table shows the whole block with weights.
 - **Records and progress.** A notification when you set a new PR, per-exercise charts, workouts per week, sets per muscle group, and body weight.
 - **Timers.** A rest timer that starts automatically, plus countdown, Tabata and stopwatch.
 - **Backup.** Export and import all your data as JSON. kg or lb.

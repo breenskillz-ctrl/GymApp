@@ -49,12 +49,14 @@ js/store.js           State, load/save + migrate(), CRUD, history(), records(), 
 js/utils.js           Dates, formatting, esc(), openModal(), confirmDialog(), promptDialog(), menuDialog(), topBar(), toast()
 js/icons.js           Our own SVG art: groupIcon(), exerciseThumb() (uses a photo if one exists), programArt(), sleepArt
 js/photos.js          PHOTOS: ids that have photos in img/ex/<id>-t.jpg, -0.jpg, -1.jpg (public domain, DECISIONS #19)
+js/blocks.js          Block training: templates (Russian, 5/3/1, Smolov Jr), setWeight(), addBlockWorkout(), moveBlock()
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart() and barChart() on canvas
 js/views/log.js       Day view (cards with sets as KG/REP columns, FAB, day menu, calendar, records)
 js/views/seteditor.js Set editor dialog (fields, −/+, comment, levels, history/1RM/plate tools)
 js/views/addsheet.js  "+" sheet and exercise browser: quick tiles, group rows, filtered exercise lists (★/region/equipment), ⋮ menu
 js/views/programs.js  Program grid (page + sheet), detail, ⋮ menu (rename/edit/copy/export/delete), import, editor
+js/views/blocks.js    Blocks page (running blocks, schedule table, start/1RM dialogs); blockeditor.js = custom block builder
 js/views/*.js         exercises (library + detail + editor), progress (+ settings, body weight), timers, picker
 sw.js                 Network-first service worker with an offline cache
 ```
@@ -69,6 +71,8 @@ sw.js                 Network-first service worker with an offline cache
   body: [{ date: 'YYYY-MM-DD', weight }],
   favorites: ['exercise-id', …],
   progression: { 'exercise-id': { min, max, inc, auto } },
+  blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],
+  blockTemplates: [ /* the user's own templates, compact items */ ],
   settings: { unit: 'kg'|'lb', rest: 90, sound: true, autoRest: true }
 }
 ```

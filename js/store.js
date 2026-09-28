@@ -13,6 +13,8 @@ const defaults = () => ({
   body: [], // [{ date, weight }]
   favorites: [], // exercise ids marked with ★
   progression: {}, // per exercise: { min, max, inc, auto } – overrides the defaults in getProgression()
+  blocks: [], // running and finished training blocks (js/blocks.js)
+  blockTemplates: [], // the user's own block templates
   settings: { unit: 'kg', rest: 90, sound: true, autoRest: true },
 });
 
@@ -341,4 +343,10 @@ export const isFavorite = (id) => state.favorites.includes(id);
 export function toggleFavorite(id) {
   state.favorites = isFavorite(id) ? state.favorites.filter((x) => x !== id) : [...state.favorites, id];
   save();
+}
+
+// Best estimated 1RM from all logged sets of an exercise (rounded to 0.5), or null
+export function bestE1rmOf(exId) {
+  const r = records(exId);
+  return r.best1rm ? Math.round(r.best1rm.v * 2) / 2 : null;
 }

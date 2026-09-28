@@ -6,6 +6,7 @@ import { renderPrograms } from './views/programs.js';
 import { renderExercises } from './views/exercises.js';
 import { renderProgress, openSettings, openBodyWeight } from './views/progress.js';
 import { renderTimers } from './views/timers.js';
+import { renderBlocks } from './views/blocks.js';
 
 load();
 
@@ -19,6 +20,7 @@ const VIEWS = {
   exercises: renderExercises,
   progress: renderProgress,
   timers: renderTimers,
+  blocks: renderBlocks,
 };
 
 export function navigate(view) {

@@ -5,6 +5,20 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #23 · 2026-09-28 · Block training
+**Decision:** A new "Blocks" page (drawer). A block is weeks × days × items. An item is either sets × reps @ % (with optional AMRAP
+"+" and weight steps) or "normal progression" for accessories. Weight = 1RM × base % × set % (+ steps), rounded to the exercise's
+weight step. **Base defaults to 90 % (training max, the user's choice)** and can be changed per block; classic Russian/Smolov
+use 100 %. Progress is sequential ("Week 2 · Day 3"): "Add next workout to today" adds the day as planned sets (showing "80 %")
+and moves on. You can skip, go back, or tap any day in the schedule table. At the end, the app suggests new 1RMs (best e1RM
+during the block) and can restart the block. Built-in templates: Russian Squat Program (6×3, per the user's ExRx table), 5/3/1
+(4-week cycle, "+" sets, deload) and Smolov Jr. (3×4, +steps in weeks 2–3). The user can create their own templates (copy week,
+add week). The code is in `js/blocks.js`, `js/views/blocks.js` and `js/views/blockeditor.js`. The data is in `state.blocks` and
+`state.blockTemplates`. Entries created by a block carry `entry.block = { id, w, d }`, and their sets carry `pct` / `amrap`.
+**Reason:** The user asked for block training and answered: training max 90 %, sequential progress, templates Russian/5-3-1/Smolov Jr + custom.
+The accessory choice was left open, so the recommended option (normal progression) was used.
+**Status:** Active
+
 ## #22 · 2026-09-28 · Show "Last time → Suggestion" in the app
 **Decision:** Suggested sets keep last session's values (`set.last`). The card shows the change under each suggested set
 (green "+1 rep" / "+2.5 kg"), and the set editor shows a "Last time | Suggestion" table for that set. Logged sets don't store `last`.
