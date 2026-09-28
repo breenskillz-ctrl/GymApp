@@ -19,8 +19,8 @@ function bestSet(ex, sets) {
   return pool.reduce((a, b) => (score(b) > score(a) ? b : a), pool[0]);
 }
 
+// Time of day from the first logged set; imported days have no times
 function title(day) {
-  if (day.title) return day.title;
   const first = Math.min(...day.entries.flatMap((e) => e.sets.filter((s) => s.at).map((s) => s.at)));
   if (!Number.isFinite(first)) return 'Workout';
   const h = new Date(first).getHours();
@@ -45,7 +45,8 @@ function cardHtml(key) {
   }).join('');
   return `<article class="h-card" data-day="${key}">
     <div class="h-head">
-      <div class="grow"><h3>${esc(title(day))}</h3><div class="sub">${fmtDate(key)}</div></div>
+      <div class="grow"><h3>${title(day)}</h3>
+        ${day.title ? `<div class="h-comment">${esc(day.title)}</div>` : ''}<div class="sub">${fmtDate(key)}</div></div>
       <button class="icon-btn h-more" data-more="${key}" aria-label="Workout menu">${icon('more')}</button>
     </div>
     <div class="h-stats">

@@ -529,6 +529,7 @@ textarea.input { resize: vertical; }
 .h-card:active { background: #252525; }
 .h-head { display: flex; align-items: flex-start; gap: 8px; }
 .h-head h3 { font-size: calc(17px * var(--fs)); font-weight: 600; margin: 0; }
+.h-comment { font-size: calc(14px * var(--fs)); color: #cfcfcf; margin-top: 1px; }
 .h-more { margin: -6px -8px 0 0; }
 .h-stats { display: flex; gap: 18px; margin: 8px 0 10px; color: #cfcfcf; font-size: calc(14px * var(--fs)); flex-wrap: wrap; }
 .h-stats span { display: inline-flex; align-items: center; gap: 5px; }

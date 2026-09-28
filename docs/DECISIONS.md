@@ -19,7 +19,8 @@ at a time. Each card: title (day comment, else Morning/Afternoon/Evening Workout
 right, "Continue workout" when today has exercises) opens today's log. Also: empty 0 kg × 0 rep sets from GymKeeper are skipped on
 import and removed from already imported data (they were planned sets that were never done).
 **Reason:** The user asked for it with a screenshot from another app (Strong-style history).
-**Status:** Active
+**Status:** Active. 2026-09-28 update (user): the card title is only Morning/Afternoon/Evening Workout ("Workout" when there
+are no set times, e.g. imported days); the day comment or block name goes on its own smaller line right under it.
 
 ## #35 · 2026-09-28 · Separate export/import file for progress photos
 **Decision:** Photos get their own file (`gymapp-photos-YYYY-MM-DD.json`, images as data URLs) from Settings or the ⬇/⬆ buttons in
