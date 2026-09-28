@@ -3,6 +3,7 @@ import { GROUPS, EQUIPMENT, TYPES, SUBGROUPS } from '../data.js';
 import { state, getExercise, saveExercise, deleteExercise, history, records, setVolume, allExercises } from '../store.js';
 import { esc, openModal, confirmDialog, icon, fmtDate, fmtNum, fmtTime, e1rm, toast, parseKey, topBar, menuDialog } from '../utils.js';
 import { lineChart } from '../charts.js';
+import { hasPhoto, photoUrl } from '../icons.js';
 import { openAddSheet, groupRowsHtml } from './addsheet.js';
 
 // Exercises page: muscle groups like the + sheet. Opening a group shows the GymKeeper-style list in browse mode.
@@ -104,6 +105,8 @@ export function openExerciseDetail(id, onChange) {
       <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button>
     </div>
     <div class="scroll">
+      ${hasPhoto(ex.id) ? `<div class="ex-photo"><img src="${photoUrl(ex.id, 0)}" alt="${esc(ex.name)}, start position">
+        <img src="${photoUrl(ex.id, 1)}" alt="${esc(ex.name)}, end position"></div>` : ''}
       ${ex.desc ? `<p class="desc">${esc(ex.desc)}</p>` : ''}
       <h3 class="section-title">Personal records</h3>
       <div class="tiles">${recTiles.map(([l, v]) => `<div class="tile"><span class="tile-val">${v}</span><span class="tile-label">${l}</span></div>`).join('')}</div>

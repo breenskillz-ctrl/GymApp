@@ -5,6 +5,17 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #19 · 2026-09-28 · Exercise photos from free-exercise-db (public domain) for now
+**Decision:** 198 of 231 exercises show photos from free-exercise-db (Unlicense / public domain): a 144px thumbnail and
+two 420×280 frames (start and end position) that alternate in the detail view. The rest keep our pictograms. The mapping is in
+`js/photos.js` and `docs/photo-sources.json`. A credit is shown in Settings → About.
+**Reason:** The user wanted real exercise images. The dataset the user found (hasaneyldrm/exercises-dataset) is MIT for data
+only; its images/GIFs are © Gym visual and need our own purchased licence ("cloning this repository does not grant you any licence
+to the media"). Gym visual's licence is a one-time purchase per item. The user may buy it later. The images are swappable
+per exercise id (replace `img/ex/<id>-*.jpg`). If Gym visual media is bought, check its redistribution terms first, because the
+repo is public.
+**Status:** Active
+
 ## #18 · 2026-09-28 · GymKeeper-style exercise library and lists
 **Decision:** 231 built-in exercises, named "Movement" + equipment variant ("Curl · Cable") in a curated order, each with a muscle
 region (`sub`). Group lists have ★/region/equipment filter chips, "N days" since last done, favourites (★, first) and a ⋮ menu.

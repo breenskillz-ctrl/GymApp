@@ -1,5 +1,6 @@
 // Our own SVG artwork: muscle-group icons, exercise thumbnails, program card backgrounds and the empty-day graphic.
 import { GROUP_COLORS } from './data.js';
+import { PHOTOS } from './photos.js';
 
 const svg = (vb, body, cls = '') => `<svg class="${cls}" viewBox="${vb}" aria-hidden="true">${body}</svg>`;
 
@@ -36,8 +37,14 @@ const EQUIP_ART = {
   Other: '<rect x="10" y="10" width="28" height="28" rx="8" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="24" cy="24" r="5"/>',
 };
 
+export const photoUrl = (id, frame = 't') => `img/ex/${id}-${frame}.jpg`;
+export const hasPhoto = (id) => PHOTOS.has(id);
+
 export function exerciseThumb(ex) {
   const color = GROUP_COLORS[ex.group] || GROUP_COLORS.Other;
+  if (PHOTOS.has(ex.id)) {
+    return `<span class="thumb photo" style="--g:${color}"><img src="${photoUrl(ex.id)}" alt="" loading="lazy" decoding="async"></span>`;
+  }
   const art = EQUIP_ART[ex.equip] || EQUIP_ART.Other;
   return `<span class="thumb" style="--g:${color}">${svg('0 0 48 48', `<g fill="currentColor">${art}</g>`)}</span>`;
 }

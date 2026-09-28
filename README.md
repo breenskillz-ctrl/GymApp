@@ -38,6 +38,10 @@ Every push to `main` deploys the app to GitHub Pages via `.github/workflows/page
 Live URL: https://breenskillz-ctrl.github.io/GymApp/ — on your phone, open it and choose
 "Add to Home Screen" to install it as an app.
 
+## Credits
+
+Exercise photos come from [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (public domain / Unlicense).
+
 ## Secrets and API keys
 
 The app currently uses no external APIs or keys. **Never commit secrets or API keys to this repository.**

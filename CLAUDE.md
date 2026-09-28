@@ -28,6 +28,8 @@ if you made or were given a decision. Keep entries short and dated (YYYY-MM-DD).
 - The sandbox cannot reach `*.github.io`. Verify a deploy through the GitHub API instead (workflow run steps and
   `repos/.../deployments?environment=github-pages`). Deploy errors are in the check-run annotations
   (`repos/.../check-runs/<job id>/annotations`).
+- **Only use images we have the rights to.** Never use GymKeeper's or Gym visual's media without a licence (DECISIONS #4, #19).
+  Check the licence of any image source, including exceptions for media, before adding it.
 - Don't ask the user to change GitHub settings unless there is no other way. Solve it in the repo when possible.
 
 ## Project
@@ -44,7 +46,8 @@ js/data.js            EXERCISES (231, curated order, with sub + equip), PROGRAMS
                       LEVELS (set intensity), EQUIPMENT, TYPES
 js/store.js           State, load/save + migrate(), CRUD, history(), records(), isPR(), daySummary(), daysSinceGroups()
 js/utils.js           Dates, formatting, esc(), openModal(), confirmDialog(), promptDialog(), menuDialog(), topBar(), toast()
-js/icons.js           Our own SVG art: groupIcon(), exerciseThumb(), programArt(), sleepArt
+js/icons.js           Our own SVG art: groupIcon(), exerciseThumb() (uses a photo if one exists), programArt(), sleepArt
+js/photos.js          PHOTOS: ids that have photos in img/ex/<id>-t.jpg, -0.jpg, -1.jpg (public domain, DECISIONS #19)
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart() and barChart() on canvas
 js/views/log.js       Day view (cards with sets as KG/REP columns, FAB, day menu, calendar, records)

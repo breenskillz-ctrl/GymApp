@@ -36,6 +36,9 @@ _Last updated: 2026-09-28 (redesign)_
 - [x] Redesigned to match the user's GymKeeper screenshots (2026-09-28): black/green theme, drawer, + sheet, card day view,
       set editor dialog, 6 intensity levels, program grid with rename/import/export, 9 muscle groups.
 - [x] Exercise library expanded to 231 exercises, with GymKeeper-style group lists (2026-09-28).
+- [x] Exercise photos added: 198/231 from free-exercise-db (public domain), 2026-09-28 (DECISIONS #19).
+- [ ] Possible later: the user buys Gym visual illustrations (the GymKeeper look). Swap files in img/ex/, and check the licence re: public repo.
+- [ ] 33 exercises still have no photo (list in docs/photo-sources.json → ids not in map).
 - [ ] Not yet seen: GymKeeper lists for Back, Legs, Core and Other. Ask for screenshots if the user wants those matched too.
 - [ ] User: try the redesign on the phone and give feedback (more GymKeeper screenshots are welcome).
 - [ ] Optional: commit an automated Playwright smoke test under `tests/`.

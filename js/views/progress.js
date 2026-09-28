@@ -222,6 +222,8 @@ export function openSettings(onChange) {
       <button class="btn ghost block" data-export>${icon('download')} Export backup</button>
       <label class="btn ghost block file-btn">${icon('upload')} Import backup<input type="file" accept="application/json,.json" data-import hidden></label>
       <button class="btn danger block" data-reset>${icon('trash')} Delete all data</button>
+      <h3 class="section-title">About</h3>
+      <p class="credit">Exercise photos: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener" style="color:inherit">free-exercise-db</a> (public domain).</p>
     </div>`, {
     className: 'tall',
     onMount(m, close) {
