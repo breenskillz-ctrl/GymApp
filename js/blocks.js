@@ -37,6 +37,7 @@ const SMOLOV_DAYS = [[6, 70, 6], [7, 75, 5], [8, 80, 4], [10, 85, 3]];
 export const BLOCK_TEMPLATES = [
   {
     id: 'bt-russian',
+    base: 100, // percentages of the real 1RM
     name: 'Russian Squat Program',
     desc: '6 weeks, 3 days a week. Lots of sets at 80 %, building to heavy triples, doubles and a test at 105 %. Works for squat or bench.',
     slots: [{ key: 'main', label: 'Main lift', ex: 'squat' }],
@@ -44,6 +45,7 @@ export const BLOCK_TEMPLATES = [
   },
   {
     id: 'bt-531',
+    base: 90, // 5/3/1 works from a training max of 90 % of 1RM
     name: '5/3/1',
     desc: '4-week cycles: a 5s week, a 3s week, a 5/3/1 week and a deload. The last set each week is "+" (as many reps as possible). 4 days a week, one main lift per day.',
     slots: [
@@ -58,6 +60,7 @@ export const BLOCK_TEMPLATES = [
   },
   {
     id: 'bt-smolov-jr',
+    base: 100, // percentages of the real 1RM
     name: 'Smolov Jr.',
     desc: '3 weeks, 4 days a week for one lift: 6×6, 7×5, 8×4 and 10×3. Weeks 2 and 3 add weight (+5/+10 kg lower body, +2.5/+5 kg upper body). Very demanding.',
     slots: [{ key: 'main', label: 'Main lift', ex: 'bench-press' }],
@@ -69,6 +72,9 @@ export const BLOCK_TEMPLATES = [
 
 export const allBlockTemplates = () => [...(state.blockTemplates || []), ...BLOCK_TEMPLATES];
 export const getBlockTemplate = (id) => allBlockTemplates().find((t) => t.id === id);
+
+// Default base % for a template: 100 % of 1RM unless the template says otherwise (5/3/1 uses a 90 % training max)
+export const templateBase = (t) => t?.base ?? 100;
 
 // Main lifts in a template that need a 1RM: slots for built-ins, distinct % exercises for custom templates
 export function templateLifts(t) {

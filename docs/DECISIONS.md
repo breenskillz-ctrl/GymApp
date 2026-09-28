@@ -5,6 +5,14 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #25 · 2026-09-28 · Block base % per template: 100 % for Russian Squat and Smolov Jr.
+**Decision:** The default base % comes from the template: **Russian Squat Program 100 %, Smolov Jr. 100 %, 5/3/1 90 %** (training
+max is part of 5/3/1), and custom blocks 100 %. It can still be changed per block. Running Russian/Smolov blocks that were started
+with 90 % are corrected to 100 % once, by `migrate()`.
+**Reason:** The user said the 90 % training max is wrong for blocks, at least for the Russian Squat Program, whose percentages are
+of the real 1RM (1RM 150 → 120 kg at 80 %, as in the user's ExRx table).
+**Status:** Active. Supersedes the "base defaults to 90 %" part of #23.
+
 ## #24 · 2026-09-28 · Adjustable text and number size
 **Decision:** Settings has a "Text and number size" slider (80–150 %, step 5, live preview), stored as `settings.textScale`. Every
 font size in `styles.css` is written as `calc(Npx * var(--fs))`, and `applyTextScale()` sets `--fs` on `<html>` at startup and while
@@ -15,8 +23,7 @@ dragging. The canvas charts scale their fonts too. Only text and numbers scale; 
 ## #23 · 2026-09-28 · Block training
 **Decision:** A new "Blocks" page (drawer). A block is weeks × days × items. An item is either sets × reps @ % (with optional AMRAP
 "+" and weight steps) or "normal progression" for accessories. Weight = 1RM × base % × set % (+ steps), rounded to the exercise's
-weight step. **Base defaults to 90 % (training max, the user's choice)** and can be changed per block; classic Russian/Smolov
-use 100 %. Progress is sequential ("Week 2 · Day 3"): "Add next workout to today" adds the day as planned sets (showing "80 %")
+weight step. Base % per block (defaults: see #25). Progress is sequential ("Week 2 · Day 3"): "Add next workout to today" adds the day as planned sets (showing "80 %")
 and moves on. You can skip, go back, or tap any day in the schedule table. At the end, the app suggests new 1RMs (best e1RM
 during the block) and can restart the block. Built-in templates: Russian Squat Program (6×3, per the user's ExRx table), 5/3/1
 (4-week cycle, "+" sets, deload) and Smolov Jr. (3×4, +steps in weeks 2–3). The user can create their own templates (copy week,

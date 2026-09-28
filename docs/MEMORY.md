@@ -11,6 +11,7 @@ _Last updated: 2026-09-28 (redesign)_
 - Wants Claude to keep notes and decisions in these Markdown files.
 - Loves being able to create programs with their own nicknames in GymKeeper. Keep that front and centre.
 - Trains with wide, exercise-specific rep ranges (deadlift 1–5, sometimes 10 at lighter weight; bench 1–12; triceps 10–30).
+- Blocks: Russian Squat (and Smolov) must use 100 % of the real 1RM, not a 90 % training max (the user corrected this 2026-09-28).
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
@@ -42,7 +43,7 @@ _Last updated: 2026-09-28 (redesign)_
 - [x] Per-exercise rep ranges with double progression (2026-09-28, DECISIONS #21). User's ranges: DL 1–5, bench 1–12, triceps 10–30.
 - [x] "Last time → Suggestion" deltas on cards and in the set editor (2026-09-28, DECISIONS #22).
 - [x] Block training built (2026-09-28, DECISIONS #23): Russian Squat, 5/3/1, Smolov Jr, custom builder, schedule table,
-      1RM update at the end. The user chose a 90 % training max, sequential progress and all three templates.
+      1RM update at the end. Base %: 100 % (Russian/Smolov/custom), 90 % (5/3/1), see DECISIONS #25. Sequential progress, all three templates.
 - [x] Text/number size slider in Settings, 80–150 % (2026-09-28, DECISIONS #24).
 - [ ] Ideas for blocks (not requested): RPE-based prescriptions, exporting/sharing block templates, a warm-up set generator.
 - [ ] Possible later: the user buys Gym visual illustrations (the GymKeeper look). Swap files in img/ex/, and check the licence re: public repo.

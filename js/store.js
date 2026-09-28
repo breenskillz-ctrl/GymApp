@@ -27,6 +27,11 @@ const GROUP_MIGRATION = {
 
 // Bring data saved by older versions up to date
 function migrate() {
+  // Russian Squat and Smolov Jr. are written for % of the real 1RM; blocks started with the old 90 % default are corrected (DECISIONS #25)
+  for (const b of state.blocks || []) {
+    if (['bt-russian', 'bt-smolov-jr'].includes(b.templateId) && b.base === 90 && !b.baseChecked) b.base = 100;
+    b.baseChecked = true;
+  }
   for (const ex of state.customExercises) {
     ex.group = GROUP_MIGRATION[ex.group] || ex.group;
     if (ex.equip === 'Dumbbells') ex.equip = 'Dumbbell';

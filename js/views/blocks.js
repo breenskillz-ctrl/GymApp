@@ -5,7 +5,7 @@ import {
 } from '../utils.js';
 import {
   allBlockTemplates, getBlockTemplate, templateLifts, createBlock, blockSize, blockIndex, moveBlock, addBlockWorkout,
-  dayText, bestSince, setWeight,
+  dayText, bestSince, setWeight, templateBase,
 } from '../blocks.js';
 import { goToDate } from './log.js';
 import { openExercisePicker } from './picker.js';
@@ -103,7 +103,7 @@ function maxesForm(lifts, maxes, base) {
         <label class="max-input">1RM (${u})<input class="input" name="max-${esc(l.key)}" inputmode="decimal" value="${maxes[l.ex] ?? ''}" placeholder="e.g. 150"></label>
       </div>`).join('')}
     <label>Base: % of 1RM to calculate from<input class="input" name="base" type="number" inputmode="numeric" min="50" max="110" value="${base}"></label>
-    <p class="sub">90 % = training max (your choice). Classic Russian Squat and Smolov Jr. are written for 100 %.</p>`;
+    <p class="sub">100 % = your real 1RM (Russian Squat, Smolov Jr.). 5/3/1 uses a 90 % training max.</p>`;
 }
 
 function openStartDialog(t) {
@@ -115,7 +115,7 @@ function openStartDialog(t) {
     ${t.desc ? `<p class="sub" style="margin:-6px 0 12px">${esc(t.desc)}</p>` : ''}
     <form class="form">
       <label>Name<input class="input" name="name" value="${esc(t.name)}"></label>
-      <div class="lifts">${maxesForm(lifts, maxes, 90)}</div>
+      <div class="lifts">${maxesForm(lifts, maxes, templateBase(t))}</div>
       <div class="dialog-actions">
         <button type="button" class="text-btn" data-close>Cancel</button>
         <button type="submit" class="text-btn accent">Start block</button>
@@ -150,7 +150,7 @@ function openStartDialog(t) {
           if (!v) { toast(`Enter a 1RM for ${getExercise(l.ex).name}`); return; }
           maxMap[l.ex] = v;
         }
-        createBlock(t, { name: f.get('name').trim() || t.name, lifts: liftMap, maxes: maxMap, base: Number(f.get('base')) || 90 });
+        createBlock(t, { name: f.get('name').trim() || t.name, lifts: liftMap, maxes: maxMap, base: Number(f.get('base')) || templateBase(t) });
         close();
         toast('Block started');
         redraw();
