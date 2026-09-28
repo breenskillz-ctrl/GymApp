@@ -35,6 +35,8 @@ _Last updated: 2026-09-28 (redesign)_
 - [ ] User: test the app on the phone and give feedback.
 - [x] Redesigned to match the user's GymKeeper screenshots (2026-09-28): black/green theme, drawer, + sheet, card day view,
       set editor dialog, 6 intensity levels, program grid with rename/import/export, 9 muscle groups.
+- [x] Exercise library expanded to 231 exercises, with GymKeeper-style group lists (2026-09-28).
+- [ ] Not yet seen: GymKeeper lists for Back, Legs, Core and Other. Ask for screenshots if the user wants those matched too.
 - [ ] User: try the redesign on the phone and give feedback (more GymKeeper screenshots are welcome).
 - [ ] Optional: commit an automated Playwright smoke test under `tests/`.
 - [ ] Optional ideas: exercise illustrations, supersets, plate calculator, workout duration, cloud sync

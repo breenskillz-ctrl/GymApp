@@ -20,7 +20,7 @@ export function exerciseListHtml(list, selected = new Set()) {
   if (!list.length) return '<p class="empty">No exercises found.</p>';
   let html = '';
   let group = null;
-  const sorted = [...list].sort((a, b) => GROUPS.indexOf(a.group) - GROUPS.indexOf(b.group) || a.name.localeCompare(b.name, 'en'));
+  const sorted = [...list].sort((a, b) => GROUPS.indexOf(a.group) - GROUPS.indexOf(b.group));
   for (const ex of sorted) {
     if (ex.group !== group) {
       group = ex.group;

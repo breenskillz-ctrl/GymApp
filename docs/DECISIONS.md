@@ -5,6 +5,15 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #18 · 2026-09-28 · GymKeeper-style exercise library and lists
+**Decision:** 231 built-in exercises, named "Movement" + equipment variant ("Curl · Cable") in a curated order, each with a muscle
+region (`sub`). Group lists have ★/region/equipment filter chips, "N days" since last done, favourites (★, first) and a ⋮ menu.
+The Exercises page uses the same lists. Chin Up moved from Back to Arms; Pullover to Chest; Swing/Farmer's Walk to Full-Body;
+Burpee/Mountain Climber/Jumping Jack to Cardio (as in GymKeeper). Brand names are replaced ("Hammer Strength Press" →
+"Plate-Loaded Chest Press"). The equipment "Dumbbells" was renamed "Dumbbell", and saved custom exercises are migrated.
+**Reason:** It matches the user's GymKeeper screenshots. Exercise names are generic, but images are not copied (#4).
+**Status:** Active
+
 ## #17 · 2026-09-28 · Filled muscle-group icons
 **Decision:** Muscle-group icons are body outlines with the trained muscle filled in the group colour (chest = pecs, back = lats,
 core = six-pack, and so on). They are drawn larger (40px) with bolder strokes, and each group row has a ⋮ menu, like GymKeeper.

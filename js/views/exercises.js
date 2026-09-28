@@ -1,35 +1,37 @@
 // Exercise library: search, filtering, details with history, records and chart, plus custom exercises.
-import { GROUPS, EQUIPMENT, TYPES } from '../data.js';
-import { state, getExercise, saveExercise, deleteExercise, history, records, setVolume } from '../store.js';
-import { esc, openModal, confirmDialog, icon, fmtDate, fmtNum, fmtTime, e1rm, toast, parseKey, topBar } from '../utils.js';
+import { GROUPS, EQUIPMENT, TYPES, SUBGROUPS } from '../data.js';
+import { state, getExercise, saveExercise, deleteExercise, history, records, setVolume, allExercises } from '../store.js';
+import { esc, openModal, confirmDialog, icon, fmtDate, fmtNum, fmtTime, e1rm, toast, parseKey, topBar, menuDialog } from '../utils.js';
 import { lineChart } from '../charts.js';
-import { exerciseListHtml, filterExercises, groupChips } from './picker.js';
+import { openAddSheet, groupRowsHtml } from './addsheet.js';
 
-let query = '';
-let group = '';
-
+// Exercises page: muscle groups like the + sheet. Opening a group shows the GymKeeper-style list in browse mode.
 export function renderExercises(root) {
-  root.innerHTML = `
-    ${topBar('Exercises', `<button class="icon-btn" data-act="new" aria-label="New exercise">${icon('plus')}</button>`)}
-    <input class="input search" type="search" placeholder="Search ${filterExercises('', '').length} exercises…" value="${esc(query)}">
-    <div class="chip-wrap">${groupChips(group)}</div>
-    <div class="list"></div>`;
-
-  const list = root.querySelector('.list');
   const draw = () => {
-    list.innerHTML = exerciseListHtml(filterExercises(query, group));
-    root.querySelector('.chip-wrap').innerHTML = groupChips(group);
+    root.innerHTML = `
+      ${topBar('Exercises', `<button class="icon-btn" data-act="new" aria-label="New exercise">${icon('plus')}</button>
+        <button class="icon-btn" data-act="search" aria-label="Search">${icon('search')}</button>`)}
+      <p class="sub center" style="margin:0 0 12px">${allExercises().length} exercises</p>
+      ${groupRowsHtml(null)}`;
   };
-  root.querySelector('.search').addEventListener('input', (e) => { query = e.target.value; draw(); });
-  root.querySelector('.chip-wrap').addEventListener('click', (e) => {
-    const c = e.target.closest('[data-group]');
-    if (c) { group = c.dataset.group; draw(); }
-  });
-  list.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-ex]');
-    if (b) openExerciseDetail(b.dataset.ex, () => draw());
-  });
-  root.querySelector('[data-act="new"]').onclick = () => openExerciseEditor(null, () => draw());
+  root.onclick = async (e) => {
+    const act = e.target.closest('[data-act]')?.dataset.act;
+    if (act === 'new') return openExerciseEditor(null, draw);
+    if (act === 'search') return openAddSheet(null, null, { mode: 'browse', page: { kind: 'search' } });
+    const gm = e.target.closest('[data-gmenu]');
+    if (gm) {
+      const grp = gm.dataset.gmenu;
+      const v = await menuDialog(grp, [
+        { value: 'open', label: 'Show exercises', icon: 'list' },
+        { value: 'new', label: `New ${grp.toLowerCase()} exercise`, icon: 'plus' },
+      ]);
+      if (v === 'open') openAddSheet(null, draw, { mode: 'browse', page: { kind: 'group', group: grp } });
+      if (v === 'new') openExerciseEditor({ name: '', group: grp, equip: 'Other', type: 'wr', desc: '', isNew: true }, draw);
+      return;
+    }
+    const g = e.target.closest('[data-group]');
+    if (g) openAddSheet(null, draw, { mode: 'browse', page: { kind: 'group', group: g.dataset.group } });
+  };
   draw();
 }
 
@@ -163,6 +165,7 @@ export function openExerciseEditor(ex, onSave) {
     <form class="form">
       <label>Name<input class="input" name="name" required value="${esc(e.name)}" placeholder="E.g. Smith Machine Incline Press"></label>
       <label>Muscle group<select class="input" name="group">${opts(GROUPS, e.group)}</select></label>
+      <label>Muscle region<select class="input" name="sub"><option value="">–</option>${Object.values(SUBGROUPS).flat().map((x) => `<option ${x === e.sub ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
       <label>Equipment<select class="input" name="equip">${opts(EQUIPMENT, e.equip)}</select></label>
       <label>Tracking type<select class="input" name="type">
         ${Object.entries(TYPES).map(([k, v]) => `<option value="${k}" ${k === e.type ? 'selected' : ''}>${v}</option>`).join('')}
@@ -177,7 +180,7 @@ export function openExerciseEditor(ex, onSave) {
         const f = new FormData(ev.target);
         const name = f.get('name').trim();
         if (!name) return;
-        saveExercise({ ...e, name, group: f.get('group'), equip: f.get('equip'), type: f.get('type'), desc: f.get('desc').trim(), builtin: false });
+        saveExercise({ ...e, name, group: f.get('group'), sub: f.get('sub'), equip: f.get('equip'), type: f.get('type'), desc: f.get('desc').trim(), builtin: false });
         close();
         toast('Exercise saved');
         onSave?.();

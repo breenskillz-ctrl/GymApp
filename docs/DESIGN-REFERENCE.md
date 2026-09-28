@@ -122,6 +122,30 @@ Opens when you tap **+** on an exercise card (and presumably when you tap an exi
 - The number pad is the **phone's own numeric keyboard** ("Neste" = next field), not part of the app.
   → For us: `inputmode="decimal"` and `enterkeyhint="next"` so Enter moves from KG to REP and then submits.
 
+## 6. Exercise list inside a muscle group (received 2026-09-28: Chest, Shoulders, Arms ×2, Full-Body, Cardio)
+
+- **Header:** ← back, the group name, **+** (new exercise) and **search**.
+- **Filter chips** (wrapping, small rounded pills):
+  - **★** first (favourites, gold star on a dark gold background)
+  - **muscle-region chips in the group colour**: Chest = Middle/Upper/Lower, Shoulders = Lateral/Anterior/Posterior,
+    Arms = Biceps/Triceps/Forearms
+  - **grey equipment chips**: Bodyweight, Barbell, Dumbbell x1, Dumbbells x2, Cable, Machine, Other
+- **Rows:** dark cards with a **thumbnail** (pastel background tinted by the group, coloured left edge),
+  **"Name · Equipment"**, **"N days"** since last done (dimmer when it was long ago) and **⋮**.
+  **Favourites** have a **gold star** on the thumbnail corner and come **first**. The user's own exercises
+  (e.g. "Bayesian Curls", "15K steps") are favourites at the top.
+- **Many variants per movement**, in a curated order (not alphabetical): e.g. Bench Press · Barbell / Dumbbell / Cable /
+  Smith Machine, Incline and Decline versions of each, Chest Fly variants, Pullover variants; Curl in many forms, Chin Up
+  (normal / wide / close grip) under Arms, Tricep extensions in many forms, Wrist Curl variants; cardio machines and
+  conditioning moves (Burpee, Mountain Climber, Jumping Jack …) under Cardio; Olympic lifts, Swing, Thruster, Wall/Slam Ball
+  under Full-Body.
+- GymKeeper's thumbnails are illustrations of a person with the muscles highlighted. **We use our own equipment pictograms**
+  (DECISIONS #4).
+
+**Ours (implemented 2026-09-28):** the same list in the + sheet and on the Exercises page (browse mode opens details). 231 exercises,
+each with `sub` (muscle region) and `equip`. The chips are ★, the group's regions and the equipment types present in the list; tap again to clear.
+The ⋮ menu has favourite, history and records, and edit/delete for custom exercises. Dumbbell x1/x2 are merged into "Dumbbell".
+
 ## Still unknown (ask the user for screenshots if needed)
 
 - 3b. Inside a program: the list of workouts/days (ours: a list of workouts with an ADD button)

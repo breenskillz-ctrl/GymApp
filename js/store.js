@@ -11,6 +11,7 @@ const defaults = () => ({
   // title = the day comment. done = performed (planned sets have done: false). lvl = intensity level id.
   log: {},
   body: [], // [{ date, weight }]
+  favorites: [], // exercise ids marked with ★
   settings: { unit: 'kg', rest: 90, sound: true, autoRest: true },
 });
 
@@ -25,6 +26,7 @@ const GROUP_MIGRATION = {
 function migrate() {
   for (const ex of state.customExercises) {
     ex.group = GROUP_MIGRATION[ex.group] || ex.group;
+    if (ex.equip === 'Dumbbells') ex.equip = 'Dumbbell';
     if (!GROUPS.includes(ex.group)) ex.group = 'Other';
   }
   for (const day of Object.values(state.log)) {
@@ -71,8 +73,9 @@ export function resetState() {
 }
 
 // ---------- Exercises ----------
+// Built-ins in their curated order, then custom exercises
 export function allExercises() {
-  return [...EXERCISES, ...state.customExercises].sort((a, b) => a.name.localeCompare(b.name, 'en'));
+  return [...EXERCISES, ...state.customExercises];
 }
 
 export function getExercise(id) {
@@ -263,4 +266,22 @@ export function recentExercises(limit = 30) {
     }
   }
   return seen;
+}
+
+// Date each exercise was last performed: { exId: 'YYYY-MM-DD' }
+export function lastDoneMap() {
+  const out = {};
+  for (const date of Object.keys(state.log).sort()) {
+    for (const e of state.log[date].entries) {
+      if (doneSets(e).length) out[e.ex] = date;
+    }
+  }
+  return out;
+}
+
+export const isFavorite = (id) => state.favorites.includes(id);
+
+export function toggleFavorite(id) {
+  state.favorites = isFavorite(id) ? state.favorites.filter((x) => x !== id) : [...state.favorites, id];
+  save();
 }
