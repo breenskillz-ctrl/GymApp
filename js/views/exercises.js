@@ -110,9 +110,9 @@ export function openExerciseDetail(id, onChange) {
       ${hasPhoto(ex.id) ? `<div class="ex-photo"><img src="${photoUrl(ex.id, 0)}" alt="${esc(ex.name)}, start position">
         <img src="${photoUrl(ex.id, 1)}" alt="${esc(ex.name)}, end position"></div>` : ''}
       ${ex.desc ? `<p class="desc">${esc(ex.desc)}</p>` : ''}
-      ${hasRange(ex) ? `<button class="card prog-row" data-prog>${icon('chart')}<span class="grow">
-        <span class="title">Rep range ${progressionText(ex.id)}</span>
-        <span class="sub">Suggestions add 1 rep until the top, then add weight</span></span>${icon('edit')}</button>` : ''}
+      <button class="card prog-row" data-prog>${icon('settings')}<span class="grow">
+        <span class="title">${esc(progressionText(ex.id))}</span>
+        <span class="sub">Exercise settings: ${hasRange(ex) ? 'rep range, weight step and ' : ''}rest time</span></span>${icon('edit')}</button>
       <h3 class="section-title">Personal records</h3>
       <div class="tiles">${recTiles.map(([l, v]) => `<div class="tile"><span class="tile-val">${v}</span><span class="tile-label">${l}</span></div>`).join('')}</div>
       <h3 class="section-title">Progress</h3>
@@ -146,7 +146,7 @@ export function openExerciseDetail(id, onChange) {
         draw();
       });
       m.querySelector('[data-prog]')?.addEventListener('click', () => openProgressionDialog(ex.id, () => {
-        m.querySelector('[data-prog] .title').textContent = `Rep range ${progressionText(ex.id)}`;
+        m.querySelector('[data-prog] .title').textContent = progressionText(ex.id);
       }));
       m.querySelector('[data-edit]')?.addEventListener('click', () => {
         close();
@@ -205,27 +205,32 @@ export const hasRange = (ex) => ex.type === 'wr' || ex.type === 'r';
 
 export function progressionText(id) {
   const p = getProgression(id);
-  if (!p.auto) return '· suggestions off';
   const ex = getExercise(id);
-  return `${p.min}–${p.max}${ex.type === 'wr' ? ` · +${fmtNum(p.inc, 2)} ${state.settings.unit}` : ''}`;
+  const parts = [];
+  if (hasRange(ex)) parts.push(p.auto ? `${p.min}–${p.max} reps${ex.type === 'wr' ? ` · +${fmtNum(p.inc, 2)} ${state.settings.unit}` : ''}` : 'Suggestions off');
+  parts.push(`Rest ${fmtTime(p.rest || state.settings.rest)}`);
+  return parts.join(' · ');
 }
 
 export function openProgressionDialog(id, onSave) {
   const ex = getExercise(id);
   const p = getProgression(id);
   const u = state.settings.unit;
+  const range = hasRange(ex);
   openModal(`
-    <h2 class="dialog-title">Rep range</h2>
+    <h2 class="dialog-title">Exercise settings</h2>
     <p class="sub" style="margin:-8px 0 14px">${esc(ex.name)}${ex.equip && ex.equip !== 'Other' ? ` · ${esc(ex.equip)}` : ''}</p>
     <form class="form">
-      <div class="row gap">
+      ${range ? `<div class="row gap">
         <label class="grow">Min reps<input class="input" name="min" type="number" inputmode="numeric" min="1" value="${p.min}"></label>
         <label class="grow">Max reps<input class="input" name="max" type="number" inputmode="numeric" min="1" value="${p.max}"></label>
         ${ex.type === 'wr' ? `<label class="grow">+ ${u} step<input class="input" name="inc" type="number" inputmode="decimal" step="0.25" min="0.25" value="${p.inc}"></label>` : ''}
       </div>
       <label class="switch"><input type="checkbox" name="auto" ${p.auto ? 'checked' : ''}> Suggest progression next time</label>
       <p class="sub">Below max: same weight, +1 rep. At max: ${ex.type === 'wr' ? 'more weight, with reps worked out from your strength.' : 'stay at max.'}
-        Warm-up sets never change.</p>
+        Warm-up sets never change.</p>` : ''}
+      <label>Rest between sets (seconds)<input class="input" name="rest" type="number" inputmode="numeric" min="0" step="15"
+        value="${p.rest || ''}" placeholder="Default: ${state.settings.rest}"></label>
       <div class="dialog-actions">
         <button type="button" class="text-btn" data-close>Cancel</button>
         <button type="submit" class="text-btn accent">Save</button>
@@ -236,12 +241,18 @@ export function openProgressionDialog(id, onSave) {
       m.querySelector('form').addEventListener('submit', (e) => {
         e.preventDefault();
         const f = new FormData(e.target);
-        const min = Math.max(1, Math.round(Number(f.get('min')) || 1));
-        const max = Math.max(min, Math.round(Number(f.get('max')) || min));
-        const inc = Math.max(0.25, Number(String(f.get('inc') ?? p.inc).replace(',', '.')) || p.inc);
-        setProgression(id, { min, max, inc, auto: !!f.get('auto') });
+        const next = { ...state.progression[id] };
+        if (range) {
+          next.min = Math.max(1, Math.round(Number(f.get('min')) || 1));
+          next.max = Math.max(next.min, Math.round(Number(f.get('max')) || next.min));
+          next.inc = Math.max(0.25, Number(String(f.get('inc') ?? p.inc).replace(',', '.')) || p.inc);
+          next.auto = !!f.get('auto');
+        }
+        const rest = Math.round(Number(f.get('rest')) || 0);
+        if (rest > 0) next.rest = rest; else delete next.rest;
+        setProgression(id, next);
         close();
-        toast('Rep range saved');
+        toast('Exercise settings saved');
         onSave?.();
       });
     },

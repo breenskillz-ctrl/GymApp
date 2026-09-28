@@ -11,7 +11,7 @@ import {
 } from '../utils.js';
 import { groupIcon, exerciseThumb } from '../icons.js';
 import {
-  openExerciseEditor, openExerciseDetail, openProgressionDialog, hasRange, progressionText,
+  openExerciseEditor, openExerciseDetail, openProgressionDialog, progressionText,
 } from './exercises.js';
 import { openProgramsSheet } from './programs.js';
 import { exLabel } from './seteditor.js';
@@ -37,7 +37,7 @@ export async function exerciseMenu(id, refresh) {
     { value: 'fav', label: isFavorite(id) ? 'Remove from favourites' : 'Add to favourites', icon: 'trophy' },
     { value: 'info', label: 'History and records', icon: 'chart' },
   ];
-  if (hasRange(ex)) items.push({ value: 'range', label: `Rep range ${progressionText(id)}`, icon: 'edit' });
+  items.push({ value: 'range', label: progressionText(id), icon: 'settings' });
   if (!ex.builtin) items.push({ value: 'edit', label: 'Edit', icon: 'edit' }, { value: 'del', label: 'Delete', icon: 'trash', danger: true });
   const v = await menuDialog(exLabel(ex), items);
   if (v === 'fav') { toggleFavorite(id); refresh(); }

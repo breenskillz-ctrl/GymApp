@@ -152,3 +152,88 @@ export function barChart(canvas, bars, { height = 180, format = (v) => v } = {})
     if ((bars.length - 1 - i) % every === 0) ctx.fillText(b.label, pad.l + i * bw + bw / 2, h - pad.b + 8);
   });
 }
+
+// Shared grid and y-axis for the multi-series charts below
+function grid(ctx, { w, pad, ch, min, max, ticks, format }) {
+  ctx.strokeStyle = css('--line');
+  ctx.fillStyle = css('--muted');
+  ctx.font = `${11 * textScale()}px system-ui, sans-serif`;
+  ctx.lineWidth = 1;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i <= ticks; i++) {
+    const v = min + ((max - min) * i) / ticks;
+    const yy = pad.t + ch - ((v - min) / (max - min)) * ch;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, yy);
+    ctx.lineTo(w - pad.r, yy);
+    ctx.stroke();
+    ctx.fillText(format(v), pad.l - 6, yy);
+  }
+}
+
+function xLabels(ctx, labels, { h, pad, cw, xAt, minGap = 48 }) {
+  ctx.fillStyle = css('--muted');
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  const every = Math.ceil(labels.length / Math.max(2, Math.floor(cw / minGap)));
+  labels.forEach((l, i) => {
+    if ((labels.length - 1 - i) % every === 0) ctx.fillText(l, xAt(i), h - pad.b + 8);
+  });
+}
+
+// Several lines on shared x labels. series: [{ color, values: [number|null] }] – null leaves a gap.
+export function multiLineChart(canvas, labels, series, { height = 200, format = (v) => Math.round(v) } = {}) {
+  const { ctx, w, h } = setup(canvas, height);
+  const vals = series.flatMap((s) => s.values.filter((v) => v != null));
+  if (vals.length < 2) { empty(ctx, w, h, 'Not enough data yet'); return; }
+  const pad = { l: 40, r: 10, t: 12, b: 24 };
+  let min = Math.min(...vals);
+  let max = Math.max(...vals);
+  const range = max - min || 10;
+  min = Math.max(0, min - range * 0.1);
+  max += range * 0.1;
+  const cw = w - pad.l - pad.r;
+  const ch = h - pad.t - pad.b;
+  const xAt = (i) => pad.l + (labels.length < 2 ? cw / 2 : (cw * i) / (labels.length - 1));
+  const y = (v) => pad.t + ch - ((v - min) / (max - min)) * ch;
+  grid(ctx, { w, pad, ch, min, max, ticks: 4, format });
+  xLabels(ctx, labels, { h, pad, cw, xAt, minGap: 44 });
+  for (const s of series) {
+    ctx.strokeStyle = s.color;
+    ctx.fillStyle = s.color;
+    ctx.lineWidth = 2.2;
+    ctx.lineJoin = 'round';
+    // Lines join the known points across gaps (a month without the lift), dots mark real data
+    const pts = s.values.map((v, i) => (v == null ? null : [xAt(i), y(v)])).filter(Boolean);
+    ctx.beginPath();
+    pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+    ctx.stroke();
+    pts.forEach(([px, py]) => { ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2); ctx.fill(); });
+  }
+}
+
+// Stacked bars. series: [{ color, values: [number] }], one value per label.
+export function stackedBarChart(canvas, labels, series, { height = 190 } = {}) {
+  const { ctx, w, h } = setup(canvas, height);
+  const totals = labels.map((_, i) => series.reduce((n, s) => n + (s.values[i] || 0), 0));
+  if (!totals.some(Boolean)) { empty(ctx, w, h, 'No sets logged yet'); return; }
+  const pad = { l: 30, r: 8, t: 12, b: 24 };
+  const max = niceMax(Math.max(...totals));
+  const cw = w - pad.l - pad.r;
+  const ch = h - pad.t - pad.b;
+  const bw = cw / labels.length;
+  grid(ctx, { w, pad, ch, min: 0, max, ticks: 2, format: (v) => Math.round(v) });
+  labels.forEach((_, i) => {
+    let base = pad.t + ch;
+    for (const s of series) {
+      const v = s.values[i] || 0;
+      if (!v) continue;
+      const bh = (v / max) * ch;
+      ctx.fillStyle = s.color;
+      ctx.fillRect(pad.l + i * bw + bw * 0.18, base - bh, bw * 0.64, Math.max(0, bh - 1)); // 1px gap between segments
+      base -= bh;
+    }
+  });
+  xLabels(ctx, labels, { h, pad, cw, xAt: (i) => pad.l + i * bw + bw / 2 });
+}

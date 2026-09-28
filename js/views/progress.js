@@ -6,9 +6,12 @@ import {
 } from '../store.js';
 import {
   esc, icon, topBar, applyTextScale, dateKey, addDays, weekStart, parseKey, fmtDate, fmtNum, num, toast, confirmDialog, openModal,
+  e1rm, MONTHS, pad, menuDialog,
 } from '../utils.js';
-import { lineChart, barChart } from '../charts.js';
+import { readGymKeeperCsv, applyImport } from '../import.js';
+import { lineChart, barChart, multiLineChart, stackedBarChart } from '../charts.js';
 import { openExerciseDetail } from './exercises.js';
+import { updateWakeLock } from '../wakelock.js';
 
 function stats() {
   const days = Object.keys(state.log).filter(dayHasWork).sort();
@@ -59,6 +62,83 @@ function stats() {
   };
 }
 
+
+// ---------- Strength trend and weekly sets (DECISIONS #29) ----------
+const LINE_COLORS = ['#3bb54a', '#3d8bff', '#f2b705', '#e5533d'];
+
+// Best estimated 1RM per month for the four weighted lifts trained most often in the last 12 months.
+// Sets above 12 reps are left out, because the 1RM estimate gets unreliable there.
+function strengthTrend() {
+  const now = parseKey(dateKey());
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+  });
+  const from = months[0];
+  const count = {};
+  const best = {};
+  for (const [date, day] of Object.entries(state.log)) {
+    const m = date.slice(0, 7);
+    if (m < from) continue;
+    for (const e of day.entries) {
+      if (getExercise(e.ex).type !== 'wr') continue;
+      let top = 0;
+      for (const st of e.sets) {
+        if (st.done && st.lvl !== 'warmup' && st.r && st.r <= 12) top = Math.max(top, e1rm(st.w, st.r) || 0);
+      }
+      if (!top) continue;
+      count[e.ex] = (count[e.ex] || 0) + 1;
+      best[e.ex] = best[e.ex] || {};
+      best[e.ex][m] = Math.max(best[e.ex][m] || 0, top);
+    }
+  }
+  const ids = Object.keys(count).sort((a, b) => count[b] - count[a]).slice(0, 4);
+  return {
+    labels: months.map((m) => MONTHS[Number(m.slice(5)) - 1].slice(0, 3)),
+    series: ids.map((id, i) => ({
+      id, name: getExercise(id).name, color: LINE_COLORS[i], values: months.map((m) => best[id][m] || null),
+    })),
+  };
+}
+
+// Working sets per muscle group per week, last 12 weeks
+function weeklyGroupSets() {
+  const thisWeek = weekStart(dateKey());
+  const weeks = Array.from({ length: 12 }, (_, i) => addDays(thisWeek, -7 * (11 - i)));
+  const data = {};
+  for (const [date, day] of Object.entries(state.log)) {
+    const i = weeks.indexOf(weekStart(date));
+    if (i < 0) continue;
+    for (const e of day.entries) {
+      const g = getExercise(e.ex).group || 'Other';
+      const n = e.sets.filter((st) => st.done && st.lvl !== 'warmup').length;
+      if (!n) continue;
+      data[g] = data[g] || Array(12).fill(0);
+      data[g][i] += n;
+    }
+  }
+  return {
+    labels: weeks.map((k) => { const d = parseKey(k); return `${d.getDate()}.${d.getMonth() + 1}`; }),
+    series: GROUPS.concat('Other').filter((g) => data[g]).map((g) => ({ name: g, color: GROUP_COLORS[g] || GROUP_COLORS.Other, values: data[g] })),
+  };
+}
+
+const legendHtml = (series) => `<div class="legend">${series.map((x) => `<span><i style="background:${x.color}"></i>${esc(x.name)}</span>`).join('')}</div>`;
+
+// ---------- Body measurements (DECISIONS #28) ----------
+// state.body entries: { date, weight?, chest?, waist?, arm?, thigh? }
+export const MEASURES = [['weight', 'Weight'], ['chest', 'Chest'], ['waist', 'Waist'], ['arm', 'Arm'], ['thigh', 'Thigh']];
+const measureUnit = (k) => (k === 'weight' ? state.settings.unit : state.settings.unit === 'lb' ? 'in' : 'cm');
+let bodyMeasure = 'weight';
+
+function saveMeasure(key, value, date = dateKey()) {
+  let entry = state.body.find((b) => b.date === date);
+  if (!entry) { entry = { date }; state.body.push(entry); }
+  if (value) entry[key] = value; else delete entry[key];
+  state.body = state.body.filter((b) => MEASURES.some(([k]) => b[k]));
+  save();
+}
+
 function topRecords() {
   const ids = new Set();
   for (const d of Object.values(state.log)) d.entries.forEach((e) => ids.add(e.ex));
@@ -76,8 +156,12 @@ export function renderProgress(root) {
   const s = stats();
   const recs = topRecords();
   const u = state.settings.unit;
-  const body = [...state.body].sort((a, b) => a.date.localeCompare(b.date));
+  const body = [...state.body].sort((a, b) => a.date.localeCompare(b.date)).filter((b) => b[bodyMeasure]);
   const lastBody = body[body.length - 1];
+  const mu = measureUnit(bodyMeasure);
+  const mLabel = MEASURES.find(([k]) => k === bodyMeasure)[1];
+  const trend = strengthTrend();
+  const weekly = weeklyGroupSets();
   const maxGroup = Math.max(1, ...Object.values(s.groupSets));
   const groupsSorted = GROUPS.concat('Other').filter((g) => s.groupSets[g]).sort((a, b) => s.groupSets[b] - s.groupSets[a]);
 
@@ -97,6 +181,18 @@ export function renderProgress(root) {
     </section>
 
     <section class="card">
+      <h3>Strength trend <span class="muted">(best est. 1RM per month)</span></h3>
+      <div class="chart-box"><canvas id="c-trend"></canvas></div>
+      ${trend.series.length ? legendHtml(trend.series) : ''}
+    </section>
+
+    <section class="card">
+      <h3>Weekly sets per muscle group</h3>
+      <div class="chart-box"><canvas id="c-weekly"></canvas></div>
+      ${weekly.series.length ? legendHtml(weekly.series) : ''}
+    </section>
+
+    <section class="card">
       <h3>Sets per muscle group <span class="muted">(30 days)</span></h3>
       ${groupsSorted.length ? groupsSorted.map((g) => `
         <div class="hbar"><span class="hbar-label">${groupIcon(g, 18)}${esc(g)}</span>
@@ -105,14 +201,15 @@ export function renderProgress(root) {
     </section>
 
     <section class="card">
-      <div class="row between"><h3>Body weight</h3>
-        ${lastBody ? `<span class="muted">${fmtNum(lastBody.weight)} ${u} · ${fmtDate(lastBody.date, false)}</span>` : ''}</div>
+      <div class="row between"><h3>Body</h3>
+        ${lastBody ? `<span class="muted">${fmtNum(lastBody[bodyMeasure])} ${mu} · ${fmtDate(lastBody.date, false)}</span>` : ''}</div>
+      <div class="chips" data-measures>${MEASURES.map(([k, l]) => `<button class="chip ${k === bodyMeasure ? 'active' : ''}" data-measure="${k}">${l}</button>`).join('')}</div>
       <form class="row gap body-form">
-        <input class="input grow" name="w" inputmode="decimal" placeholder="Today's weight (${u})">
+        <input class="input grow" name="w" inputmode="decimal" placeholder="Today's ${mLabel.toLowerCase()} (${mu})">
         <button class="btn primary" type="submit">Save</button>
       </form>
       <div class="chart-box"><canvas id="c-body"></canvas></div>
-      ${body.length ? `<button class="btn ghost sm" data-act="body-list">Show all entries</button>` : ''}
+      <button class="btn ghost sm" data-act="body-list">All measurements</button>
     </section>
 
     <section class="card">
@@ -127,9 +224,11 @@ export function renderProgress(root) {
 
   requestAnimationFrame(() => {
     barChart(root.querySelector('#c-weeks'), s.perWeek);
+    multiLineChart(root.querySelector('#c-trend'), trend.labels, trend.series, { format: (v) => fmtNum(v, 0) });
+    stackedBarChart(root.querySelector('#c-weekly'), weekly.labels, weekly.series);
     lineChart(root.querySelector('#c-body'), body.slice(-60).map((b) => {
       const d = parseKey(b.date);
-      return { label: `${d.getDate()}.${d.getMonth() + 1}`, value: b.weight };
+      return { label: `${d.getDate()}.${d.getMonth() + 1}`, value: b[bodyMeasure] };
     }), { height: 170, format: (v) => fmtNum(v, 0) });
   });
 
@@ -137,33 +236,33 @@ export function renderProgress(root) {
     e.preventDefault();
     const w = num(e.target.w.value);
     if (!w) return;
-    const today = dateKey();
-    state.body = state.body.filter((b) => b.date !== today);
-    state.body.push({ date: today, weight: w });
-    save();
-    toast('Body weight saved');
+    saveMeasure(bodyMeasure, w);
+    toast(`${mLabel} saved`);
     renderProgress(root);
   };
 
   root.onclick = (e) => {
     const ex = e.target.closest('[data-ex]');
     if (ex) return openExerciseDetail(ex.dataset.ex);
+    const ms = e.target.closest('[data-measure]');
+    if (ms) { bodyMeasure = ms.dataset.measure; return renderProgress(root); }
     const a = e.target.closest('[data-act]')?.dataset.act;
     if (a === 'settings') openSettings(() => renderProgress(root));
     if (a === 'body-list') openBodyWeight(() => renderProgress(root));
   };
 }
 
-// Body weight log: add today's weight and see or delete earlier entries
+// Body measurements: today's values for all measures, and every earlier entry
 export function openBodyWeight(onChange) {
-  const u = state.settings.unit;
-  const list = () => [...state.body].sort((a, b) => b.date.localeCompare(a.date));
+  const list = () => [...state.body].sort((x, y) => y.date.localeCompare(x.date));
+  const today = () => state.body.find((b) => b.date === dateKey()) || {};
   openModal(`
-    <div class="modal-head"><h2>Body weight</h2>
+    <div class="modal-head"><h2>Body measurements</h2>
       <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
-    <form class="row gap body-add">
-      <input class="input grow" name="w" inputmode="decimal" placeholder="Today's weight (${u})">
-      <button class="btn primary" type="submit">Save</button>
+    <form class="body-add">
+      <div class="measure-grid">${MEASURES.map(([k, l]) => `<label>${l} <span class="muted">(${measureUnit(k)})</span>
+        <input class="input" name="${k}" inputmode="decimal" value="${today()[k] ?? ''}"></label>`).join('')}</div>
+      <button class="btn primary block" type="submit">Save today</button>
     </form>
     <div class="list scroll"></div>`, {
     className: 'tall',
@@ -171,21 +270,15 @@ export function openBodyWeight(onChange) {
       const box = m.querySelector('.list');
       m.querySelector('.body-add').addEventListener('submit', (e) => {
         e.preventDefault();
-        const w = num(e.target.w.value);
-        if (!w) return;
-        const today = dateKey();
-        state.body = state.body.filter((b) => b.date !== today);
-        state.body.push({ date: today, weight: w });
-        save();
-        e.target.reset();
-        toast('Body weight saved');
+        for (const [k] of MEASURES) saveMeasure(k, num(e.target[k].value));
+        toast('Measurements saved');
         draw();
         onChange();
       });
       const draw = () => {
         box.innerHTML = list().map((b) => `
-          <div class="list-item static"><span class="grow">${fmtDate(b.date)}</span>
-          <strong>${fmtNum(b.weight)} ${u}</strong>
+          <div class="list-item static"><span class="grow">${fmtDate(b.date)}
+            <span class="sub">${MEASURES.filter(([k]) => b[k]).map(([k, l]) => `${l} ${fmtNum(b[k])} ${measureUnit(k)}`).join(' · ')}</span></span>
           <button class="icon-btn sm" data-del="${b.date}" aria-label="Delete">${icon('trash')}</button></div>`).join('')
           || '<p class="empty">No entries.</p>';
       };
@@ -200,6 +293,26 @@ export function openBodyWeight(onChange) {
       draw();
     },
   });
+}
+
+// Download all data as a JSON file and remember when (for the weekly reminder, DECISIONS #32)
+export function exportBackup() {
+  state.lastBackup = Date.now();
+  save();
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `gymapp-backup-${dateKey()}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+// Show the backup reminder when there is data and no backup (or snooze) in the last 7 days
+export function backupDue() {
+  const week = 7 * 86400000;
+  const last = Math.max(state.lastBackup || 0, state.backupSnooze || 0);
+  if (Date.now() - last < week) return false;
+  return Object.keys(state.log).filter(dayHasWork).length >= 3;
 }
 
 export function openSettings(onChange) {
@@ -226,10 +339,12 @@ export function openSettings(onChange) {
       <label>Default rest time (seconds)<input class="input" type="number" min="5" step="5" data-rest value="${st.rest}"></label>
       <label class="switch"><input type="checkbox" data-auto ${st.autoRest ? 'checked' : ''}> Start rest timer automatically when a set is completed</label>
       <label class="switch"><input type="checkbox" data-sound ${st.sound ? 'checked' : ''}> Play a sound when the timer finishes</label>
+      <label class="switch"><input type="checkbox" data-awake ${st.keepAwake ? 'checked' : ''}> Keep the screen on during a workout</label>
       <h3 class="section-title">Data</h3>
       <p class="muted small">All data is stored only on this device. Back it up regularly.</p>
       <button class="btn ghost block" data-export>${icon('download')} Export backup</button>
       <label class="btn ghost block file-btn">${icon('upload')} Import backup<input type="file" accept="application/json,.json" data-import hidden></label>
+      <label class="btn ghost block file-btn">${icon('import')} Import from GymKeeper (CSV)<input type="file" accept=".csv,text/csv" data-gk hidden></label>
       <button class="btn danger block" data-reset>${icon('trash')} Delete all data</button>
       <h3 class="section-title">About</h3>
       <p class="credit">Exercise photos: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener" style="color:inherit">free-exercise-db</a> (public domain).</p>
@@ -254,14 +369,8 @@ export function openSettings(onChange) {
       m.querySelector('[data-rest]').addEventListener('change', (e) => { st.rest = Math.max(5, Number(e.target.value) || 90); save(); });
       m.querySelector('[data-auto]').addEventListener('change', (e) => { st.autoRest = e.target.checked; save(); });
       m.querySelector('[data-sound]').addEventListener('change', (e) => { st.sound = e.target.checked; save(); });
-      m.querySelector('[data-export]').addEventListener('click', () => {
-        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `gymapp-backup-${dateKey()}.json`;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-      });
+      m.querySelector('[data-awake]').addEventListener('change', (e) => { st.keepAwake = e.target.checked; save(); updateWakeLock(); });
+      m.querySelector('[data-export]').addEventListener('click', exportBackup);
       m.querySelector('[data-import]').addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -276,6 +385,30 @@ export function openSettings(onChange) {
         } catch {
           toast('Could not read the file');
         }
+      });
+      m.querySelector('[data-gk]').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        let res;
+        try {
+          res = readGymKeeperCsv(await file.text());
+        } catch {
+          toast('This is not a GymKeeper diary export');
+          return;
+        }
+        const { stats } = res;
+        if (!stats.days) { toast('No workouts found in the file'); return; }
+        const clash = Object.keys(res.days).filter((k) => state.log[k]?.entries.length).length;
+        const mode = await menuDialog('Import from GymKeeper', [
+          { value: 'skip', label: clash ? 'Import, keep my existing days' : 'Import', icon: 'import' },
+          ...(clash ? [{ value: 'replace', label: 'Import, replace those days', icon: 'repeat' }] : []),
+        ], `${stats.days} days and ${stats.sets} sets, ${fmtDate(stats.from, false)} – ${fmtDate(stats.to, false)}. `
+          + `${res.newExercises.length} exercises are new and will be added as your own.${clash ? ` ${clash} of the days already have workouts here.` : ''}`);
+        if (!mode) return;
+        const n = applyImport(res, mode);
+        toast(`Imported ${n} workout day${n === 1 ? '' : 's'}`);
+        onChange();
       });
       m.querySelector('[data-reset]').addEventListener('click', async () => {
         if (await confirmDialog('Delete all workout data, custom exercises and programs? This cannot be undone.', 'Delete all')) {

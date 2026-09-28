@@ -5,7 +5,7 @@ import {
 } from '../utils.js';
 import {
   allBlockTemplates, getBlockTemplate, templateLifts, createBlock, blockSize, blockIndex, moveBlock, addBlockWorkout,
-  dayText, bestSince, setWeight, templateBase,
+  dayText, bestSince, setWeight, templateBase, amrapResults,
 } from '../blocks.js';
 import { goToDate } from './log.js';
 import { openExercisePicker } from './picker.js';
@@ -190,12 +190,12 @@ function openStartDialog(t) {
   });
 }
 
-function openMaxesDialog(b, title = 'Edit 1RM', suggested = null) {
+function openMaxesDialog(b, title = 'Edit 1RM', suggested = null, note = '') {
   const lifts = Object.keys(b.maxes).map((ex) => ({ key: ex, label: 'Lift', ex }));
   const maxes = { ...b.maxes, ...(suggested || {}) };
   openModal(`
     <h2 class="dialog-title">${esc(title)}</h2>
-    ${suggested ? '<p class="sub" style="margin:-6px 0 12px">Pre-filled with your best estimated 1RM during the block.</p>' : ''}
+    ${suggested ? `<p class="sub" style="margin:-6px 0 12px">${note || 'Pre-filled with your best estimated 1RM during the block.'}</p>` : ''}
     <form class="form">
       ${maxesForm(lifts, maxes, b.base)}
       ${suggested ? '<label class="switch"><input type="checkbox" name="restart" checked> Start the block again from week 1</label>' : ''}
@@ -231,6 +231,17 @@ function openMaxesDialog(b, title = 'Edit 1RM', suggested = null) {
 
 function openFinishDialog(b) {
   const suggested = {};
+  const amrap = amrapResults(b);
+  if (Object.keys(amrap).length) {
+    // "+" sets decide: one step up for lifts where every AMRAP set hit its reps, the same max otherwise
+    const lines = [];
+    for (const [ex, r] of Object.entries(amrap)) {
+      suggested[ex] = r.max;
+      lines.push(`${esc(getExercise(ex).name)}: ${r.ok ? 'all + sets hit, training max up one step' : 'missed reps on a + set, same max'}`);
+    }
+    openMaxesDialog(b, 'Next cycle', suggested, lines.join('<br>'));
+    return;
+  }
   for (const ex of Object.keys(b.maxes)) {
     const best = bestSince(ex, b.started);
     if (best && best > b.maxes[ex]) suggested[ex] = best;

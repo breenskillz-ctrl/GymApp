@@ -212,11 +212,12 @@ export function promptDialog(title, value = '', { placeholder = '', okLabel = 'S
 }
 
 // Pick one option from a list. Resolves with the chosen value, or null.
-export function menuDialog(title, items) {
+export function menuDialog(title, items, text = '') {
   return new Promise((resolve) => {
     let result = null;
     openModal(`
       ${title ? `<h2 class="dialog-title">${esc(title)}</h2>` : ''}
+      ${text ? `<p class="sub" style="margin:-6px 0 12px">${esc(text)}</p>` : ''}
       <div class="menu">${items.map((it) => `<button data-v="${esc(it.value)}" class="${it.danger ? 'danger-text' : ''}">${it.icon ? icon(it.icon) : ''}${esc(it.label)}</button>`).join('')}</div>`, {
       className: 'dialog',
       onMount(m, close) {

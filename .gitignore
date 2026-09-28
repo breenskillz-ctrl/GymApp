@@ -16,3 +16,6 @@ Thumbs.db
 # Dependencies and build output
 node_modules/
 dist/
+
+# Personal exports (never commit)
+*.csv

@@ -5,6 +5,48 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #32 · 2026-09-28 · Weekly backup reminder
+**Decision:** A banner on today's log when there are 3+ workout days and no backup (or "later") in 7 days. Export sets
+`state.lastBackup`; the ✕ sets `state.backupSnooze`.
+**Reason:** All data lives only in localStorage; the user asked for the reminder (idea #11).
+**Status:** Active
+
+## #31 · 2026-09-28 · 5/3/1 next cycle from the AMRAP sets
+**Decision:** Block AMRAP sets store `goal` (prescribed reps). When a block ends, a lift whose "+" sets all reached their goal
+gets its training max raised one step (2.5 kg upper / 5 kg lower); stored 1RM += step ÷ base %. A missed "+" set keeps the max.
+Blocks without AMRAP sets still suggest the best e1RM (#23). "Start again from week 1" stays ticked.
+**Reason:** Wendler's standard progression; user asked for auto training max (idea #9).
+**Status:** Active
+
+## #30 · 2026-09-28 · Stall detection and one-tap deload
+**Decision:** A weighted card (not a block card, nothing logged yet) shows "No progress in 3 sessions" when the best working e1RM
+of the last 3 sessions did not beat the session before. "Deload −10 %" lowers the planned working weights by 10 % (rounded).
+**Reason:** Idea #10.
+**Status:** Active
+
+## #29 · 2026-09-28 · Strength trend and weekly sets charts
+**Decision:** Progress shows best e1RM per month (sets ≤ 12 reps, warm-ups excluded) for the 4 most-trained weighted lifts over
+12 months, and stacked weekly working sets per muscle group for 12 weeks. Own canvas code, no libraries.
+**Reason:** Idea #7.
+**Status:** Active
+
+## #28 · 2026-09-28 · Body measurements
+**Decision:** `state.body` entries become `{ date, weight?, chest?, waist?, arm?, thigh? }` (old entries still valid, no migration).
+Chips on Progress pick the measure for the chart; the drawer item opens a form for all five. Lengths in cm (in for lb).
+**Reason:** Idea #8; the user added chest.
+**Status:** Active
+
+## #27 · 2026-09-28 · GymKeeper CSV import, plus log-all, warm-ups, rest per exercise, wake lock, duration
+**Decision:** Settings → "Import from GymKeeper (CSV)" (`js/import.js`). Exercises match by "Name · Equipment" plus an alias table;
+unknown ones become custom exercises with a guessed group/type. Set comments map to levels ("Hard (failure)" → failure, other
+text in brackets → set comment). Day rows give `duration` and the 💬 title. Existing days are kept or replaced (user chooses).
+The user's own export file is never committed (public repo, personal data).
+Also: "Log all as suggested" (button + menu), "Add warm-up sets" (bar×10, 50 %×5, 70 %×3, 85 %×1), rest seconds per exercise
+in "Exercise settings" (`progression.rest`), set timestamps `at` → workout duration in the day summary, and a screen wake lock
+while today has exercises (Settings toggle, on by default).
+**Reason:** The user asked for all suggested ideas (#1–#6) and sent their export.
+**Status:** Active
+
 ## #26 · 2026-09-28 · Blocks live under Programs
 **Decision:** The Programs page has two tabs, **Programs | Blocks**. The Blocks tab holds everything the old Blocks page had.
 Running blocks show as an **"Active blocks" card at the top** of the Programs tab and of the "From program" sheet, with an "Add"

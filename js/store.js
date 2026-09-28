@@ -15,7 +15,8 @@ const defaults = () => ({
   progression: {}, // per exercise: { min, max, inc, auto } – overrides the defaults in getProgression()
   blocks: [], // running and finished training blocks (js/blocks.js)
   blockTemplates: [], // the user's own block templates
-  settings: { unit: 'kg', rest: 90, sound: true, autoRest: true, textScale: 100 },
+  lastBackup: 0, // time of the last exported backup (weekly reminder)
+  settings: { unit: 'kg', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true },
 });
 
 export let state = defaults();
@@ -354,4 +355,62 @@ export function toggleFavorite(id) {
 export function bestE1rmOf(exId) {
   const r = records(exId);
   return r.best1rm ? Math.round(r.best1rm.v * 2) / 2 : null;
+}
+
+// ---------- Rest time per exercise ----------
+// Seconds of rest after a set of this exercise (exercise settings), else the default from Settings
+export const getRest = (exId) => state.progression[exId]?.rest || state.settings.rest;
+
+// ---------- Warm-up sets ----------
+// Planned warm-up sets up to a working weight: (empty bar × 10), 50 % × 5, 70 % × 3, 85 % × 1, rounded to the weight step
+export function warmupSets(exId, workW) {
+  const ex = getExercise(exId);
+  const bar = state.settings.unit === 'lb' ? 45 : 20;
+  const step = getProgression(exId).inc || 2.5;
+  const barbell = ['Barbell', 'Smith Machine'].includes(ex.equip);
+  if (!workW || (barbell && workW <= bar)) return [];
+  const out = barbell && workW > bar * 1.5 ? [{ w: bar, r: 10 }] : [];
+  for (const [pct, reps] of [[0.5, 5], [0.7, 3], [0.85, 1]]) {
+    const w = Math.round((workW * pct) / step) * step;
+    const prev = out.length ? out[out.length - 1].w : 0;
+    if (w > prev && w < workW && (!barbell || w > bar)) out.push({ w, r: reps });
+  }
+  return out.map((s) => ({ ...s, t: null, d: null, done: false, lvl: 'warmup' }));
+}
+
+// ---------- Workout duration ----------
+// Minutes from the first to the last logged set of a day (sets carry an `at` timestamp), or null
+// Imported days carry their duration in minutes instead.
+export function dayDuration(day) {
+  if (day?.duration) return day.duration;
+  const times = (day?.entries || []).flatMap((e) => e.sets.filter((s) => s.done && s.at).map((s) => s.at));
+  if (times.length < 2) return null;
+  const min = Math.round((Math.max(...times) - Math.min(...times)) / 60000);
+  return min > 0 ? min : null;
+}
+
+// ---------- Stalls and deloads (DECISIONS #30) ----------
+// Best estimated 1RM of the working sets in each of the last sessions, newest first
+function sessionBests(exId, beforeKey, n) {
+  return history(exId, beforeKey).slice(0, n)
+    .map((h) => Math.max(0, ...h.sets.filter((s) => s.lvl !== 'warmup').map((s) => e1rm(s.w, s.r) || 0)));
+}
+
+// True when the last three sessions of a weighted exercise did not beat the session before them
+export function isStalled(exId, beforeKey) {
+  if (getExercise(exId).type !== 'wr') return false;
+  const b = sessionBests(exId, beforeKey, 4);
+  return b.length === 4 && b[3] > 0 && Math.max(b[0], b[1], b[2]) <= b[3];
+}
+
+// Take 10 % off the planned working sets of a card (rounded to the weight step)
+export function deloadEntry(entry) {
+  const step = getProgression(entry.ex).inc || 2.5;
+  for (const s of entry.sets) {
+    if (s.done || s.lvl === 'warmup' || !s.w) continue;
+    s.w = Math.round((s.w * 0.9) / step) * step;
+    if (s.last?.r != null) s.r = s.last.r;
+  }
+  entry.deload = true;
+  save();
 }

@@ -2,16 +2,19 @@
 import { GROUP_COLORS } from '../data.js';
 import {
   state, save, getDay, cleanupDay, addEntry, getExercise, dayHasWork, isPR, daySummary, records, makeSets,
+  warmupSets, getRest, dayDuration, isStalled, deloadEntry, setHasData,
 } from '../store.js';
+import { startRest } from '../timer.js';
 import {
   esc, icon, openModal, confirmDialog, dateKey, addDays, fmtTime, fmtNum, toast,
   parseKey, MONTHS, pad, go, promptDialog, menuDialog,
 } from '../utils.js';
 import { exerciseThumb, sleepArt } from '../icons.js';
 import { openExercisePicker } from './picker.js';
-import { openExerciseDetail, openProgressionDialog, hasRange, progressionText } from './exercises.js';
+import { openExerciseDetail, openProgressionDialog, progressionText } from './exercises.js';
 import { openSetEditor, levelColor, exLabel, suggestionDelta } from './seteditor.js';
 import { openAddSheet } from './addsheet.js';
+import { backupDue, exportBackup } from './progress.js';
 
 export const logState = { date: dateKey() };
 
@@ -55,8 +58,13 @@ function setColHtml(ex, s, i) {
   </button>`;
 }
 
+// Planned (suggested) sets that already have numbers and can be logged in one tap
+const plannedSets = (entry) => entry.sets.filter((s) => !s.done && setHasData(s));
+
 function entryHtml(entry) {
   const ex = getExercise(entry.ex);
+  const planned = plannedSets(entry).length;
+  const stalled = !entry.block && !entry.deload && !entry.sets.some((s) => s.done) && isStalled(entry.ex, logState.date);
   return `
     <section class="ex-card" data-entry="${entry.id}">
       <button data-act="info" aria-label="Exercise details">${exerciseThumb(ex)}</button>
@@ -67,6 +75,9 @@ function entryHtml(entry) {
           <button class="icon-btn" data-act="entry-menu" aria-label="Menu">${icon('more')}</button>
         </div>
         <div class="sets">${entry.sets.map((s, i) => setColHtml(ex, s, i)).join('')}</div>
+        ${stalled ? `<div class="stall">No progress in 3 sessions.
+          <button class="text-btn accent" data-act="deload">Deload −10&nbsp;%</button></div>` : ''}
+        ${planned > 1 ? `<button class="log-all" data-act="log-all">${icon('check')} Log all ${planned} as suggested</button>` : ''}
       </div>
     </section>`;
 }
@@ -86,6 +97,7 @@ export function renderLog(root) {
   const day = getDay(key);
   const entries = day?.entries || [];
   const sum = daySummary(day);
+  const mins = dayDuration(day);
   const isToday = key === dateKey();
 
   root.innerHTML = `
@@ -97,8 +109,12 @@ export function renderLog(root) {
       <button class="icon-btn" data-act="calendar" aria-label="Calendar">${icon('calendar')}</button>
       <button class="icon-btn" data-act="day-menu" aria-label="More">${icon('more')}</button>
     </header>
+    ${isToday && backupDue() ? `<div class="backup-banner">${icon('download')}
+      <span class="grow">${state.lastBackup ? `Last backup ${Math.floor((Date.now() - state.lastBackup) / 86400000)} days ago` : 'Your data is only on this phone'}</span>
+      <button class="text-btn accent" data-act="backup">Back up</button>
+      <button class="icon-btn sm" data-act="backup-later" aria-label="Remind me later">${icon('close')}</button></div>` : ''}
     ${entries.length ? `
-      <p class="day-summary">${sum.exs} exs · ${sum.sets} sets${sum.vol ? ` · ${fmtNum(sum.vol, 0)} ${state.settings.unit}` : ''}</p>
+      <p class="day-summary">${sum.exs} exs · ${sum.sets} sets${sum.vol ? ` · ${fmtNum(sum.vol, 0)} ${state.settings.unit}` : ''}${mins ? ` · ${mins} min` : ''}</p>
       ${sum.groups.length ? `<div class="group-tags">${sum.groups.map((g) => `<span style="color:${GROUP_COLORS[g]}">${esc(g)}</span>`).join('')}</div>` : ''}
       ${day.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
       <div class="entries">${entries.map(entryHtml).join('')}</div>` : `
@@ -139,6 +155,19 @@ function onClick(e) {
     case 'info': return openExerciseDetail(entry.ex);
     case 'entry-menu': return openEntryMenu(entry);
     case 'add-set': return openSetEditor(date, entry, null, rerender);
+    case 'log-all': return logAll(entry);
+    case 'backup':
+      exportBackup();
+      toast('Backup saved to your downloads');
+      return rerender();
+    case 'backup-later':
+      state.backupSnooze = Date.now();
+      save();
+      return rerender();
+    case 'deload':
+      deloadEntry(entry);
+      toast('Weights lowered by 10 % for this session');
+      return rerender();
     case 'edit-set': return openSetEditor(date, entry, Number(b.dataset.set), rerender);
     default:
   }
@@ -152,6 +181,38 @@ async function editComment() {
   cleanupDay(logState.date);
   save();
   rerender();
+}
+
+// Mark every suggested set of a card as done, exactly as suggested
+function logAll(entry) {
+  const date = logState.date;
+  const now = Date.now();
+  let pr = false;
+  let work = false;
+  for (const s of plannedSets(entry)) {
+    s.done = true;
+    s.at = now;
+    s.lvl = s.lvl || 'normal';
+    delete s.last;
+    if (s.lvl !== 'warmup') work = true;
+    if (isPR(entry.ex, date, s)) pr = true;
+  }
+  save();
+  rerender();
+  toast(pr ? '🏆 Logged – new personal record!' : 'All sets logged');
+  if (work && state.settings.autoRest && date === dateKey()) startRest(getRest(entry.ex));
+}
+
+// Put warm-up sets in front of the working sets, based on the heaviest working set of the card
+function addWarmups(entry) {
+  const work = entry.sets.filter((s) => s.lvl !== 'warmup' && s.w);
+  const top = Math.max(0, ...work.map((s) => s.w));
+  const sets = warmupSets(entry.ex, top);
+  if (!sets.length) { toast(top ? 'The weight is too light for warm-up sets' : 'Enter a working weight first'); return; }
+  entry.sets = [...sets, ...entry.sets.filter((s) => s.done || s.lvl !== 'warmup')];
+  save();
+  rerender();
+  toast(`${sets.length} warm-up set${sets.length === 1 ? '' : 's'} added`);
 }
 
 function removeEntry(entry) {
@@ -193,17 +254,21 @@ async function openEntryMenu(entry) {
   const day = getDay(logState.date);
   const idx = day.entries.indexOf(entry);
   const items = [{ value: 'info', label: 'History and records', icon: 'chart' }];
-  if (hasRange(ex)) items.push({ value: 'range', label: `Rep range ${progressionText(ex.id)}`, icon: 'edit' });
+  if (plannedSets(entry).length) items.push({ value: 'logall', label: 'Log all as suggested', icon: 'check' });
+  if (ex.type === 'wr') items.push({ value: 'warmup', label: 'Add warm-up sets', icon: 'up' });
+  items.push({ value: 'range', label: progressionText(ex.id), icon: 'settings' });
   if (idx > 0) items.push({ value: 'up', label: 'Move up', icon: 'up' });
   if (idx < day.entries.length - 1) items.push({ value: 'down', label: 'Move down', icon: 'down' });
   items.push({ value: 'swap', label: 'Replace exercise', icon: 'repeat' });
   items.push({ value: 'del', label: 'Remove from day', icon: 'trash', danger: true });
   const a = await menuDialog(exLabel(ex), items);
   if (a === 'info') openExerciseDetail(entry.ex);
+  if (a === 'logall') logAll(entry);
+  if (a === 'warmup') addWarmups(entry);
   if (a === 'range') {
     openProgressionDialog(ex.id, () => {
       // Recalculate the suggestions if nothing has been logged on this card yet
-      if (!entry.sets.some((s) => s.done)) entry.sets = makeSets(entry.ex, logState.date);
+      if (!entry.block && !entry.sets.some((s) => s.done)) entry.sets = makeSets(entry.ex, logState.date);
       save();
       rerender();
     });

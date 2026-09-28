@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-09-28 (redesign)_
+_Last updated: 2026-09-28 (feature batch v15)_
 
 ## About the user
 
@@ -46,6 +46,12 @@ _Last updated: 2026-09-28 (redesign)_
       1RM update at the end. Base %: 100 % (Russian/Smolov/custom), 90 % (5/3/1), see DECISIONS #25. Sequential progress, all three templates.
 - [x] Blocks moved under Programs (tabs + active-block cards at the top), 2026-09-28, DECISIONS #26.
 - [x] Text/number size slider in Settings, 80–150 % (2026-09-28, DECISIONS #24).
+- [x] Feature batch v15 (2026-09-28, DECISIONS #27–#32): GymKeeper CSV import, log all, warm-up sets, rest per exercise,
+      wake lock, workout duration, strength trend + weekly sets charts, body measurements (weight/chest/waist/arm/thigh),
+      5/3/1 next cycle from AMRAP, stall/deload, backup reminder.
+- [ ] User: import their GymKeeper CSV on the phone (Settings → Import from GymKeeper). Tested locally with their file:
+      320 days, 7512 sets, 22 new custom exercises. The file must never be committed.
+- [ ] Imported custom exercises have guessed groups/equipment; the user may want to fix some (e.g. Bayesian Curls → Cable).
 - [ ] Ideas for blocks (not requested): RPE-based prescriptions, exporting/sharing block templates, a warm-up set generator.
 - [ ] Possible later: the user buys Gym visual illustrations (the GymKeeper look). Swap files in img/ex/, and check the licence re: public repo.
 - [ ] 33 exercises still have no photo (list in docs/photo-sources.json → ids not in map).

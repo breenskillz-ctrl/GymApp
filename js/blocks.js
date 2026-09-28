@@ -145,13 +145,16 @@ export function moveBlock(b, step) {
 
 const isLower = (ex) => ex.group === 'Legs' || ex.id === 'deadlift';
 
+// One weight step for a lift: 5 kg lower body, 2.5 kg upper body (10/5 lb)
+export const liftStep = (ex) => (state.settings.unit === 'lb' ? (isLower(ex) ? 10 : 5) : (isLower(ex) ? 5 : 2.5));
+
 // Weight for one prescribed set: 1RM × base % × set % (+ weight steps), rounded to the exercise's weight step
 export function setWeight(b, exId, set) {
   const max = b.maxes[exId];
   if (!max) return null;
   const ex = getExercise(exId);
   const step = getProgression(exId).inc || 2.5;
-  const add = (set.addSteps || 0) * (state.settings.unit === 'lb' ? (isLower(ex) ? 10 : 5) : (isLower(ex) ? 5 : 2.5));
+  const add = (set.addSteps || 0) * liftStep(ex);
   const raw = max * (b.base / 100) * (set.pct / 100) + add;
   return Math.round(raw / step) * step;
 }
@@ -176,7 +179,7 @@ export function addBlockWorkout(b, date, w = b.pos.w, d = b.pos.d) {
       done: false,
       lvl: s.pct >= 90 || s.amrap ? 'hard' : 'normal',
       pct: s.pct,
-      ...(s.amrap ? { amrap: true, c: 'AMRAP – as many reps as possible' } : {}),
+      ...(s.amrap ? { amrap: true, goal: s.reps, c: 'AMRAP – as many reps as possible' } : {}),
     }));
   }
   b.pos = { w, d };
@@ -212,4 +215,29 @@ export function dayText(b, bd) {
       return `${n}×${s.reps}${s.amrap ? '+' : ''} @ ${s.pct}\u00a0%${kg ? ` (${kg} ${u})` : ''}`;
     }).join(', ')}`;
   }).join(' · ');
+}
+
+// 5/3/1-style update from the "+" sets (DECISIONS #31): when every AMRAP set of a lift in this block reached its
+// prescribed reps, the training max goes up one step (2.5 kg upper / 5 kg lower body). The 1RM we store moves by
+// step ÷ base %, so the training max (1RM × base %) rises by exactly one step. Returns { exId: { max, ok, sets } }.
+export function amrapResults(b) {
+  const out = {};
+  for (const day of Object.values(state.log)) {
+    for (const e of day.entries) {
+      if (e.block?.id !== b.id) continue;
+      for (const s of e.sets) {
+        if (!s.amrap || !s.done || !s.goal) continue;
+        const r = out[e.ex] || (out[e.ex] = { ok: true, sets: 0 });
+        r.sets++;
+        if ((s.r || 0) < s.goal) r.ok = false;
+      }
+    }
+  }
+  for (const [exId, r] of Object.entries(out)) {
+    const max = b.maxes[exId];
+    if (!max) { delete out[exId]; continue; }
+    const step = liftStep(getExercise(exId)) / ((b.base || 100) / 100);
+    r.max = r.ok ? Math.round((max + step) * 2) / 2 : max;
+  }
+  return out;
 }

@@ -1,6 +1,6 @@
 // Set editor dialog: add or edit one set (weight/reps/time/distance, comment, intensity level).
 import { LEVELS } from '../data.js';
-import { state, save, getExercise, history, lastSets, isPR } from '../store.js';
+import { state, save, getExercise, history, lastSets, isPR, getRest } from '../store.js';
 import { esc, icon, openModal, num, parseTime, fmtTime, fmtNum, e1rm, toast, dateKey, fmtDate } from '../utils.js';
 import { startRest } from '../timer.js';
 import { setText } from './exercises.js';
@@ -185,14 +185,16 @@ export function openSetEditor(date, entry, index, onDone) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const v = cur();
-        const set = { w: v.w ?? null, r: v.r ?? null, t: v.t ?? null, d: v.d ?? null, done: true, lvl };
+        const set = { w: v.w ?? null, r: v.r ?? null, t: v.t ?? null, d: v.d ?? null, done: true, lvl, at: existing?.done && existing.at ? existing.at : Date.now() };
         const c = m.querySelector('[data-comment]').value.trim();
         if (c) set.c = c;
+        // Keep block prescriptions (percentage, AMRAP target) on the logged set
+        for (const k of ['pct', 'amrap', 'goal']) if (existing?.[k] != null) set[k] = existing[k];
         if (editing) entry.sets[index] = set; else entry.sets.push(set);
         save();
         close();
         if (isPR(entry.ex, date, set)) toast('🏆 New personal record!');
-        if (state.settings.autoRest && date === dateKey() && lvl !== 'warmup') startRest();
+        if (state.settings.autoRest && date === dateKey() && lvl !== 'warmup') startRest(getRest(entry.ex));
         onDone?.();
       });
     },

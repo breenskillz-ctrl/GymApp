@@ -30,6 +30,7 @@ if you made or were given a decision. Keep entries short and dated (YYYY-MM-DD).
   (`repos/.../check-runs/<job id>/annotations`).
 - **Only use images we have the rights to.** Never use GymKeeper's or Gym visual's media without a licence (DECISIONS #4, #19).
   Check the licence of any image source, including exceptions for media, before adding it.
+- **Never commit the user's own exports (e.g. GymKeeper `diary_*.csv`).** They are personal data and the repo is public.
 - Don't ask the user to change GitHub settings unless there is no other way. Solve it in the repo when possible.
 
 ## Project
@@ -50,8 +51,10 @@ js/utils.js           Dates, formatting, esc(), openModal(), confirmDialog(), pr
 js/icons.js           Our own SVG art: groupIcon(), exerciseThumb() (uses a photo if one exists), programArt(), sleepArt
 js/photos.js          PHOTOS: ids that have photos in img/ex/<id>-t.jpg, -0.jpg, -1.jpg (public domain, DECISIONS #19)
 js/blocks.js          Block training: templates (Russian, 5/3/1, Smolov Jr), setWeight(), addBlockWorkout(), moveBlock()
+js/import.js          GymKeeper CSV import: readGymKeeperCsv() (alias table, level mapping), applyImport() (DECISIONS #27)
+js/wakelock.js        Screen wake lock while today has exercises (settings.keepAwake)
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
-js/charts.js          lineChart() and barChart() on canvas
+js/charts.js          lineChart(), barChart(), multiLineChart(), stackedBarChart() on canvas
 js/views/log.js       Day view (cards with sets as KG/REP columns, FAB, day menu, calendar, records)
 js/views/seteditor.js Set editor dialog (fields, −/+, comment, levels, history/1RM/plate tools)
 js/views/addsheet.js  "+" sheet and exercise browser: quick tiles, group rows, filtered exercise lists (★/region/equipment), ⋮ menu
@@ -68,13 +71,14 @@ sw.js                 Network-first service worker with an offline cache
 {
   customExercises: [{ id: 'c-…', name, group, equip, type, desc }],
   customPrograms:  [{ id: 'cp-…', name, desc, level, days, workouts: [{ id, name, exercises: [{ ex, sets, reps }] }] }],
-  log:  { 'YYYY-MM-DD': { title, note, entries: [{ id, ex, sets: [{ w, r, t, d, done }] }] } },
-  body: [{ date: 'YYYY-MM-DD', weight }],
+  log:  { 'YYYY-MM-DD': { title, duration?, entries: [{ id, ex, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, at?, last?, pct?, amrap?, goal? }] }] } },
+  body: [{ date: 'YYYY-MM-DD', weight?, chest?, waist?, arm?, thigh? }],
   favorites: ['exercise-id', …],
-  progression: { 'exercise-id': { min, max, inc, auto } },
+  progression: { 'exercise-id': { min, max, inc, auto, rest? } },
   blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],
   blockTemplates: [ /* the user's own templates, compact items */ ],
-  settings: { unit: 'kg'|'lb', rest: 90, sound: true, autoRest: true, textScale: 100 }
+  lastBackup, backupSnooze,
+  settings: { unit: 'kg'|'lb', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true }
 }
 ```
 

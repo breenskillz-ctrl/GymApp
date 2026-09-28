@@ -2,6 +2,7 @@
 import { load, state } from './store.js';
 import { applyTextScale } from './utils.js';
 import { initRestBar } from './timer.js';
+import { initWakeLock } from './wakelock.js';
 import { renderLog, enableSwipe } from './views/log.js';
 import { renderPrograms } from './views/programs.js';
 import { renderExercises } from './views/exercises.js';
@@ -65,6 +66,7 @@ drawer.addEventListener('click', (e) => {
 
 enableSwipe(main, () => current === 'log');
 initRestBar();
+initWakeLock();
 
 // Redraw charts when the screen size changes
 let resizeT;
