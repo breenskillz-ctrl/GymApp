@@ -72,9 +72,40 @@ Opened with the + button. Full screen, black background.
 SVG illustration (kettlebell/dumbbell/barbell silhouettes), varied per program. Keep the same layout, name and badge
 placement. Add program import/export (JSON file) and let users rename programs easily (nickname).
 
+## 4. Day view: a logged workout (received 2026-09-28)
+
+A previous day (25 Sep) with 9 exercises. **This is the most important screen.**
+
+- **Top bar:** ☰, the **date as plain text ("25 sep.")** when it is not today (the green pill only shows "Today"),
+  then the timer, calendar and ⋮ icons.
+- **Day summary:** centred, small, uppercase, grey: **"9 EXS · 34 SETS · 7010 KG"**, with a ≡ icon at the right edge.
+- **Muscle-group tags:** a centred row of coloured words for the groups trained that day, e.g. **Back** (blue),
+  **Legs** (yellow-green), **Core** (purple), using the same colours as in the group list.
+- **Day comment / title:** centred grey text, **"Fredag Lower + Hypers"**, with a ≡ icon at the right. This is the
+  "Add comment" text from the + sheet, and it works as a name for the workout.
+- **Exercise cards:** stacked dark grey (`#1E1E1E`) rounded cards with small gaps:
+  - **A thumbnail on the left:** a square, rounded, pastel-background illustration of the exercise, with a **coloured
+    left edge in the muscle-group colour** (blue = back, yellow-green = legs, purple = core).
+  - **Title: "Name · Equipment"**, e.g. "Squat · Barbell", "Leg Press · Machine", "Crunch · Cable". Just the name
+    if there is no equipment ("Hyperextension", "Russian Twist").
+  - **Right side:** a large **+** (add a set) and **⋮** (exercise menu).
+  - **Sets are shown as compact columns that wrap onto new rows** (about 6 per row), not as a table with input fields:
+    - the top line is a big bold number with a small grey uppercase unit: **"120 KG"**
+    - the bottom line is **"2 REP"**
+    - an empty value shows as **"- KG"** / **"- REP"** (e.g. bodyweight exercises: "- KG / 15 REP")
+    - there is a **small coloured dot above each set**: **yellow/orange** on most sets and **red** on some (e.g. the heaviest
+      single "130 KG / 1 REP", and the last two cable crunch sets). Sets with no dot look like planned but not yet
+      performed sets (e.g. Leg Press, all "- KG / - REP"). **The exact meaning of the dots needs confirming with the user.**
+    - some sets have a **red "FAILURE" pill** above them (a set tagged as taken to failure).
+  - Planned sets from a program show the target reps (e.g. "- KG / 20 REP") before they are filled in.
+- **Bottom right:** a round grey **🏆 trophy** button (records) next to the green **+** FAB.
+- Sets are edited by tapping, not typed inline (the set editor screenshot is still to come).
+
 ## Still to come
 
 - 3b. Inside a program: the list of workouts/days
+- 5. The set editor: what opens when you tap + on an exercise or tap a set
+- The meaning of the yellow and red dots above sets (ask the user)
 - Probably: set logging for an exercise, exercise list within a group, exercise details/stats, calendar, timers, drawer menu.
 
 ## Planned changes (not started; wait for all screenshots)
@@ -84,4 +115,7 @@ placement. Add program import/export (JSON file) and let users rename programs e
 - Merge the muscle groups into GymKeeper's 9 while keeping the existing exercise ids (DECISIONS: ids never change).
 - Add "days since last trained" per group, and "Recent exercises".
 - New "Empty Day" empty state with our own sleep graphic.
+- Day view: summary line, coloured group tags, day comment as the title, exercise cards with a thumbnail, "Name · Equipment",
+  + / ⋮, and sets as wrapping KG/REP columns with status dots and a FAILURE tag. Trophy button next to the FAB.
+- Our own exercise thumbnails (simple SVG pictograms per exercise or equipment type; never GymKeeper's illustrations).
 - Programs screen as a two-column image-card grid with level badges and a ⋮ menu (rename/edit/delete/export), plus program import.
