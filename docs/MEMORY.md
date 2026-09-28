@@ -9,6 +9,7 @@ _Last updated: 2026-09-28_
 - Writes in Norwegian → reply in Norwegian. App and code are in English.
 - Security-conscious: no secrets in GitHub, ever (see DECISIONS #6).
 - Wants Claude to keep notes and decisions in these Markdown files.
+- Loves being able to create programs with their own nicknames in GymKeeper. Keep that front and centre.
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
@@ -32,7 +33,7 @@ _Last updated: 2026-09-28_
 - [x] Get the Pages deploy working without the user changing settings (2026-09-28).
 - [x] Deploy succeeded (verified via the Actions run and the deployments API; the sandbox can't open github.io).
 - [ ] User: test the app on the phone and give feedback.
-- [ ] **In progress:** the user is sending GymKeeper screenshots (2 received so far). Redesign to match once all have arrived.
+- [ ] **In progress:** the user is sending GymKeeper screenshots (3 received so far). Redesign to match once all have arrived.
       See `docs/DESIGN-REFERENCE.md`. The user said the current app looks like a different app (Strong/Hevy style).
 - [ ] Optional: commit an automated Playwright smoke test under `tests/`.
 - [ ] Optional ideas: exercise illustrations, supersets, plate calculator, workout duration, cloud sync

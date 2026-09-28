@@ -50,9 +50,31 @@ Opened with the + button. Full screen, black background.
   GymKeeper uses fewer and broader groups than our current 12. Arms covers biceps, triceps and forearms, and Legs covers glutes and calves.
 - **"CLOSE"** text button at the bottom right.
 
+## 3. "Programs": opened from the "From program" tile (received 2026-09-28)
+
+- **Header:** "Programs" on the left. On the right, an **import icon** (a file with an up arrow: import a program from a file)
+  and **+** (new program).
+- **A two-column grid of large image cards** (roughly 4:3, rounded corners, tight gaps):
+  - a background image covering the whole card
+  - the **program name centred** in bold white with a text shadow, wrapping over up to 3 lines
+  - a **⋮ menu** at the top right of each card
+  - a **level badge** at the bottom right as a coloured pill with uppercase text: **INTERMEDIATE** is yellow with dark text,
+    **ADVANCED** is red with dark red text (so **BEGINNER** is probably green). No badge when no level is set.
+- **The user's own programs come first.** They get a default greyscale photo of kettlebells, and the user gives them
+  **their own nicknames** (e.g. "DT's plan", "Cardio based", "Hybrid PPL", "Heggen", "AI", "Chest/Arms").
+  **The user especially likes this.**
+- **Built-in programs come next,** with colour photos of athletes. Examples: "Power Hypertrophy Upper Lower (P.H.U.L.) Workout",
+  "10 Week Mass Building Program", "Dumbbell Only Home Or Gym Full Body Workout", "4 Day Power … Burn Workout".
+- A floating **CLOSE** button at the bottom right.
+- Tapping a card presumably opens the program's workouts (days) to pick one to add to today. Screenshot pending.
+
+**Our version:** we cannot use their photos. Each card gets its own background: a dark greyscale gradient with our own
+SVG illustration (kettlebell/dumbbell/barbell silhouettes), varied per program. Keep the same layout, name and badge
+placement. Add program import/export (JSON file) and let users rename programs easily (nickname).
+
 ## Still to come
 
-- 3. "From program" (the user is sending it next)
+- 3b. Inside a program: the list of workouts/days
 - Probably: set logging for an exercise, exercise list within a group, exercise details/stats, calendar, timers, drawer menu.
 
 ## Planned changes (not started; wait for all screenshots)
@@ -62,3 +84,4 @@ Opened with the + button. Full screen, black background.
 - Merge the muscle groups into GymKeeper's 9 while keeping the existing exercise ids (DECISIONS: ids never change).
 - Add "days since last trained" per group, and "Recent exercises".
 - New "Empty Day" empty state with our own sleep graphic.
+- Programs screen as a two-column image-card grid with level badges and a ⋮ menu (rename/edit/delete/export), plus program import.
