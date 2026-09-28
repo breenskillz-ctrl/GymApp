@@ -5,6 +5,12 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #17 · 2026-09-28 · Filled muscle-group icons
+**Decision:** Muscle-group icons are body outlines with the trained muscle filled in the group colour (chest = pecs, back = lats,
+core = six-pack, and so on). They are drawn larger (40px) with bolder strokes, and each group row has a ⋮ menu, like GymKeeper.
+**Reason:** The user said the first thin line icons looked very poor next to GymKeeper's. The drawings are our own (#4).
+**Status:** Active
+
 ## #16 · 2026-09-28 · Adding exercises and sets works like GymKeeper
 **Decision:** The + button opens an "Exercises" sheet (four quick tiles, then muscle groups showing days since last trained).
 Picking an exercise adds an empty card and opens the set editor. Sets are entered in a dialog, not typed inline.

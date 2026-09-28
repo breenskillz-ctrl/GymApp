@@ -3,22 +3,23 @@ import { GROUP_COLORS } from './data.js';
 
 const svg = (vb, body, cls = '') => `<svg class="${cls}" viewBox="${vb}" aria-hidden="true">${body}</svg>`;
 
-// ---------- Muscle-group icons (outline, drawn in the group colour) ----------
+// ---------- Muscle-group icons: a body outline with the trained muscle filled in (our own drawings) ----------
+const BUST = '<circle cx="16" cy="6.2" r="3.4"/><path d="M6.5 29v-8.5c0-4.6 2.8-7.8 6.8-8.7h5.4c4 .9 6.8 4.1 6.8 8.7V29"/>';
 const GROUP_PATHS = {
-  Chest: '<path d="M3.5 7.5C6 5 9.5 5.5 11 7v6.5c-2 2.5-6 2.5-7.5-.5zM20.5 7.5C18 5 14.5 5.5 13 7v6.5c2 2.5 6 2.5 7.5-.5z"/><path d="M9 4.5h6"/>',
-  Arms: '<path d="M3 19.5h9.5c3.5 0 6.5-2.5 6.5-6 0-1.8-.8-3.2-2-4.2L15 5c-.6-1.2-2.4-1.1-2.9.1L11 7.8c-.4 1 .7 1.9 1.6 1.3l1-.7.8 2.6c-2.4-.2-4.7 1-5.8 2.9H3z"/>',
-  Back: '<path d="M5.5 4h13l-2.5 8 2.5 8h-13L8 12z"/><path d="M12 4v16M8.5 9.5 12 12l3.5-2.5"/>',
-  Legs: '<path d="M8 3h7l-.5 7.5L16 21h-3.5L11 13l-1.5 8H6l2-10.5z"/>',
-  Shoulders: '<circle cx="12" cy="6" r="2.5"/><path d="M3.5 17c0-4.5 3.5-7.5 8.5-7.5s8.5 3 8.5 7.5M7.5 13v7M16.5 13v7"/>',
-  Core: '<rect x="7" y="3.5" width="10" height="17" rx="3"/><path d="M7 9h10M7 14.5h10M12 3.5v17"/>',
-  'Full-Body': '<circle cx="12" cy="4.5" r="2"/><path d="M12 7.5v7M6.5 10h11M12 14.5l-3 6.5M12 14.5l3 6.5"/>',
-  Cardio: '<path d="M12 20.5s-8.5-5.2-8.5-11.2A4.3 4.3 0 0 1 12 7.8a4.3 4.3 0 0 1 8.5 1.5c0 6-8.5 11.2-8.5 11.2z"/><path d="M5 12.5h3.5l1.8-2.8 2.4 5 1.8-2.2H19"/>',
-  Other: '<path d="M4.5 9.5 9.5 4.5M3 11l5-5M6.5 13.5l7-7M10.5 17.5l7-7M14.5 19.5l5-5M16 21l5-5"/>',
+  Chest: `${BUST}<path class="f" d="M8.8 15.9c1.9-2.2 4.9-2.6 6.5-1.2v5.4c-1.9 1.9-5.1 1.7-6.9-.3-.5-1.3-.3-2.8.4-3.9z"/><path class="f" d="M23.2 15.9c-1.9-2.2-4.9-2.6-6.5-1.2v5.4c1.9 1.9 5.1 1.7 6.9-.3.5-1.3.3-2.8-.4-3.9z"/>`,
+  Arms: '<path d="M3.5 27.5h11c6.6 0 11.5-3.9 11.5-9.6 0-2.9-1.3-5.2-3.3-6.8l-1.9-5.6c-.7-2-3.4-2.1-4.3-.2l-1.9 3.9c-.7 1.5 1 3 2.4 2l1.1-.8 1.2 3.9c-3.7-.3-7.1 1.5-8.7 4.4H3.5"/><path class="f" d="M11.4 19.7c1.9-3 5.6-4.4 9-3.6 2.4.6 3.6 2.4 2.9 4.2-1 2.8-4.4 4.4-8.1 4.2-2.6-.2-4.5-2.1-3.8-4.8z"/>',
+  Back: `${BUST}<path class="f" d="M12.2 13.4 15.2 15v11.6l-5.4-3.8c-1.3-3.2-1.1-6.8 2.4-9.4z"/><path class="f" d="M19.8 13.4 16.8 15v11.6l5.4-3.8c1.3-3.2 1.1-6.8-2.4-9.4z"/>`,
+  Legs: '<path d="M8.6 3.5h6.2l-.4 10.4-1.2 6.6.6 8h-3.6l-.6-8-1.8-7.4z"/><path d="M23.4 3.5h-6.2l.4 10.4 1.2 6.6-.6 8h3.6l.6-8 1.8-7.4z"/><path class="f" d="M9.5 5.3h4.2l-.3 8.2-1.1 4.9h-1.6L9.1 12.8z"/><path class="f" d="M22.5 5.3h-4.2l.3 8.2 1.1 4.9h1.6l1.6-5.6z"/>',
+  Shoulders: `${BUST}<path class="f" d="M6.6 20.5c-.3-4.2 1.7-7.4 5.2-8.5l1.3 3.6c-2.3 1-3.6 2.9-3.8 5.2z"/><path class="f" d="M25.4 20.5c.3-4.2-1.7-7.4-5.2-8.5l-1.3 3.6c2.3 1 3.6 2.9 3.8 5.2z"/>`,
+  Core: `${BUST}${[14.6, 19, 23.4].map((y) => `<rect class="f" x="12.4" y="${y}" width="3.2" height="3.4" rx="1.1"/><rect class="f" x="16.4" y="${y}" width="3.2" height="3.4" rx="1.1"/>`).join('')}`,
+  'Full-Body': '<circle class="f" cx="16" cy="4.8" r="2.9"/><path class="f" d="M12.2 9.3h7.6c1.4 0 2.5.9 2.9 2.2l2.4 8.2c.3 1-.3 2-1.3 2.2-.9.2-1.7-.3-2-1.2L20 15v5.6l1.2 8.3c.1 1-.6 1.9-1.6 1.9-.8 0-1.5-.6-1.6-1.4L16.6 22h-1.2L14 29.6c-.1.8-.8 1.4-1.6 1.4-1 0-1.7-.9-1.6-1.9L12 20.6V15l-1.8 5.7c-.3.9-1.1 1.4-2 1.2-1-.2-1.6-1.2-1.3-2.2l2.4-8.2c.4-1.3 1.5-2.2 2.9-2.2z"/>',
+  Cardio: '<path class="s" d="M16 27.5S4 20.2 4 11.8A5.8 5.8 0 0 1 16 9a5.8 5.8 0 0 1 12 2.8C28 20.2 16 27.5 16 27.5z"/><path d="M4.8 16.5h5.4l2.2-3.6 3.4 7 2.4-3.4h9"/>',
+  Other: '<g transform="rotate(-45 16 16)"><rect class="f" x="3" y="10" width="4" height="12" rx="1.4"/><rect class="f" x="7.6" y="7.5" width="4" height="17" rx="1.4"/><rect class="f" x="11.6" y="14.6" width="8.8" height="2.8"/><rect class="f" x="20.4" y="7.5" width="4" height="17" rx="1.4"/><rect class="f" x="25" y="10" width="4" height="12" rx="1.4"/></g>',
 };
 
-export function groupIcon(group, size = 26) {
+export function groupIcon(group, size = 30) {
   const color = GROUP_COLORS[group] || GROUP_COLORS.Other;
-  return `<svg class="group-ico" width="${size}" height="${size}" viewBox="0 0 24 24" style="color:${color}" aria-hidden="true">${GROUP_PATHS[group] || GROUP_PATHS.Other}</svg>`;
+  return `<svg class="group-ico" width="${size}" height="${size}" viewBox="0 0 32 32" style="color:${color}" aria-hidden="true">${GROUP_PATHS[group] || GROUP_PATHS.Other}</svg>`;
 }
 
 // ---------- Exercise thumbnails: a pictogram of the equipment ----------

@@ -3,7 +3,7 @@ import { GROUPS } from '../data.js';
 import {
   state, save, getDay, cleanupDay, addEntry, allExercises, getExercise, daysSinceGroups, recentExercises, dayHasWork,
 } from '../store.js';
-import { esc, icon, openModal, fmtDate, promptDialog, toast } from '../utils.js';
+import { esc, icon, openModal, fmtDate, promptDialog, menuDialog, toast } from '../utils.js';
 import { groupIcon } from '../icons.js';
 import { exRowHtml } from './picker.js';
 import { openExerciseEditor } from './exercises.js';
@@ -45,10 +45,10 @@ export function openAddSheet(date, onAdded) {
               </div>
               ${GROUPS.map((g) => `
                 <button class="group-row" data-group="${esc(g)}">
-                  ${groupIcon(g, 30)}
+                  ${groupIcon(g, 40)}
                   <span class="name">${esc(g)}</span>
                   <span class="days">${days[g] == null ? '' : days[g] === 0 ? 'today' : `${days[g]} day${days[g] === 1 ? '' : 's'}`}</span>
-                  ${icon('right')}
+                  <span class="icon-btn" data-gmenu="${esc(g)}" role="button" aria-label="${esc(g)} menu">${icon('more')}</span>
                 </button>`).join('')}
             </div>`;
           return;
@@ -82,6 +82,17 @@ export function openAddSheet(date, onAdded) {
         if (e.target.closest('[data-search]')) { page = { kind: 'search' }; draw(); return; }
         if (e.target.closest('[data-new]')) {
           openExerciseEditor(page.kind === 'group' ? { name: '', group: page.group, equip: 'Other', type: 'wr', desc: '', isNew: true } : null, draw);
+          return;
+        }
+        const gm = e.target.closest('[data-gmenu]');
+        if (gm) {
+          const grp = gm.dataset.gmenu;
+          const v = await menuDialog(grp, [
+            { value: 'open', label: 'Show exercises', icon: 'list' },
+            { value: 'new', label: `New ${grp.toLowerCase()} exercise`, icon: 'plus' },
+          ]);
+          if (v === 'open') { page = { kind: 'group', group: grp }; draw(); }
+          if (v === 'new') openExerciseEditor({ name: '', group: grp, equip: 'Other', type: 'wr', desc: '', isNew: true }, draw);
           return;
         }
         const g = e.target.closest('[data-group]');
