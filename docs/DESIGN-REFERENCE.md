@@ -101,10 +101,30 @@ A previous day (25 Sep) with 9 exercises. **This is the most important screen.**
 - **Bottom right:** a round grey **🏆 trophy** button (records) next to the green **+** FAB.
 - Sets are edited by tapping, not typed inline (the set editor screenshot is still to come).
 
+## 5. Set editor dialog (received 2026-09-28)
+
+Opens when you tap **+** on an exercise card (and presumably when you tap an existing set to edit it).
+
+- **A centred modal dialog** in dark grey (`#1F1F1F`), rounded, over a dimmed background (not a bottom sheet).
+- **Title "Set №5"**, the set number, with the subtitle **"Leg Press · Machine"** in grey.
+- **Three icons at the top right:**
+  - a barbell-with-plates icon, probably a plate calculator or equipment choice (to confirm)
+  - a **calculator** (e.g. 1RM or plate calculator)
+  - a **history clock**: this exercise's previous sets
+- **Input rows**, each with a label, a large number field and **− / +** stepper buttons:
+  - **"▾ KG"**: the ▾ suggests the field type or unit can be switched (kg/lb, or other measures)
+  - **"REP"**
+  - the focused field has a **green underline**, and the value is pre-selected so typing replaces it
+- **"≡ Add comment"** row: a per-set comment.
+- **Intensity selector:** a row of uppercase text buttons **WARMUP · EASY · NORMAL · HARD · DROP**. GymKeeper's levels
+  therefore include **DROP** (drop set). Failure is not a level there (see #4 and DECISIONS #13).
+- **CANCEL** (grey) and **ADD** (green) text buttons at the bottom right. "ADD" is presumably "SAVE" when editing.
+- The number pad is the **phone's own numeric keyboard** ("Neste" = next field), not part of the app.
+  → For us: `inputmode="decimal"` and `enterkeyhint="next"` so Enter moves from KG to REP and then submits.
+
 ## Still to come
 
 - 3b. Inside a program: the list of workouts/days
-- 5. The set editor: what opens when you tap + on an exercise or tap a set
 - Probably: set logging for an exercise, exercise list within a group, exercise details/stats, calendar, timers, drawer menu.
 
 ## Planned changes (not started; wait for all screenshots)
@@ -117,5 +137,8 @@ A previous day (25 Sep) with 9 exercises. **This is the most important screen.**
 - Day view: summary line, coloured group tags, day comment as the title, exercise cards with a thumbnail, "Name · Equipment",
   + / ⋮, and sets as wrapping KG/REP columns with intensity dots
   (grey warm-up, green easy, yellow normal, red hard, purple failure). Trophy button next to the FAB.
+- Set editor as a centred dialog: "Set №N", "Name · Equipment", history/calculator icons, KG and REP fields with −/+,
+  a per-set comment, an intensity row (WARMUP · EASY · NORMAL · HARD · FAILURE, plus DROP if the user wants it), and CANCEL/ADD.
+  Steppers change by 2.5 kg and 1 rep. Pre-fill from the previous set or the last session.
 - Our own exercise thumbnails (simple SVG pictograms per exercise or equipment type; never GymKeeper's illustrations).
 - Programs screen as a two-column image-card grid with level badges and a ⋮ menu (rename/edit/delete/export), plus program import.
