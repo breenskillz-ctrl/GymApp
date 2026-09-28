@@ -479,8 +479,10 @@ textarea.input { resize: vertical; }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: calc(12px * var(--fs)); color: var(--muted); }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 .measure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; margin-bottom: 10px; }
+.measure-grid .row-start { grid-column: 1; }
 .measure-grid label { font-size: calc(13px * var(--fs)); color: var(--muted); }
 [data-measures] { margin: 4px 0 10px; }
 .backup-banner { display: flex; align-items: center; gap: 10px; margin: 4px 0 10px; padding: 6px 4px 6px 12px; border-radius: 12px;
   background: var(--card); color: var(--muted); font-size: calc(13px * var(--fs)); }
 .backup-banner > .ico { width: 20px; height: 20px; color: var(--accent); flex: none; }
+.body-list .sub { white-space: normal; overflow: visible; }

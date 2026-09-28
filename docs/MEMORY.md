@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-09-28 (feature batch v15)_
+_Last updated: 2026-09-28 (v16: left/right arm and thigh)_
 
 ## About the user
 

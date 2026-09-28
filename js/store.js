@@ -10,7 +10,7 @@ const defaults = () => ({
   // { 'YYYY-MM-DD': { title, entries: [{ id, ex, sets: [{ w, r, t, d, done, lvl, c }] }] } }
   // title = the day comment. done = performed (planned sets have done: false). lvl = intensity level id.
   log: {},
-  body: [], // [{ date, weight }]
+  body: [], // [{ date, weight?, chest?, waist?, armL?, armR?, thighL?, thighR? }]
   favorites: [], // exercise ids marked with ★
   progression: {}, // per exercise: { min, max, inc, auto } – overrides the defaults in getProgression()
   blocks: [], // running and finished training blocks (js/blocks.js)
@@ -32,6 +32,12 @@ function migrate() {
   for (const b of state.blocks || []) {
     if (['bt-russian', 'bt-smolov-jr'].includes(b.templateId) && b.base === 90 && !b.baseChecked) b.base = 100;
     b.baseChecked = true;
+  }
+  // Body measurements: arm and thigh are now measured per side (DECISIONS #33); a single old value becomes the right side
+  for (const b of state.body || []) {
+    for (const k of ['arm', 'thigh']) {
+      if (b[k] != null) { if (b[k + 'R'] == null) b[k + 'R'] = b[k]; delete b[k]; }
+    }
   }
   for (const ex of state.customExercises) {
     ex.group = GROUP_MIGRATION[ex.group] || ex.group;

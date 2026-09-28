@@ -127,7 +127,10 @@ const legendHtml = (series) => `<div class="legend">${series.map((x) => `<span><
 
 // ---------- Body measurements (DECISIONS #28) ----------
 // state.body entries: { date, weight?, chest?, waist?, arm?, thigh? }
-export const MEASURES = [['weight', 'Weight'], ['chest', 'Chest'], ['waist', 'Waist'], ['arm', 'Arm'], ['thigh', 'Thigh']];
+export const MEASURES = [
+  ['weight', 'Weight'], ['chest', 'Chest'], ['waist', 'Waist'],
+  ['armL', 'Left arm'], ['armR', 'Right arm'], ['thighL', 'Left thigh'], ['thighR', 'Right thigh'],
+];
 const measureUnit = (k) => (k === 'weight' ? state.settings.unit : state.settings.unit === 'lb' ? 'in' : 'cm');
 let bodyMeasure = 'weight';
 
@@ -260,11 +263,11 @@ export function openBodyWeight(onChange) {
     <div class="modal-head"><h2>Body measurements</h2>
       <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
     <form class="body-add">
-      <div class="measure-grid">${MEASURES.map(([k, l]) => `<label>${l} <span class="muted">(${measureUnit(k)})</span>
+      <div class="measure-grid">${MEASURES.map(([k, l]) => `<label${k === 'armL' ? ' class="row-start"' : ''}>${l} <span class="muted">(${measureUnit(k)})</span>
         <input class="input" name="${k}" inputmode="decimal" value="${today()[k] ?? ''}"></label>`).join('')}</div>
       <button class="btn primary block" type="submit">Save today</button>
     </form>
-    <div class="list scroll"></div>`, {
+    <div class="list scroll body-list"></div>`, {
     className: 'tall',
     onMount(m) {
       const box = m.querySelector('.list');

@@ -72,7 +72,7 @@ sw.js                 Network-first service worker with an offline cache
   customExercises: [{ id: 'c-…', name, group, equip, type, desc }],
   customPrograms:  [{ id: 'cp-…', name, desc, level, days, workouts: [{ id, name, exercises: [{ ex, sets, reps }] }] }],
   log:  { 'YYYY-MM-DD': { title, duration?, entries: [{ id, ex, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, at?, last?, pct?, amrap?, goal? }] }] } },
-  body: [{ date: 'YYYY-MM-DD', weight?, chest?, waist?, arm?, thigh? }],
+  body: [{ date: 'YYYY-MM-DD', weight?, chest?, waist?, armL?, armR?, thighL?, thighR? }],
   favorites: ['exercise-id', …],
   progression: { 'exercise-id': { min, max, inc, auto, rest? } },
   blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],

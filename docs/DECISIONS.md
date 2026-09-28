@@ -5,6 +5,12 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #33 · 2026-09-28 · Left and right arm and thigh
+**Decision:** Body measurements have `armL`/`armR` and `thighL`/`thighR` instead of `arm`/`thigh`. `migrate()` moves an old
+single value to the right side.
+**Reason:** The user asked for left/right on arm and thigh (screenshot of the measurement form).
+**Status:** Active (updates #28)
+
 ## #32 · 2026-09-28 · Weekly backup reminder
 **Decision:** A banner on today's log when there are 3+ workout days and no backup (or "later") in 7 days. Export sets
 `state.lastBackup`; the ✕ sets `state.backupSnooze`.
