@@ -9,6 +9,8 @@ import { programArt } from '../icons.js';
 import { openExercisePicker } from './picker.js';
 import { startWorkout, goToDate } from './log.js';
 import { exLabel } from './seteditor.js';
+import { renderBlocks, activeBlocksHtml, onBannerClick } from './blocks.js';
+import { openBlockEditor } from './blockeditor.js';
 
 export const LEVEL_OPTIONS = ['Beginner', 'Intermediate', 'Advanced'];
 
@@ -42,17 +44,37 @@ async function onGridClick(e, ctx) {
   openProgramDetail(p, ctx);
 }
 
-// Programs page (from the drawer)
-export function renderPrograms(root) {
-  const draw = () => {
-    root.innerHTML = `${topBar('Programs', headActions)}${gridHtml()}`;
-  };
+// Programs page with two tabs: "Programs" (the card grid) and "Blocks" (block training, DECISIONS #26)
+let tab = 'programs';
+
+export function renderPrograms(root, opts = {}) {
+  if (opts.tab) tab = opts.tab;
   const ctx = {
     date: dateKey(),
-    refresh: draw,
+    refresh: () => draw(),
     onAdded: () => { goToDate(dateKey()); go('log'); },
   };
-  root.onclick = (e) => onGridClick(e, ctx);
+  const draw = () => {
+    const actions = tab === 'programs' ? headActions
+      : `<button class="icon-btn" data-newblock aria-label="New block">${icon('plus')}</button>`;
+    root.innerHTML = `${topBar('Programs', actions)}
+      <div class="seg wide" data-tabs>
+        <button class="${tab === 'programs' ? 'active' : ''}" data-tab="programs">Programs</button>
+        <button class="${tab === 'blocks' ? 'active' : ''}" data-tab="blocks">Blocks</button>
+      </div>
+      <div class="tab-body"></div>`;
+    const body = root.querySelector('.tab-body');
+    if (tab === 'blocks') renderBlocks(body, { embedded: true });
+    else body.innerHTML = `${activeBlocksHtml()}${gridHtml()}`;
+  };
+  root.onclick = (e) => {
+    const t = e.target.closest('[data-tab]');
+    if (t) { tab = t.dataset.tab; draw(); return; }
+    if (e.target.closest('[data-newblock]')) { openBlockEditor(null, draw); return; }
+    if (tab !== 'programs') return; // the Blocks tab handles its own clicks
+    if (onBannerClick(e, ctx.date, ctx.onAdded)) return;
+    onGridClick(e, ctx);
+  };
   draw();
 }
 
@@ -64,10 +86,13 @@ export function openProgramsSheet({ date, onAdded }) {
       const body = m.querySelector('.sheet-body');
       const draw = () => {
         body.innerHTML = `<div class="modal-head"><h2 class="grow">Programs</h2><div class="actions">${headActions}</div></div>
-          <div class="scroll">${gridHtml()}</div>`;
+          <div class="scroll">${activeBlocksHtml()}${state.blocks.some((b) => !b.finished) ? '<h3 class="section-title">Programs</h3>' : ''}${gridHtml()}</div>`;
       };
       const ctx = { date, refresh: draw, onAdded: () => { close(); onAdded?.(); } };
-      body.addEventListener('click', (e) => onGridClick(e, ctx));
+      body.addEventListener('click', (e) => {
+        if (onBannerClick(e, date, ctx.onAdded)) return;
+        onGridClick(e, ctx);
+      });
       draw();
     },
   });

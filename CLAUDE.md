@@ -56,7 +56,8 @@ js/views/log.js       Day view (cards with sets as KG/REP columns, FAB, day menu
 js/views/seteditor.js Set editor dialog (fields, −/+, comment, levels, history/1RM/plate tools)
 js/views/addsheet.js  "+" sheet and exercise browser: quick tiles, group rows, filtered exercise lists (★/region/equipment), ⋮ menu
 js/views/programs.js  Program grid (page + sheet), detail, ⋮ menu (rename/edit/copy/export/delete), import, editor
-js/views/blocks.js    Blocks page (running blocks, schedule table, start/1RM dialogs); blockeditor.js = custom block builder
+js/views/blocks.js    Blocks tab inside Programs (renderBlocks(el, {embedded})), activeBlocksHtml() cards, schedule, start/1RM dialogs;
+                      blockeditor.js = custom block builder
 js/views/*.js         exercises (library + detail + editor), progress (+ settings, body weight), timers, picker
 sw.js                 Network-first service worker with an offline cache
 ```

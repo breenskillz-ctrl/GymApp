@@ -209,7 +209,7 @@ export function dayText(b, bd) {
     }
     return `${ex.name} ${groups.map(({ n, s }) => {
       const kg = setWeight(b, it.ex, s);
-      return `${n}×${s.reps}${s.amrap ? '+' : ''} @ ${s.pct} %${kg ? ` (${kg} ${u})` : ''}`;
+      return `${n}×${s.reps}${s.amrap ? '+' : ''} @ ${s.pct}\u00a0%${kg ? ` (${kg} ${u})` : ''}`;
     }).join(', ')}`;
   }).join(' · ');
 }

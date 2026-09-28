@@ -21,7 +21,7 @@ const read = (f, s) => (f === 't' ? parseTime(s) : num(s));
 
 // Short description of how a suggestion differs from last time, e.g. "+1 rep" or "+2.5 kg"
 export function suggestionDelta(s) {
-  if (s.pct && !s.done) return `${s.pct} %${s.amrap ? '+' : ''}`; // block set: show the prescribed percentage
+  if (s.pct && !s.done) return `${s.pct}\u00a0%${s.amrap ? '+' : ''}`; // block set: show the prescribed percentage
   const l = s.last;
   if (!l || s.done) return '';
   const u = state.settings.unit;

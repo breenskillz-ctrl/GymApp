@@ -308,6 +308,10 @@ textarea.input { resize: vertical; }
 .modal .card { background: var(--card); }
 
 /* ---------- Blocks ---------- */
+.block-banner { display: flex; align-items: center; gap: 12px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.block-banner .sub { white-space: normal; }
+.banner-ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex: none;
+  background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
 .block-card .bar { height: 6px; border-radius: 99px; background: var(--card2); margin: 10px 0 8px; overflow: hidden; }
 .block-card .bar span { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
 .block-next { margin: 8px 0 4px; font-size: calc(14px * var(--fs)); }

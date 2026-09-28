@@ -5,6 +5,13 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #26 · 2026-09-28 · Blocks live under Programs
+**Decision:** The Programs page has two tabs, **Programs | Blocks**. The Blocks tab holds everything the old Blocks page had.
+Running blocks show as an **"Active blocks" card at the top** of the Programs tab and of the "From program" sheet, with an "Add"
+button for the next block day. The drawer item is now "Programs & blocks". The old `#blocks` link opens the Blocks tab.
+**Reason:** The user wanted blocks under Programs, possibly as their own category at the top. This was the suggested option.
+**Status:** Active
+
 ## #25 · 2026-09-28 · Block base % per template: 100 % for Russian Squat and Smolov Jr.
 **Decision:** The default base % comes from the template: **Russian Squat Program 100 %, Smolov Jr. 100 %, 5/3/1 90 %** (training
 max is part of 5/3/1), and custom blocks 100 %. It can still be changed per block. Running Russian/Smolov blocks that were started

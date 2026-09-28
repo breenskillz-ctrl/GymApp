@@ -7,7 +7,6 @@ import { renderPrograms } from './views/programs.js';
 import { renderExercises } from './views/exercises.js';
 import { renderProgress, openSettings, openBodyWeight } from './views/progress.js';
 import { renderTimers } from './views/timers.js';
-import { renderBlocks } from './views/blocks.js';
 
 load();
 applyTextScale(state.settings.textScale);
@@ -22,7 +21,7 @@ const VIEWS = {
   exercises: renderExercises,
   progress: renderProgress,
   timers: renderTimers,
-  blocks: renderBlocks,
+  blocks: (el) => renderPrograms(el, { tab: 'blocks' }), // old links: Blocks now lives under Programs
 };
 
 export function navigate(view) {

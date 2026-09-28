@@ -12,7 +12,36 @@ import { openExercisePicker } from './picker.js';
 import { openBlockEditor } from './blockeditor.js';
 
 let rootEl;
-const redraw = () => renderBlocks(rootEl);
+let embedded = false;
+const redraw = () => renderBlocks(rootEl, { embedded });
+
+// Compact cards for running blocks, shown at the top of Programs and in the "From program" sheet
+export function activeBlocksHtml() {
+  const running = state.blocks.filter((b) => !b.finished);
+  if (!running.length) return '';
+  return `<h3 class="section-title">Active blocks</h3>${running.map((b) => {
+    const next = b.weeks[b.pos.w].days[b.pos.d];
+    return `<div class="card block-banner">
+      <span class="banner-ico">${icon('blocks')}</span>
+      <span class="grow"><span class="title">${esc(b.name)}</span>
+        <span class="sub">Week ${b.pos.w + 1} · Day ${b.pos.d + 1} – ${esc(dayText(b, next))}</span></span>
+      <button class="btn primary sm" data-bnext="${esc(b.id)}">${icon('plus')} Add</button>
+    </div>`;
+  }).join('')}`;
+}
+
+// Handle a tap on an "Add" button from activeBlocksHtml(). Returns true if it was handled.
+export function onBannerClick(e, date, onAdded) {
+  const btn = e.target.closest('[data-bnext]');
+  if (!btn) return false;
+  const b = state.blocks.find((x) => x.id === btn.dataset.bnext);
+  if (b) {
+    addBlockWorkout(b, date);
+    toast('Block workout added – tap a set to log it');
+    onAdded?.();
+  }
+  return true;
+}
 
 function blockCard(b) {
   const size = blockSize(b);
@@ -37,11 +66,13 @@ function blockCard(b) {
     </section>`;
 }
 
-export function renderBlocks(root) {
+// Blocks content. embedded = shown inside the Programs page's "Blocks" tab (no top bar of its own).
+export function renderBlocks(root, opts = {}) {
   rootEl = root;
+  embedded = !!opts.embedded;
   const running = state.blocks;
   root.innerHTML = `
-    ${topBar('Blocks', `<button class="icon-btn" data-act="new" aria-label="New block template">${icon('plus')}</button>`)}
+    ${embedded ? '' : topBar('Blocks', `<button class="icon-btn" data-act="new" aria-label="New block template">${icon('plus')}</button>`)}
     ${running.length ? running.map(blockCard).join('') : `<p class="empty">No active block. Pick a template below to start one.</p>`}
     <h3 class="section-title">Start a block</h3>
     ${allBlockTemplates().map((t) => `
