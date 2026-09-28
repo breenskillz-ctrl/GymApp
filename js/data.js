@@ -2,8 +2,30 @@
 // Exercise types: 'wr' = weight + reps, 'r' = reps only, 't' = time, 'dt' = distance + time
 
 export const GROUPS = [
-  'Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Forearms',
-  'Legs', 'Glutes', 'Calves', 'Core', 'Cardio', 'Full body',
+  'Chest', 'Arms', 'Back', 'Legs', 'Shoulders', 'Core', 'Full-Body', 'Cardio', 'Other',
+];
+
+// Colour for each muscle group (used for icons, tags and card edges)
+export const GROUP_COLORS = {
+  Chest: '#4CAF50',
+  Arms: '#F4511E',
+  Back: '#3D6BFF',
+  Legs: '#C0CA33',
+  Shoulders: '#29B6F6',
+  Core: '#8E5CFF',
+  'Full-Body': '#FF9800',
+  Cardio: '#EC407A',
+  Other: '#9E9E9E',
+};
+
+// Set intensity levels (DECISIONS #13): shown as a coloured dot above each set
+export const LEVELS = [
+  { id: 'warmup', label: 'Warmup', color: '#8A8A8A' },
+  { id: 'easy', label: 'Easy', color: '#43C463' },
+  { id: 'normal', label: 'Normal', color: '#F2B705' },
+  { id: 'hard', label: 'Hard', color: '#E53935' },
+  { id: 'failure', label: 'Failure', color: '#A259FF' },
+  { id: 'drop', label: 'Drop', color: '#3D8BFF' },
 ];
 
 export const EQUIPMENT = [
@@ -64,29 +86,29 @@ export const EXERCISES = [
   E('band-shoulder-press', 'Band Shoulder Press', 'Shoulders', 'Band', 'r', 'Stand on the band and press the handles overhead.'),
   E('band-lateral-raise', 'Band Lateral Raise', 'Shoulders', 'Band', 'r', 'Stand on the band and raise your arms out to the sides.'),
 
-  // Biceps
-  E('barbell-curl', 'Barbell Curl', 'Biceps', 'Barbell', 'wr', 'Standing curl with your elbows tucked in to your sides.'),
-  E('db-curl', 'Dumbbell Curl', 'Biceps', 'Dumbbells', 'wr', 'Curl with supination of the wrist at the top.'),
-  E('hammer-curl', 'Hammer Curl', 'Biceps', 'Dumbbells', 'wr', 'Curl with a neutral grip (thumbs up).'),
-  E('preacher-curl', 'Preacher Curl', 'Biceps', 'Barbell', 'wr', 'Curl with your upper arms resting on an angled pad.'),
-  E('concentration-curl', 'Concentration Curl', 'Biceps', 'Dumbbells', 'wr', 'Seated, elbow braced against the inside of your thigh.'),
-  E('cable-curl', 'Cable Curl', 'Biceps', 'Cable', 'wr', 'Curl with constant tension from a cable.'),
-  E('band-curl', 'Band Curl', 'Biceps', 'Band', 'r', 'Stand on the band and curl the handles up.'),
+  // Arms: biceps
+  E('barbell-curl', 'Barbell Curl', 'Arms', 'Barbell', 'wr', 'Standing curl with your elbows tucked in to your sides.'),
+  E('db-curl', 'Dumbbell Curl', 'Arms', 'Dumbbells', 'wr', 'Curl with supination of the wrist at the top.'),
+  E('hammer-curl', 'Hammer Curl', 'Arms', 'Dumbbells', 'wr', 'Curl with a neutral grip (thumbs up).'),
+  E('preacher-curl', 'Preacher Curl', 'Arms', 'Barbell', 'wr', 'Curl with your upper arms resting on an angled pad.'),
+  E('concentration-curl', 'Concentration Curl', 'Arms', 'Dumbbells', 'wr', 'Seated, elbow braced against the inside of your thigh.'),
+  E('cable-curl', 'Cable Curl', 'Arms', 'Cable', 'wr', 'Curl with constant tension from a cable.'),
+  E('band-curl', 'Band Curl', 'Arms', 'Band', 'r', 'Stand on the band and curl the handles up.'),
 
-  // Triceps
-  E('triceps-pushdown', 'Triceps Pushdown', 'Triceps', 'Cable', 'wr', 'Push the bar or rope down with your elbows tucked in to your sides.'),
-  E('skull-crusher', 'Skull Crusher', 'Triceps', 'Barbell', 'wr', 'Lying down, lower the bar towards your forehead and extend your arms.'),
-  E('overhead-triceps-extension', 'Overhead Triceps Extension', 'Triceps', 'Dumbbells', 'wr', 'Hold the dumbbell overhead, lower it behind your neck and extend.'),
-  E('close-grip-bench', 'Close-Grip Bench Press', 'Triceps', 'Barbell', 'wr', 'Bench press with a shoulder-width grip for the triceps.'),
-  E('bench-dips', 'Bench Dips', 'Triceps', 'Bodyweight', 'r', 'Hands on the bench behind you, lower and press back up.'),
-  E('triceps-kickback', 'Triceps Kickback', 'Triceps', 'Dumbbells', 'wr', 'Bent over, extend your arm backwards.'),
-  E('diamond-push-ups', 'Diamond Push-ups', 'Triceps', 'Bodyweight', 'r', 'Push-ups with your hands close together under your chest.'),
-  E('band-triceps-extension', 'Band Triceps Extension', 'Triceps', 'Band', 'r', 'With the band anchored high, push down with your elbows tucked in.'),
+  // Arms: triceps
+  E('triceps-pushdown', 'Triceps Pushdown', 'Arms', 'Cable', 'wr', 'Push the bar or rope down with your elbows tucked in to your sides.'),
+  E('skull-crusher', 'Skull Crusher', 'Arms', 'Barbell', 'wr', 'Lying down, lower the bar towards your forehead and extend your arms.'),
+  E('overhead-triceps-extension', 'Overhead Triceps Extension', 'Arms', 'Dumbbells', 'wr', 'Hold the dumbbell overhead, lower it behind your neck and extend.'),
+  E('close-grip-bench', 'Close-Grip Bench Press', 'Arms', 'Barbell', 'wr', 'Bench press with a shoulder-width grip for the triceps.'),
+  E('bench-dips', 'Bench Dips', 'Arms', 'Bodyweight', 'r', 'Hands on the bench behind you, lower and press back up.'),
+  E('triceps-kickback', 'Triceps Kickback', 'Arms', 'Dumbbells', 'wr', 'Bent over, extend your arm backwards.'),
+  E('diamond-push-ups', 'Diamond Push-ups', 'Arms', 'Bodyweight', 'r', 'Push-ups with your hands close together under your chest.'),
+  E('band-triceps-extension', 'Band Triceps Extension', 'Arms', 'Band', 'r', 'With the band anchored high, push down with your elbows tucked in.'),
 
-  // Forearms
-  E('wrist-curl', 'Wrist Curl', 'Forearms', 'Dumbbells', 'wr', 'Forearms on the bench, curl with the wrist only.'),
-  E('farmers-walk', 'Farmer\'s Walk', 'Forearms', 'Dumbbells', 'dt', 'Walk while holding heavy dumbbells or kettlebells.'),
-  E('dead-hang', 'Dead Hang', 'Forearms', 'Bodyweight', 't', 'Hang from the bar with straight arms for as long as you can.'),
+  // Arms: forearms
+  E('wrist-curl', 'Wrist Curl', 'Arms', 'Dumbbells', 'wr', 'Forearms on the bench, curl with the wrist only.'),
+  E('farmers-walk', 'Farmer\'s Walk', 'Arms', 'Dumbbells', 'dt', 'Walk while holding heavy dumbbells or kettlebells.'),
+  E('dead-hang', 'Dead Hang', 'Arms', 'Bodyweight', 't', 'Hang from the bar with straight arms for as long as you can.'),
 
   // Legs
   E('squat', 'Squat', 'Legs', 'Barbell', 'wr', 'Bar on your upper back, sit down to at least parallel and stand back up.'),
@@ -104,19 +126,19 @@ export const EXERCISES = [
   E('wall-sit', 'Wall Sit', 'Legs', 'Bodyweight', 't', 'Sit with your back against the wall and knees at 90°.'),
   E('band-squat', 'Band Squat', 'Legs', 'Band', 'r', 'Stand on the band with the handles at your shoulders and squat.'),
 
-  // Glutes
-  E('hip-thrust', 'Hip Thrust', 'Glutes', 'Barbell', 'wr', 'Upper back against the bench, bar over your hips, drive your hips up.'),
-  E('glute-bridge', 'Glute Bridge', 'Glutes', 'Bodyweight', 'r', 'Lie on your back and lift your hips towards the ceiling.'),
-  E('kettlebell-swing', 'Kettlebell Swing', 'Glutes', 'Kettlebell', 'wr', 'Explosive hip hinge that swings the kettlebell to chest height.'),
-  E('cable-kickback', 'Cable Kickback', 'Glutes', 'Cable', 'wr', 'Kick your leg backwards against cable resistance.'),
-  E('hip-abduction', 'Hip Abduction Machine', 'Glutes', 'Machine', 'wr', 'Push your knees out against resistance.'),
-  E('band-lateral-walk', 'Band Lateral Walk', 'Glutes', 'Band', 'r', 'Band around your knees, walk sideways in a half squat.'),
-  E('band-glute-bridge', 'Band Glute Bridge', 'Glutes', 'Band', 'r', 'Glute bridge with a band around your knees, pushing the knees out.'),
+  // Legs: glutes
+  E('hip-thrust', 'Hip Thrust', 'Legs', 'Barbell', 'wr', 'Upper back against the bench, bar over your hips, drive your hips up.'),
+  E('glute-bridge', 'Glute Bridge', 'Legs', 'Bodyweight', 'r', 'Lie on your back and lift your hips towards the ceiling.'),
+  E('kettlebell-swing', 'Kettlebell Swing', 'Legs', 'Kettlebell', 'wr', 'Explosive hip hinge that swings the kettlebell to chest height.'),
+  E('cable-kickback', 'Cable Kickback', 'Legs', 'Cable', 'wr', 'Kick your leg backwards against cable resistance.'),
+  E('hip-abduction', 'Hip Abduction Machine', 'Legs', 'Machine', 'wr', 'Push your knees out against resistance.'),
+  E('band-lateral-walk', 'Band Lateral Walk', 'Legs', 'Band', 'r', 'Band around your knees, walk sideways in a half squat.'),
+  E('band-glute-bridge', 'Band Glute Bridge', 'Legs', 'Band', 'r', 'Glute bridge with a band around your knees, pushing the knees out.'),
 
-  // Calves
-  E('standing-calf-raise', 'Standing Calf Raise', 'Calves', 'Machine', 'wr', 'Rise up onto your toes and lower slowly.'),
-  E('seated-calf-raise', 'Seated Calf Raise', 'Calves', 'Machine', 'wr', 'Seated calf raise for the soleus.'),
-  E('bodyweight-calf-raise', 'Bodyweight Calf Raise', 'Calves', 'Bodyweight', 'r', 'Calf raise on a step using your own bodyweight.'),
+  // Legs: calves
+  E('standing-calf-raise', 'Standing Calf Raise', 'Legs', 'Machine', 'wr', 'Rise up onto your toes and lower slowly.'),
+  E('seated-calf-raise', 'Seated Calf Raise', 'Legs', 'Machine', 'wr', 'Seated calf raise for the soleus.'),
+  E('bodyweight-calf-raise', 'Bodyweight Calf Raise', 'Legs', 'Bodyweight', 'r', 'Calf raise on a step using your own bodyweight.'),
 
   // Core
   E('plank', 'Plank', 'Core', 'Bodyweight', 't', 'Hold your body straight on your forearms and toes.'),
@@ -140,13 +162,13 @@ export const EXERCISES = [
   E('jump-rope', 'Jump Rope', 'Cardio', 'Other', 't', 'Skip rope at a steady pace.'),
   E('stair-climber', 'Stair Climber', 'Cardio', 'Machine', 't', 'Climb on a stair machine.'),
 
-  // Full body
-  E('burpees', 'Burpees', 'Full body', 'Bodyweight', 'r', 'Squat, kick your legs back, push-up, jump forward and jump up.'),
-  E('power-clean', 'Power Clean', 'Full body', 'Barbell', 'wr', 'Explosively lift the bar from the floor to your shoulders.'),
-  E('thrusters', 'Thrusters', 'Full body', 'Dumbbells', 'wr', 'A front squat that flows straight into a shoulder press.'),
-  E('turkish-get-up', 'Turkish Get-up', 'Full body', 'Kettlebell', 'wr', 'Get up from lying to standing with a kettlebell overhead.'),
-  E('jumping-jacks', 'Jumping Jacks', 'Full body', 'Bodyweight', 'r', 'Jump out with arms and legs at the same time and back.'),
-  E('box-jumps', 'Box Jumps', 'Full body', 'Other', 'r', 'Jump up onto a stable box and step down.'),
+  // Full-Body
+  E('burpees', 'Burpees', 'Full-Body', 'Bodyweight', 'r', 'Squat, kick your legs back, push-up, jump forward and jump up.'),
+  E('power-clean', 'Power Clean', 'Full-Body', 'Barbell', 'wr', 'Explosively lift the bar from the floor to your shoulders.'),
+  E('thrusters', 'Thrusters', 'Full-Body', 'Dumbbells', 'wr', 'A front squat that flows straight into a shoulder press.'),
+  E('turkish-get-up', 'Turkish Get-up', 'Full-Body', 'Kettlebell', 'wr', 'Get up from lying to standing with a kettlebell overhead.'),
+  E('jumping-jacks', 'Jumping Jacks', 'Full-Body', 'Bodyweight', 'r', 'Jump out with arms and legs at the same time and back.'),
+  E('box-jumps', 'Box Jumps', 'Full-Body', 'Other', 'r', 'Jump up onto a stable box and step down.'),
 ];
 
 const W = (name, exercises) => ({ name, exercises: exercises.map(([ex, sets, reps]) => ({ ex, sets, reps })) });

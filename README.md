@@ -5,19 +5,21 @@ web app (PWA) that works on phones and desktops, including offline. All data is 
 
 ## Features
 
-- **Daily workout log** – swipe left/right or use the calendar to change day.
-- **Smart autofill** – new exercises are pre-filled with the weight and reps from last time, and the
-  "Previous" column shows what you did in your last session.
-- **100+ exercises** with descriptions, grouped by muscle group and equipment (including resistance bands,
-  kettlebells and bodyweight).
-- **Custom exercises** with different tracking types: weight + reps, reps only, time, or distance + time.
-- **10 ready-made programs** (full body, 5×5, push/pull/legs, upper/lower, home workout, resistance bands and more),
-  plus your own programs or customised copies of the built-in ones.
-- **Personal records** – get notified when you hit a new PR; see estimated 1RM, heaviest lift and best volume.
-- **Progress and statistics** – per-exercise charts, workouts per week, sets per muscle group, week streak and body weight.
-- **Timers** – a rest timer that starts automatically when you complete a set, countdown, Tabata intervals and a stopwatch.
-- **Backup** – export and import all data as JSON.
-- Dark and light theme (follows the system), kg or lb.
+The look and flow follow GymKeeper: a black and green theme, a side menu, and a green **+** button.
+
+- **Daily workout log.** Change day by swiping or with the calendar. Each day shows a summary (exercises · sets · kg),
+  the muscle groups trained, and a comment you can use as the workout's name.
+- **Exercise cards** with a picture, "Name · Equipment", and the sets shown as compact KG/REP columns.
+- **Set editor.** KG and REP fields with −/+ buttons, a comment per set, and six intensity levels shown as coloured dots:
+  warm-up (grey), easy (green), normal (yellow), hard (red), failure (purple) and drop (blue).
+  It also has buttons for exercise history, a 1RM calculator and a plate calculator.
+- **Smart autofill.** New sets are pre-filled from the previous set or from your last session.
+- **Add from:** a program, another day, recent exercises, or muscle groups, which show how many days since you last trained each one.
+- **100+ exercises** in 9 muscle groups. You can also add your own exercises.
+- **Programs** as a card grid with level badges. Give your own programs nicknames, edit them, copy them, and import or export them as files.
+- **Records and progress.** A notification when you set a new PR, per-exercise charts, workouts per week, sets per muscle group, and body weight.
+- **Timers.** A rest timer that starts automatically, plus countdown, Tabata and stopwatch.
+- **Backup.** Export and import all your data as JSON. kg or lb.
 
 ## Running locally
 

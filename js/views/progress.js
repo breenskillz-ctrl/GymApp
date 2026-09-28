@@ -1,10 +1,11 @@
 // Progress: statistics, charts, records, body weight and settings.
-import { GROUPS } from '../data.js';
+import { GROUPS, GROUP_COLORS } from '../data.js';
+import { groupIcon } from '../icons.js';
 import {
   state, save, dayHasWork, getExercise, records, setVolume, replaceState, resetState,
 } from '../store.js';
 import {
-  esc, icon, dateKey, addDays, weekStart, parseKey, fmtDate, fmtNum, num, toast, confirmDialog, openModal,
+  esc, icon, topBar, dateKey, addDays, weekStart, parseKey, fmtDate, fmtNum, num, toast, confirmDialog, openModal,
 } from '../utils.js';
 import { lineChart, barChart } from '../charts.js';
 import { openExerciseDetail } from './exercises.js';
@@ -81,8 +82,7 @@ export function renderProgress(root) {
   const groupsSorted = GROUPS.concat('Other').filter((g) => s.groupSets[g]).sort((a, b) => s.groupSets[b] - s.groupSets[a]);
 
   root.innerHTML = `
-    <header class="page-head"><h1>Progress</h1>
-      <button class="icon-btn" data-act="settings" aria-label="Settings">${icon('settings')}</button></header>
+    ${topBar('Progress', `<button class="icon-btn" data-act="settings" aria-label="Settings">${icon('settings')}</button>`)}
 
     <div class="tiles four">
       <div class="tile"><span class="tile-val">${s.total}</span><span class="tile-label">Total workouts</span></div>
@@ -99,8 +99,8 @@ export function renderProgress(root) {
     <section class="card">
       <h3>Sets per muscle group <span class="muted">(30 days)</span></h3>
       ${groupsSorted.length ? groupsSorted.map((g) => `
-        <div class="hbar"><span class="hbar-label">${esc(g)}</span>
-          <span class="hbar-track"><span class="hbar-fill" style="width:${(s.groupSets[g] / maxGroup) * 100}%"></span></span>
+        <div class="hbar"><span class="hbar-label">${groupIcon(g, 18)}${esc(g)}</span>
+          <span class="hbar-track"><span class="hbar-fill" style="width:${(s.groupSets[g] / maxGroup) * 100}%;background:${GROUP_COLORS[g] || GROUP_COLORS.Other}"></span></span>
           <span class="hbar-val">${s.groupSets[g]}</span></div>`).join('') : '<p class="empty">Complete some sets to see the breakdown.</p>'}
     </section>
 
@@ -150,20 +150,38 @@ export function renderProgress(root) {
     if (ex) return openExerciseDetail(ex.dataset.ex);
     const a = e.target.closest('[data-act]')?.dataset.act;
     if (a === 'settings') openSettings(() => renderProgress(root));
-    if (a === 'body-list') openBodyList(() => renderProgress(root));
+    if (a === 'body-list') openBodyWeight(() => renderProgress(root));
   };
 }
 
-function openBodyList(onChange) {
+// Body weight log: add today's weight and see or delete earlier entries
+export function openBodyWeight(onChange) {
   const u = state.settings.unit;
   const list = () => [...state.body].sort((a, b) => b.date.localeCompare(a.date));
   openModal(`
     <div class="modal-head"><h2>Body weight</h2>
       <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
+    <form class="row gap body-add">
+      <input class="input grow" name="w" inputmode="decimal" placeholder="Today's weight (${u})">
+      <button class="btn primary" type="submit">Save</button>
+    </form>
     <div class="list scroll"></div>`, {
     className: 'tall',
     onMount(m) {
       const box = m.querySelector('.list');
+      m.querySelector('.body-add').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const w = num(e.target.w.value);
+        if (!w) return;
+        const today = dateKey();
+        state.body = state.body.filter((b) => b.date !== today);
+        state.body.push({ date: today, weight: w });
+        save();
+        e.target.reset();
+        toast('Body weight saved');
+        draw();
+        onChange();
+      });
       const draw = () => {
         box.innerHTML = list().map((b) => `
           <div class="list-item static"><span class="grow">${fmtDate(b.date)}</span>

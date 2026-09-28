@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-09-28_
+_Last updated: 2026-09-28 (redesign)_
 
 ## About the user
 
@@ -33,9 +33,9 @@ _Last updated: 2026-09-28_
 - [x] Get the Pages deploy working without the user changing settings (2026-09-28).
 - [x] Deploy succeeded (verified via the Actions run and the deployments API; the sandbox can't open github.io).
 - [ ] User: test the app on the phone and give feedback.
-- [ ] Open question to the user: keep GymKeeper's DROP (drop set) level alongside purple FAILURE? What colour?
-- [ ] **In progress:** the user is sending GymKeeper screenshots (5 received so far: empty day, + sheet, programs, logged day, set editor). Redesign to match once all have arrived.
-      See `docs/DESIGN-REFERENCE.md`. The user said the current app looks like a different app (Strong/Hevy style).
+- [x] Redesigned to match the user's GymKeeper screenshots (2026-09-28): black/green theme, drawer, + sheet, card day view,
+      set editor dialog, 6 intensity levels, program grid with rename/import/export, 9 muscle groups.
+- [ ] User: try the redesign on the phone and give feedback (more GymKeeper screenshots are welcome).
 - [ ] Optional: commit an automated Playwright smoke test under `tests/`.
 - [ ] Optional ideas: exercise illustrations, supersets, plate calculator, workout duration, cloud sync
       (cloud sync would need a backend and secrets → GitHub Secrets / server-side only).

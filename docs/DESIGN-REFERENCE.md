@@ -122,12 +122,12 @@ Opens when you tap **+** on an exercise card (and presumably when you tap an exi
 - The number pad is the **phone's own numeric keyboard** ("Neste" = next field), not part of the app.
   → For us: `inputmode="decimal"` and `enterkeyhint="next"` so Enter moves from KG to REP and then submits.
 
-## Still to come
+## Still unknown (ask the user for screenshots if needed)
 
-- 3b. Inside a program: the list of workouts/days
+- 3b. Inside a program: the list of workouts/days (ours: a list of workouts with an ADD button)
 - Probably: set logging for an exercise, exercise list within a group, exercise details/stats, calendar, timers, drawer menu.
 
-## Planned changes (not started; wait for all screenshots)
+## Implemented (2026-09-28)
 
 - Switch the theme to pure black with a green accent. Replace the bottom nav with a hamburger drawer and a top bar (date pill, timer, calendar, ⋮).
 - Replace the "Add exercise" and "Start from program" buttons with a green + FAB that opens the Exercises sheet (2×2 tiles and a group list).
@@ -138,7 +138,7 @@ Opens when you tap **+** on an exercise card (and presumably when you tap an exi
   + / ⋮, and sets as wrapping KG/REP columns with intensity dots
   (grey warm-up, green easy, yellow normal, red hard, purple failure). Trophy button next to the FAB.
 - Set editor as a centred dialog: "Set №N", "Name · Equipment", history/calculator icons, KG and REP fields with −/+,
-  a per-set comment, an intensity row (WARMUP · EASY · NORMAL · HARD · FAILURE, plus DROP if the user wants it), and CANCEL/ADD.
+  a per-set comment, an intensity row (WARMUP · EASY · NORMAL · HARD · FAILURE · DROP), and CANCEL/ADD.
   Steppers change by 2.5 kg and 1 rep. Pre-fill from the previous set or the last session.
 - Our own exercise thumbnails (simple SVG pictograms per exercise or equipment type; never GymKeeper's illustrations).
 - Programs screen as a two-column image-card grid with level badges and a ⋮ menu (rename/edit/delete/export), plus program import.

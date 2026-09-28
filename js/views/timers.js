@@ -1,6 +1,6 @@
 // Timers: rest timer, countdown, Tabata intervals and stopwatch.
 import { state, save } from '../store.js';
-import { icon, fmtTime, beep, vibrate, pad } from '../utils.js';
+import { icon, fmtTime, beep, vibrate, pad, topBar } from '../utils.js';
 import { startRest } from '../timer.js';
 
 let tab = 'rest';
@@ -186,7 +186,7 @@ export function renderTimers(root) {
   rootEl = root;
   const tabs = [['rest', 'Rest'], ['countdown', 'Countdown'], ['tabata', 'Tabata'], ['stopwatch', 'Stopwatch']];
   root.innerHTML = `
-    <header class="page-head"><h1>Timer</h1></header>
+    ${topBar('Timers')}
     <div class="seg wide" data-tabs>${tabs.map(([k, l]) => `<button class="${tab === k ? 'active' : ''}" data-tab="${k}">${l}</button>`).join('')}</div>
     <div class="timer-body">${body()}</div>`;
   updateDisplay();

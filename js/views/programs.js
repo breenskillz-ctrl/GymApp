@@ -1,46 +1,76 @@
-// Training programs: built-in and custom, with editing.
-import { allPrograms, getProgram, saveProgram, deleteProgram, getExercise } from '../store.js';
-import { esc, icon, openModal, confirmDialog, toast, dateKey } from '../utils.js';
+// Programs: a two-column card grid (GymKeeper style), with your own nicknamed programs first.
+import {
+  state, save, allPrograms, getProgram, saveProgram, deleteProgram, getExercise,
+} from '../store.js';
+import {
+  esc, icon, openModal, confirmDialog, toast, topBar, go, promptDialog, menuDialog, dateKey, fmtDate,
+} from '../utils.js';
+import { programArt } from '../icons.js';
 import { openExercisePicker } from './picker.js';
 import { startWorkout, goToDate } from './log.js';
+import { exLabel } from './seteditor.js';
 
-let rootEl;
-let navigate;
+export const LEVEL_OPTIONS = ['Beginner', 'Intermediate', 'Advanced'];
 
-export function renderPrograms(root, nav) {
-  rootEl = root;
-  navigate = nav;
-  const programs = allPrograms();
-  const mine = programs.filter((p) => !p.builtin);
-  const builtin = programs.filter((p) => p.builtin);
-  const card = (p) => `
-    <button class="card prog-card" data-id="${esc(p.id)}">
-      <div class="prog-top">
-        <span class="title">${esc(p.name)}</span>
-        ${p.level ? `<span class="badge">${esc(p.level)}</span>` : ''}
-      </div>
-      ${p.desc ? `<p class="sub clamp">${esc(p.desc)}</p>` : ''}
-      <div class="prog-meta">
-        <span>${icon('list')} ${p.workouts.length} workout${p.workouts.length === 1 ? '' : 's'}</span>
-        ${p.days ? `<span>${icon('calendar')} ${p.days} days/week</span>` : ''}
-        <span>${icon('dumbbell')} ${new Set(p.workouts.flatMap((w) => w.exercises.map((x) => x.ex))).size} exercises</span>
-      </div>
-    </button>`;
+const levelClass = (lvl) => {
+  const l = String(lvl || '').toLowerCase();
+  return ['beginner', 'intermediate', 'advanced'].includes(l) ? `lvl-${l}` : 'lvl-other';
+};
 
-  root.innerHTML = `
-    <header class="page-head">
-      <h1>Programs</h1>
-      <button class="btn primary sm" data-act="new">${icon('plus')} New program</button>
-    </header>
-    ${mine.length ? `<h3 class="section-title">My programs</h3>${mine.map(card).join('')}` : ''}
-    <h3 class="section-title">Ready-made programs</h3>
-    ${builtin.map(card).join('')}`;
+function gridHtml() {
+  return `<div class="prog-grid">${allPrograms().map((p) => `
+    <div class="prog-tile" data-id="${esc(p.id)}" role="button" tabindex="0">
+      ${programArt(p.id)}
+      <span class="prog-name">${esc(p.name)}</span>
+      <button class="icon-btn prog-more" data-more aria-label="Program menu">${icon('more')}</button>
+      ${p.level ? `<span class="lvl-badge ${levelClass(p.level)}">${esc(p.level)}</span>` : ''}
+    </div>`).join('')}</div>`;
+}
 
-  root.onclick = (e) => {
-    if (e.target.closest('[data-act="new"]')) return openProgramEditor(null);
-    const c = e.target.closest('[data-id]');
-    if (c) openProgramDetail(c.dataset.id);
+const headActions = `
+  <button class="icon-btn" data-import aria-label="Import program">${icon('import')}</button>
+  <button class="icon-btn" data-new aria-label="New program">${icon('plus')}</button>`;
+
+// Shared click handling for the grid (page and sheet). `ctx` = { date, onAdded, refresh }
+async function onGridClick(e, ctx) {
+  if (e.target.closest('[data-new]')) return openProgramEditor(null, ctx.refresh);
+  if (e.target.closest('[data-import]')) return importProgram(ctx.refresh);
+  const tile = e.target.closest('[data-id]');
+  if (!tile) return;
+  const p = getProgram(tile.dataset.id);
+  if (e.target.closest('[data-more]')) return programMenu(p, ctx);
+  openProgramDetail(p, ctx);
+}
+
+// Programs page (from the drawer)
+export function renderPrograms(root) {
+  const draw = () => {
+    root.innerHTML = `${topBar('Programs', headActions)}${gridHtml()}`;
   };
+  const ctx = {
+    date: dateKey(),
+    refresh: draw,
+    onAdded: () => { goToDate(dateKey()); go('log'); },
+  };
+  root.onclick = (e) => onGridClick(e, ctx);
+  draw();
+}
+
+// Programs sheet (from the + sheet's "From program" tile): picks a workout for `date`
+export function openProgramsSheet({ date, onAdded }) {
+  openModal('<div class="sheet-body editor"></div><button class="close-float" data-close>Close</button>', {
+    className: 'sheet',
+    onMount(m, close) {
+      const body = m.querySelector('.sheet-body');
+      const draw = () => {
+        body.innerHTML = `<div class="modal-head"><h2 class="grow">Programs</h2><div class="actions">${headActions}</div></div>
+          <div class="scroll">${gridHtml()}</div>`;
+      };
+      const ctx = { date, refresh: draw, onAdded: () => { close(); onAdded?.(); } };
+      body.addEventListener('click', (e) => onGridClick(e, ctx));
+      draw();
+    },
+  });
 }
 
 const target = (x) => {
@@ -51,78 +81,135 @@ const target = (x) => {
   return `${x.sets} × ${x.reps ?? '–'}`;
 };
 
-function openProgramDetail(id) {
-  const p = getProgram(id);
+function openProgramDetail(p, ctx) {
+  const dayLabel = ctx.date === dateKey() ? 'today' : fmtDate(ctx.date, false);
   openModal(`
     <div class="modal-head">
-      <div><h2>${esc(p.name)}</h2>
-      <p class="sub">${[p.level, p.days && `${p.days} days/week`].filter(Boolean).map(esc).join(' · ')}</p></div>
-      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button>
+      <button class="icon-btn" data-close aria-label="Back">${icon('left')}</button>
+      <h2 class="grow">${esc(p.name)}</h2>
+      <button class="icon-btn" data-more aria-label="Program menu">${icon('more')}</button>
     </div>
     <div class="scroll">
       ${p.desc ? `<p class="desc">${esc(p.desc)}</p>` : ''}
+      <p class="sub">${[p.level, p.days && `${p.days} days/week`].filter(Boolean).map(esc).join(' · ')}</p>
+      <h3 class="section-title">Pick a workout to add to ${esc(dayLabel)}</h3>
       ${p.workouts.map((w) => `
-        <div class="card workout">
-          <div class="row between">
-            <h3>${esc(w.name)}</h3>
-            <button class="btn primary sm" data-start="${esc(w.id)}">${icon('play')} Start today</button>
-          </div>
-          <ol class="wo-list">
-            ${w.exercises.map((x) => `<li><span>${esc(getExercise(x.ex).name)}</span><span class="muted">${target(x)}</span></li>`).join('')}
-          </ol>
-        </div>`).join('')}
-      <div class="row gap mt">
-        ${p.builtin
-          ? `<button class="btn ghost grow" data-copy>${icon('copy')} Copy and customise</button>`
-          : `<button class="btn ghost grow" data-edit>${icon('edit')} Edit</button>
-             <button class="btn danger grow" data-del>${icon('trash')} Delete</button>`}
-      </div>
+        <button class="workout-row" data-w="${esc(w.id)}">
+          <span class="grow">
+            <span class="title">${esc(w.name)}</span>
+            <span class="sub">${w.exercises.map((x) => `${esc(exLabel(getExercise(x.ex)))} <span class="muted">${target(x)}</span>`).join(' · ')}</span>
+          </span>
+          <span class="add">Add</span>
+        </button>`).join('')}
     </div>`, {
-    className: 'tall',
+    className: 'sheet',
     onMount(m, close) {
-      m.addEventListener('click', async (e) => {
-        const s = e.target.closest('[data-start]');
-        if (s) {
-          const today = dateKey();
-          startWorkout(p, p.workouts.find((w) => w.id === s.dataset.start), today);
-          close();
-          goToDate(today);
-          navigate('log');
-          toast('Workout added for today – good luck!');
+      m.addEventListener('click', (e) => {
+        if (e.target.closest('[data-more]')) {
+          programMenu(p, { ...ctx, refresh: () => { close(); ctx.refresh(); } });
           return;
         }
-        if (e.target.closest('[data-copy]')) {
-          close();
-          const copy = JSON.parse(JSON.stringify(p));
-          copy.name = `${p.name} (copy)`;
-          copy.workouts.forEach((w) => { delete w.id; });
-          openProgramEditor(copy);
-        }
-        if (e.target.closest('[data-edit]')) { close(); openProgramEditor(JSON.parse(JSON.stringify(p))); }
-        if (e.target.closest('[data-del]') && await confirmDialog(`Delete the program "${p.name}"?`)) {
-          deleteProgram(p.id);
-          close();
-          renderPrograms(rootEl, navigate);
-          toast('Program deleted');
-        }
+        const b = e.target.closest('[data-w]');
+        if (!b) return;
+        startWorkout(p, p.workouts.find((w) => w.id === b.dataset.w), ctx.date);
+        close();
+        toast('Workout added – tap a set to log it');
+        ctx.onAdded();
       });
     },
   });
 }
 
-function openProgramEditor(program) {
+async function programMenu(p, ctx) {
+  const items = [];
+  if (!p.builtin) items.push({ value: 'rename', label: 'Rename', icon: 'edit' }, { value: 'edit', label: 'Edit', icon: 'list' });
+  items.push({ value: 'copy', label: p.builtin ? 'Copy and customise' : 'Duplicate', icon: 'copy' });
+  items.push({ value: 'export', label: 'Export to file', icon: 'download' });
+  if (!p.builtin) items.push({ value: 'delete', label: 'Delete', icon: 'trash', danger: true });
+  const v = await menuDialog(p.name, items);
+  if (v === 'rename') {
+    const name = await promptDialog('Rename program', p.name, { placeholder: 'E.g. Hybrid PPL' });
+    if (!name) return;
+    p.name = name;
+    saveProgram(p);
+    ctx.refresh();
+  }
+  if (v === 'edit') openProgramEditor(JSON.parse(JSON.stringify(p)), ctx.refresh);
+  if (v === 'copy') {
+    const copy = JSON.parse(JSON.stringify(p));
+    copy.name = p.builtin ? p.name : `${p.name} (copy)`;
+    delete copy.id;
+    copy.workouts.forEach((w) => { delete w.id; });
+    openProgramEditor(copy, ctx.refresh);
+  }
+  if (v === 'export') exportProgram(p);
+  if (v === 'delete' && await confirmDialog(`Delete the program "${p.name}"?`)) {
+    deleteProgram(p.id);
+    ctx.refresh();
+    toast('Program deleted');
+  }
+}
+
+// ---------- Import / export ----------
+function exportProgram(p) {
+  const exIds = new Set(p.workouts.flatMap((w) => w.exercises.map((x) => x.ex)));
+  const data = {
+    gymapp: 'program',
+    version: 1,
+    program: { ...p, id: undefined, builtin: undefined },
+    exercises: state.customExercises.filter((x) => exIds.has(x.id)),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${p.name.replace(/[^\w\- ]+/g, '').trim() || 'program'}.gymapp.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function importProgram(onDone) {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'application/json,.json';
+  inp.onchange = async () => {
+    try {
+      const data = JSON.parse(await inp.files[0].text());
+      if (data.gymapp !== 'program' || !data.program?.workouts) throw new Error('Not a program file');
+      for (const ex of data.exercises || []) {
+        if (!state.customExercises.some((x) => x.id === ex.id)) state.customExercises.push({ ...ex, builtin: false });
+      }
+      save();
+      const p = { ...data.program, id: undefined };
+      p.workouts.forEach((w) => { delete w.id; });
+      saveProgram(p);
+      toast(`Imported "${p.name}"`);
+      onDone?.();
+    } catch {
+      toast('Could not import that file');
+    }
+  };
+  inp.click();
+}
+
+// ---------- Editor ----------
+function openProgramEditor(program, onSave) {
   const p = program || { name: '', desc: '', level: '', days: 3, workouts: [{ name: 'Workout A', exercises: [] }] };
 
   const html = () => `
     <div class="modal-head">
-      <h2>${program?.id && !program.builtin ? 'Edit program' : 'New program'}</h2>
       <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button>
+      <h2 class="grow">${program?.id && !program.builtin ? 'Edit program' : 'New program'}</h2>
+      <button class="text-btn accent" data-save>Save</button>
     </div>
     <div class="scroll form">
-      <label>Name<input class="input" data-f="name" value="${esc(p.name)}" placeholder="My program"></label>
-      <label>Description<textarea class="input" data-f="desc" rows="2" placeholder="Optional">${esc(p.desc)}</textarea></label>
+      <label>Name (your own nickname)<input class="input" data-f="name" value="${esc(p.name)}" placeholder="E.g. Hybrid PPL"></label>
+      <label>Description<textarea class="input" data-f="desc" rows="2" placeholder="Optional">${esc(p.desc || '')}</textarea></label>
       <div class="row gap">
-        <label class="grow">Level<input class="input" data-f="level" value="${esc(p.level || '')}" placeholder="E.g. Beginner"></label>
+        <label class="grow">Level<select class="input" data-f="level">
+          <option value="">None</option>
+          ${LEVEL_OPTIONS.map((l) => `<option ${p.level === l ? 'selected' : ''}>${l}</option>`).join('')}
+          ${p.level && !LEVEL_OPTIONS.includes(p.level) ? `<option selected>${esc(p.level)}</option>` : ''}
+        </select></label>
         <label class="grow">Days per week<input class="input" data-f="days" type="number" min="1" max="7" value="${p.days ?? ''}"></label>
       </div>
       ${p.workouts.map((w, wi) => `
@@ -146,11 +233,10 @@ function openProgramEditor(program) {
           <button class="btn ghost sm" data-xadd>${icon('plus')} Add exercises</button>
         </div>`).join('')}
       <button class="btn ghost block" data-wadd>${icon('plus')} Add workout</button>
-      <button class="btn primary block" data-save>Save program</button>
     </div>`;
 
   openModal('<div class="editor"></div>', {
-    className: 'tall',
+    className: 'sheet',
     onMount(m, close) {
       const box = m.querySelector('.editor');
       const draw = () => {
@@ -158,7 +244,7 @@ function openProgramEditor(program) {
         box.innerHTML = html();
         box.querySelector('.scroll').scrollTop = st;
       };
-      box.addEventListener('input', (e) => {
+      const onField = (e) => {
         const t = e.target;
         if (t.dataset.f) p[t.dataset.f] = t.dataset.f === 'days' ? (Number(t.value) || null) : t.value;
         const wEl = t.closest('[data-wi]');
@@ -166,7 +252,9 @@ function openProgramEditor(program) {
         const w = p.workouts[Number(wEl.dataset.wi)];
         if (t.hasAttribute('data-wname')) w.name = t.value;
         if (t.dataset.x) w.exercises[Number(t.closest('[data-xi]').dataset.xi)][t.dataset.x] = Number(t.value) || null;
-      });
+      };
+      box.addEventListener('input', onField);
+      box.addEventListener('change', onField);
       box.addEventListener('click', (e) => {
         const wEl = e.target.closest('[data-wi]');
         const w = wEl && p.workouts[Number(wEl.dataset.wi)];
@@ -196,7 +284,7 @@ function openProgramEditor(program) {
           if (!p.workouts.length) { toast('Add at least one workout'); return; }
           saveProgram(p);
           close();
-          renderPrograms(rootEl, navigate);
+          onSave?.();
           toast('Program saved');
         }
       });

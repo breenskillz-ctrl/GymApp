@@ -1,7 +1,7 @@
 // Exercise library: search, filtering, details with history, records and chart, plus custom exercises.
 import { GROUPS, EQUIPMENT, TYPES } from '../data.js';
 import { state, getExercise, saveExercise, deleteExercise, history, records, setVolume } from '../store.js';
-import { esc, openModal, confirmDialog, icon, fmtDate, fmtNum, fmtTime, e1rm, toast, parseKey } from '../utils.js';
+import { esc, openModal, confirmDialog, icon, fmtDate, fmtNum, fmtTime, e1rm, toast, parseKey, topBar } from '../utils.js';
 import { lineChart } from '../charts.js';
 import { exerciseListHtml, filterExercises, groupChips } from './picker.js';
 
@@ -10,10 +10,7 @@ let group = '';
 
 export function renderExercises(root) {
   root.innerHTML = `
-    <header class="page-head">
-      <h1>Exercises</h1>
-      <button class="btn primary sm" data-act="new">${icon('plus')} Custom exercise</button>
-    </header>
+    ${topBar('Exercises', `<button class="icon-btn" data-act="new" aria-label="New exercise">${icon('plus')}</button>`)}
     <input class="input search" type="search" placeholder="Search ${filterExercises('', '').length} exercises…" value="${esc(query)}">
     <div class="chip-wrap">${groupChips(group)}</div>
     <div class="list"></div>`;
@@ -156,10 +153,11 @@ export function openExerciseDetail(id, onChange) {
 
 export function openExerciseEditor(ex, onSave) {
   const e = ex ? { ...ex } : { name: '', group: GROUPS[0], equip: EQUIPMENT[0], type: 'wr', desc: '' };
+  delete e.isNew;
   const opts = (arr, v) => arr.map((x) => `<option ${x === v ? 'selected' : ''}>${esc(x)}</option>`).join('');
   openModal(`
     <div class="modal-head">
-      <h2>${ex ? 'Edit exercise' : 'New exercise'}</h2>
+      <h2>${e.id ? 'Edit exercise' : 'New exercise'}</h2>
       <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button>
     </div>
     <form class="form">

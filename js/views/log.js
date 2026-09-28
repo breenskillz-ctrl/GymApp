@@ -1,14 +1,17 @@
-// Training log: one page per day with exercises and sets.
+// Day view: the workout log for one day, styled after GymKeeper (see docs/DESIGN-REFERENCE.md).
+import { GROUP_COLORS } from '../data.js';
 import {
-  state, save, getDay, cleanupDay, addEntry, getExercise, lastSets, allPrograms, dayHasWork, isPR, setVolume, setHasData,
+  state, save, getDay, cleanupDay, addEntry, getExercise, dayHasWork, isPR, daySummary, records,
 } from '../store.js';
 import {
-  esc, icon, openModal, confirmDialog, dateKey, addDays, fmtDate, relDay, num, parseTime, fmtTime, fmtNum, toast,
-  parseKey, MONTHS, pad,
+  esc, icon, openModal, confirmDialog, dateKey, addDays, fmtTime, fmtNum, toast,
+  parseKey, MONTHS, pad, go, promptDialog, menuDialog,
 } from '../utils.js';
-import { startRest } from '../timer.js';
+import { exerciseThumb, sleepArt } from '../icons.js';
 import { openExercisePicker } from './picker.js';
-import { openExerciseDetail, setText } from './exercises.js';
+import { openExerciseDetail } from './exercises.js';
+import { openSetEditor, levelColor, exLabel } from './seteditor.js';
+import { openAddSheet } from './addsheet.js';
 
 export const logState = { date: dateKey() };
 
@@ -16,72 +19,63 @@ let rootEl;
 
 export function goToDate(key) {
   logState.date = key;
-  if (rootEl) renderLog(rootEl);
+  if (rootEl && document.body.contains(rootEl)) renderLog(rootEl);
 }
 
-const COLS = {
-  wr: [['w', () => state.settings.unit], ['r', () => 'reps']],
-  r: [['r', () => 'reps']],
-  t: [['t', () => 'time']],
-  dt: [['d', () => 'km'], ['t', () => 'time']],
-};
+const rerender = () => renderLog(rootEl);
 
-function inputHtml(field, value) {
-  if (field === 't') {
-    return `<input class="set-input" data-field="t" inputmode="numeric" placeholder="m:ss" value="${value != null ? fmtTime(value) : ''}">`;
+// Copy performed sets as planned (not yet done) sets
+const asPlanned = (sets) => sets.filter((s) => s.done)
+  .map((s) => ({ w: s.w ?? null, r: s.r ?? null, t: s.t ?? null, d: s.d ?? null, done: false, lvl: s.lvl }));
+
+// One set as a compact two-line column: "120 KG / 2 REP"
+function setColHtml(ex, s, i) {
+  const u = state.settings.unit;
+  const val = (v, unit, fmt = (x) => fmtNum(x, 2)) => `<span class="v">${v == null ? '-' : fmt(v)}</span><span class="u">${unit}</span>`;
+  let l1;
+  let l2;
+  if (ex.type === 't') {
+    l1 = val(s.t, '', fmtTime);
+    l2 = s.w ? val(s.w, u) : '';
+  } else if (ex.type === 'dt') {
+    l1 = val(s.d, 'km');
+    l2 = val(s.t, '', fmtTime);
+  } else {
+    l1 = val(s.w, u);
+    l2 = val(s.r, 'rep', String);
   }
-  const mode = field === 'r' ? 'numeric' : 'decimal';
-  return `<input class="set-input" data-field="${field}" type="text" inputmode="${mode}" placeholder="–" value="${value ?? ''}">`;
-}
-
-function setRowHtml(ex, s, i, prev) {
-  const cols = COLS[ex.type] || COLS.wr;
   const pr = s.done && isPR(ex.id, logState.date, s);
-  return `
-    <div class="set-row ${s.done ? 'done' : ''}" data-set="${i}">
-      <button class="set-num" data-act="set-menu" title="Delete set">${pr ? '<span class="pr">PR</span>' : i + 1}</button>
-      <span class="set-prev" data-act="copy-prev">${prev ? esc(setText(ex, prev)) : '–'}</span>
-      ${cols.map(([f]) => inputHtml(f, s[f])).join('')}
-      <button class="set-check" data-act="toggle" aria-label="Done">${icon('check')}</button>
-    </div>`;
+  const color = s.done ? levelColor(s.lvl || 'normal') : null;
+  return `<button class="set-col ${s.done ? '' : 'planned'} ${pr ? 'pr' : ''}" data-act="edit-set" data-set="${i}">
+    ${color ? `<span class="dot" style="background:${color}"></span>` : ''}
+    <span class="line">${l1}</span>${l2 ? `<span class="line">${l2}</span>` : ''}
+    ${s.c ? `<span class="set-note">${esc(s.c)}</span>` : ''}
+  </button>`;
 }
 
 function entryHtml(entry) {
   const ex = getExercise(entry.ex);
-  const prev = lastSets(entry.ex, logState.date) || [];
-  const cols = COLS[ex.type] || COLS.wr;
-  const done = entry.sets.filter((s) => s.done).length;
   return `
-    <section class="card entry ${cols.length === 1 ? 'one-col' : ''}" data-entry="${entry.id}">
-      <div class="entry-head">
-        <button class="entry-title" data-act="info">
-          <span class="title">${esc(ex.name)}</span>
-          <span class="sub">${esc(ex.group)} · ${done}/${entry.sets.length} sets</span>
-        </button>
-        <button class="icon-btn" data-act="entry-menu" aria-label="Menu">${icon('more')}</button>
-      </div>
-      <div class="set-row head">
-        <span>Set</span><span>Previous</span>
-        ${cols.map(([, l]) => `<span>${l()}</span>`).join('')}
-        <span>${icon('check')}</span>
-      </div>
-      ${entry.sets.map((s, i) => setRowHtml(ex, s, i, prev[i])).join('')}
-      <div class="entry-foot">
-        <button class="btn ghost sm" data-act="add-set">${icon('plus')} Add set</button>
+    <section class="ex-card" data-entry="${entry.id}">
+      <button data-act="info" aria-label="Exercise details">${exerciseThumb(ex)}</button>
+      <div class="ex-body">
+        <div class="ex-head">
+          <button class="ex-title" data-act="info">${esc(exLabel(ex))}</button>
+          <button class="icon-btn" data-act="add-set" aria-label="Add set">${icon('plus')}</button>
+          <button class="icon-btn" data-act="entry-menu" aria-label="Menu">${icon('more')}</button>
+        </div>
+        <div class="sets">${entry.sets.map((s, i) => setColHtml(ex, s, i)).join('')}</div>
       </div>
     </section>`;
 }
 
-function summary(day) {
-  if (!day?.entries.length) return '';
-  let sets = 0;
-  let vol = 0;
-  for (const e of day.entries) {
-    for (const s of e.sets) {
-      if (s.done) { sets++; vol += setVolume(s); }
-    }
-  }
-  return `${day.entries.length} exercise${day.entries.length > 1 ? 's' : ''} · ${sets} set${sets === 1 ? '' : 's'} done${vol ? ` · ${fmtNum(vol, 0)} ${state.settings.unit} lifted` : ''}`;
+// "Today", "Yesterday" or a short date like "25 Sep"
+function dateLabel(key) {
+  if (key === dateKey()) return 'Today';
+  if (key === addDays(dateKey(), -1)) return 'Yesterday';
+  const d = parseKey(key);
+  const y = d.getFullYear() !== new Date().getFullYear() ? ` ${d.getFullYear()}` : '';
+  return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}${y}`;
 }
 
 export function renderLog(root) {
@@ -89,263 +83,168 @@ export function renderLog(root) {
   const key = logState.date;
   const day = getDay(key);
   const entries = day?.entries || [];
+  const sum = daySummary(day);
+  const isToday = key === dateKey();
 
   root.innerHTML = `
-    <header class="day-nav">
-      <button class="icon-btn" data-act="prev" aria-label="Previous day">${icon('left')}</button>
-      <button class="day-title" data-act="calendar">
-        <span class="title">${relDay(key)} ${icon('calendar')}</span>
-        <span class="sub">${fmtDate(key, false)}</span>
-      </button>
-      <button class="icon-btn" data-act="next" aria-label="Next day">${icon('right')}</button>
+    <header class="topbar">
+      <button class="icon-btn" data-open-drawer aria-label="Menu">${icon('menu')}</button>
+      <button class="${isToday ? 'date-pill' : 'date-text'}" data-act="calendar">${esc(dateLabel(key))}</button>
+      <span class="spacer"></span>
+      <button class="icon-btn" data-act="timers" aria-label="Timers">${icon('timer')}</button>
+      <button class="icon-btn" data-act="calendar" aria-label="Calendar">${icon('calendar')}</button>
+      <button class="icon-btn" data-act="day-menu" aria-label="More">${icon('more')}</button>
     </header>
-    ${key !== dateKey() ? `<button class="today-link" data-act="today">Go to today</button>` : ''}
-    ${day?.title ? `<div class="day-label">${icon('dumbbell')} ${esc(day.title)}</div>` : ''}
-    <p class="day-summary">${summary(day)}</p>
-    <div class="entries">
-      ${entries.length ? entries.map((e) => entryHtml(e)).join('') : `
-        <div class="empty-state">
-          <div class="empty-icon">${icon('dumbbell')}</div>
-          <h2>No workout logged</h2>
-          <p>Add exercises or start a workout from a program. Swipe sideways to change day.</p>
-        </div>`}
-    </div>
-    <div class="day-actions">
-      <button class="btn primary" data-act="add">${icon('plus')} Add exercise</button>
-      <button class="btn ghost" data-act="program">${icon('list')} Start from program</button>
-      ${entries.length ? '' : `<button class="btn ghost" data-act="repeat">${icon('repeat')} Repeat past workout</button>`}
-    </div>
-    <label class="note-label">Notes
-      <textarea class="input note" rows="2" placeholder="How did the workout feel?">${esc(day?.note || '')}</textarea>
-    </label>`;
+    ${entries.length ? `
+      <p class="day-summary">${sum.exs} exs · ${sum.sets} sets${sum.vol ? ` · ${fmtNum(sum.vol, 0)} ${state.settings.unit}` : ''}</p>
+      ${sum.groups.length ? `<div class="group-tags">${sum.groups.map((g) => `<span style="color:${GROUP_COLORS[g]}">${esc(g)}</span>`).join('')}</div>` : ''}
+      ${day.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
+      <div class="entries">${entries.map(entryHtml).join('')}</div>` : `
+      ${day?.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
+      <div class="empty-day">${sleepArt}<h2>Empty Day</h2></div>`}
+    <div class="fab-wrap">
+      ${entries.length ? `<button class="fab-round" data-act="records" aria-label="Records">${icon('trophy')}</button>` : ''}
+      <button class="fab" data-act="add" aria-label="Add exercise">${icon('plus')}</button>
+    </div>`;
 
-  bind(root);
+  root.onclick = onClick;
 }
 
 function entryById(id) {
   return getDay(logState.date)?.entries.find((e) => e.id === id);
 }
 
-function rerenderEntry(root, entry) {
-  const day = getDay(logState.date);
-  const card = root.querySelector(`[data-entry="${entry.id}"]`);
-  const tmp = document.createElement('div');
-  tmp.innerHTML = entryHtml(entry);
-  card.replaceWith(tmp.firstElementChild);
-  root.querySelector('.day-summary').textContent = summary(day);
+function onClick(e) {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const card = b.closest('[data-entry]');
+  const entry = card && entryById(card.dataset.entry);
+  const date = logState.date;
+
+  switch (b.dataset.act) {
+    case 'calendar': return openCalendar();
+    case 'timers': return go('timers');
+    case 'day-menu': return openDayMenu();
+    case 'records': return openDayRecords();
+    case 'comment': return editComment();
+    case 'add':
+      return openAddSheet(date, (added) => {
+        rerender();
+        if (added) openSetEditor(date, added, null, rerender);
+      });
+    case 'info': return openExerciseDetail(entry.ex);
+    case 'entry-menu': return openEntryMenu(entry);
+    case 'add-set': return openSetEditor(date, entry, null, rerender);
+    case 'edit-set': return openSetEditor(date, entry, Number(b.dataset.set), rerender);
+    default:
+  }
 }
 
-function bind(root) {
-  root.onclick = async (e) => {
-    const b = e.target.closest('[data-act]');
-    if (!b) return;
-    const act = b.dataset.act;
-    const card = b.closest('[data-entry]');
-    const entry = card && entryById(card.dataset.entry);
-    const row = b.closest('[data-set]');
-    const si = row ? Number(row.dataset.set) : -1;
-
-    switch (act) {
-      case 'prev': return goToDate(addDays(logState.date, -1));
-      case 'next': return goToDate(addDays(logState.date, 1));
-      case 'today': return goToDate(dateKey());
-      case 'calendar': return openCalendar();
-      case 'add':
-        return openExercisePicker({
-          onPick(ids) {
-            ids.forEach((id) => addEntry(logState.date, id));
-            renderLog(root);
-          },
-        });
-      case 'program': return openProgramStarter();
-      case 'repeat': return openRepeat();
-      case 'info': return openExerciseDetail(entry.ex);
-      case 'entry-menu': return openEntryMenu(entry);
-      case 'add-set': {
-        const last = entry.sets[entry.sets.length - 1];
-        entry.sets.push(last ? { ...last, done: false } : { w: null, r: null, t: null, d: null, done: false });
-        save();
-        return rerenderEntry(root, entry);
-      }
-      case 'toggle': {
-        const s = entry.sets[si];
-        // Fill in from last time if the fields are empty
-        if (!s.done && !setHasData(s)) {
-          const prev = (lastSets(entry.ex, logState.date) || [])[si];
-          if (prev) Object.assign(s, { w: prev.w, r: prev.r, t: prev.t, d: prev.d });
-        }
-        s.done = !s.done;
-        save();
-        rerenderEntry(root, entry);
-        if (s.done) {
-          if (isPR(entry.ex, logState.date, s)) toast('🏆 New personal record!');
-          if (state.settings.autoRest && logState.date === dateKey()) startRest();
-        }
-        return;
-      }
-      case 'copy-prev': {
-        const prev = (lastSets(entry.ex, logState.date) || [])[si];
-        if (!prev) return;
-        Object.assign(entry.sets[si], { w: prev.w, r: prev.r, t: prev.t, d: prev.d });
-        save();
-        return rerenderEntry(root, entry);
-      }
-      case 'set-menu': {
-        if (entry.sets.length === 1) {
-          if (await confirmDialog('Remove this exercise from the day?', 'Remove')) removeEntry(entry);
-          return;
-        }
-        if (!await confirmDialog(`Delete set ${si + 1}?`)) return;
-        entry.sets.splice(si, 1);
-        save();
-        return rerenderEntry(root, entry);
-      }
-      default:
-    }
-  };
-
-  root.oninput = (e) => {
-    const inp = e.target;
-    if (inp.classList.contains('note')) {
-      const day = getDay(logState.date, true);
-      day.note = inp.value;
-      cleanupDay(logState.date);
-      save();
-      return;
-    }
-    if (!inp.classList.contains('set-input')) return;
-    const entry = entryById(inp.closest('[data-entry]').dataset.entry);
-    const s = entry.sets[Number(inp.closest('[data-set]').dataset.set)];
-    const f = inp.dataset.field;
-    s[f] = f === 't' ? parseTime(inp.value) : num(inp.value);
-    save();
-  };
-
-  root.onfocusin = (e) => {
-    if (e.target.classList.contains('set-input')) e.target.select();
-  };
+async function editComment() {
+  const day = getDay(logState.date);
+  const text = await promptDialog('Comment', day?.title || '', { placeholder: 'E.g. Friday Lower + Hypers' });
+  if (text == null) return;
+  getDay(logState.date, true).title = text;
+  cleanupDay(logState.date);
+  save();
+  rerender();
 }
 
 function removeEntry(entry) {
   const day = getDay(logState.date);
   day.entries = day.entries.filter((x) => x !== entry);
-  if (!day.entries.length) day.title = '';
   cleanupDay(logState.date);
   save();
-  renderLog(rootEl);
+  rerender();
 }
 
-function openEntryMenu(entry) {
+async function openDayMenu() {
+  const key = logState.date;
+  const day = getDay(key);
+  const items = [{ value: 'comment', label: day?.title ? 'Edit comment' : 'Add comment', icon: 'comment' }];
+  if (key !== dateKey()) items.push({ value: 'today', label: 'Go to today', icon: 'calendar' });
+  if (day?.entries.length && key !== dateKey()) items.push({ value: 'copy', label: 'Copy workout to today', icon: 'copy' });
+  if (day?.entries.length) items.push({ value: 'clear', label: 'Clear this day', icon: 'trash', danger: true });
+  const v = await menuDialog(null, items);
+  if (v === 'comment') editComment();
+  if (v === 'today') goToDate(dateKey());
+  if (v === 'copy') {
+    const today = dateKey();
+    const target = getDay(today, true);
+    if (!target.title && day.title) target.title = day.title;
+    for (const x of day.entries) addEntry(today, x.ex).sets = asPlanned(x.sets);
+    save();
+    goToDate(today);
+    toast('Copied to today – tap a set to log it');
+  }
+  if (v === 'clear' && await confirmDialog('Remove all exercises and the comment from this day?', 'Clear')) {
+    delete state.log[key];
+    save();
+    rerender();
+  }
+}
+
+async function openEntryMenu(entry) {
   const ex = getExercise(entry.ex);
   const day = getDay(logState.date);
   const idx = day.entries.indexOf(entry);
-  openModal(`
-    <div class="modal-head"><h2>${esc(ex.name)}</h2>
-      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
-    <div class="menu">
-      <button data-m="info">${icon('chart')} History and records</button>
-      ${idx > 0 ? `<button data-m="up">${icon('up')} Move up</button>` : ''}
-      ${idx < day.entries.length - 1 ? `<button data-m="down">${icon('down')} Move down</button>` : ''}
-      <button data-m="swap">${icon('repeat')} Replace exercise</button>
-      <button data-m="del" class="danger-text">${icon('trash')} Remove from day</button>
-    </div>`, {
-    className: 'small',
-    onMount(m, close) {
-      m.querySelector('.menu').addEventListener('click', async (e) => {
-        const b = e.target.closest('[data-m]');
-        if (!b) return;
-        close();
-        const a = b.dataset.m;
-        if (a === 'info') openExerciseDetail(entry.ex);
-        if (a === 'up' || a === 'down') {
-          const j = idx + (a === 'up' ? -1 : 1);
-          [day.entries[idx], day.entries[j]] = [day.entries[j], day.entries[idx]];
-          save();
-          renderLog(rootEl);
-        }
-        if (a === 'swap') {
-          openExercisePicker({
-            title: 'Replace with',
-            multi: false,
-            onPick([id]) {
-              entry.ex = id;
-              save();
-              renderLog(rootEl);
-            },
-          });
-        }
-        if (a === 'del' && await confirmDialog(`Remove ${ex.name} from the day?`, 'Remove')) removeEntry(entry);
-      });
-    },
-  });
-}
-
-export function startWorkout(program, workout, key = logState.date) {
-  const day = getDay(key, true);
-  day.title = `${program.name} – ${workout.name}`;
-  workout.exercises.forEach((w) => addEntry(key, w.ex, { sets: w.sets, reps: w.reps }));
-  save();
-}
-
-function openProgramStarter() {
-  const programs = allPrograms();
-  openModal(`
-    <div class="modal-head"><h2>Start from program</h2>
-      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
-    <div class="scroll">
-      ${programs.map((p) => `
-        <div class="prog-group">
-          <div class="list-heading">${esc(p.name)}</div>
-          ${p.workouts.map((w) => `
-            <button class="list-item" data-p="${esc(p.id)}" data-w="${esc(w.id)}">
-              <span class="grow"><span class="title">${esc(w.name)}</span>
-              <span class="sub">${w.exercises.map((x) => esc(getExercise(x.ex).name)).join(', ')}</span></span>
-              ${icon('right')}
-            </button>`).join('')}
-        </div>`).join('')}
-    </div>`, {
-    className: 'tall',
-    onMount(m, close) {
-      m.addEventListener('click', (e) => {
-        const b = e.target.closest('[data-w]');
-        if (!b) return;
-        const p = programs.find((x) => x.id === b.dataset.p);
-        const w = p.workouts.find((x) => x.id === b.dataset.w);
-        startWorkout(p, w);
-        close();
-        renderLog(rootEl);
-        toast('Workout added – good luck!');
-      });
-    },
-  });
-}
-
-function openRepeat() {
-  const dates = Object.keys(state.log).filter((k) => k !== logState.date && dayHasWork(k)).sort().reverse().slice(0, 30);
-  openModal(`
-    <div class="modal-head"><h2>Repeat past workout</h2>
-      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
-    <div class="list scroll">
-      ${dates.length ? dates.map((k) => {
-        const d = state.log[k];
-        return `<button class="list-item" data-date="${k}">
-          <span class="grow"><span class="title">${esc(d.title || fmtDate(k))}</span>
-          <span class="sub">${d.title ? fmtDate(k) + ' · ' : ''}${d.entries.map((x) => esc(getExercise(x.ex).name)).join(', ')}</span></span>
-          ${icon('right')}</button>`;
-      }).join('') : '<p class="empty">You have no past workouts yet.</p>'}
-    </div>`, {
-    className: 'tall',
-    onMount(m, close) {
-      m.addEventListener('click', (e) => {
-        const b = e.target.closest('[data-date]');
-        if (!b) return;
-        const src = state.log[b.dataset.date];
-        const day = getDay(logState.date, true);
-        day.title = src.title || '';
-        src.entries.forEach((x) => addEntry(logState.date, x.ex));
+  const items = [{ value: 'info', label: 'History and records', icon: 'chart' }];
+  if (idx > 0) items.push({ value: 'up', label: 'Move up', icon: 'up' });
+  if (idx < day.entries.length - 1) items.push({ value: 'down', label: 'Move down', icon: 'down' });
+  items.push({ value: 'swap', label: 'Replace exercise', icon: 'repeat' });
+  items.push({ value: 'del', label: 'Remove from day', icon: 'trash', danger: true });
+  const a = await menuDialog(exLabel(ex), items);
+  if (a === 'info') openExerciseDetail(entry.ex);
+  if (a === 'up' || a === 'down') {
+    const j = idx + (a === 'up' ? -1 : 1);
+    [day.entries[idx], day.entries[j]] = [day.entries[j], day.entries[idx]];
+    save();
+    rerender();
+  }
+  if (a === 'swap') {
+    openExercisePicker({
+      title: 'Replace with',
+      multi: false,
+      onPick([id]) {
+        entry.ex = id;
         save();
-        close();
-        renderLog(rootEl);
+        rerender();
+      },
+    });
+  }
+  if (a === 'del' && await confirmDialog(`Remove ${ex.name} from the day?`, 'Remove')) removeEntry(entry);
+}
+
+// Records for the exercises in this day
+function openDayRecords() {
+  const day = getDay(logState.date);
+  const u = state.settings.unit;
+  const rows = day.entries.map((e) => {
+    const ex = getExercise(e.ex);
+    const rec = records(e.ex);
+    const newPR = e.sets.some((s) => s.done && isPR(e.ex, logState.date, s));
+    let best = 'No records yet';
+    if (ex.type === 'wr' && rec.best1rm) best = `Est. 1RM ${fmtNum(rec.best1rm.v, 1)} ${u} · heaviest ${fmtNum(rec.maxW.v, 2)} ${u}`;
+    else if (ex.type === 'r' && rec.maxR) best = `Most reps: ${rec.maxR.v}`;
+    else if (ex.type === 't' && rec.maxT) best = `Longest: ${fmtTime(rec.maxT.v)}`;
+    else if (ex.type === 'dt' && rec.maxD) best = `Longest: ${fmtNum(rec.maxD.v, 2)} km`;
+    return `<button class="ex-row" data-ex="${esc(e.ex)}">
+      ${exerciseThumb(ex)}
+      <span class="grow"><span class="title">${esc(exLabel(ex))}</span><span class="sub">${best}</span></span>
+      ${newPR ? `<span class="avatar gold" title="New record today">${icon('trophy')}</span>` : ''}
+    </button>`;
+  }).join('');
+  openModal(`
+    <div class="modal-head"><h2>Records</h2>
+      <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
+    <div class="list scroll">${rows}</div>
+    <button class="btn ghost block" data-all>${icon('chart')} All progress and records</button>`, {
+    className: 'tall',
+    onMount(m, close) {
+      m.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-ex]');
+        if (b) openExerciseDetail(b.dataset.ex);
+        if (e.target.closest('[data-all]')) { close(); go('progress'); }
       });
     },
   });
@@ -381,20 +280,30 @@ function openCalendar() {
       <div class="cal-grid">${cells}</div>`;
   };
 
-  openModal('<div class="cal"></div><button class="btn ghost block" data-close>Close</button>', {
-    className: 'small',
+  openModal(`<div class="cal"></div>
+    <div class="dialog-actions"><button class="text-btn accent" data-today>Today</button><button class="text-btn" data-close>Close</button></div>`, {
+    className: 'dialog',
     onMount(m, close) {
       const cal = m.querySelector('.cal');
       const draw = () => { cal.innerHTML = monthHtml(); };
-      cal.addEventListener('click', (e) => {
+      m.addEventListener('click', (e) => {
         const mo = e.target.closest('[data-mo]');
         if (mo) { cur.setMonth(cur.getMonth() + Number(mo.dataset.mo)); draw(); return; }
         const d = e.target.closest('[data-day]');
         if (d) { close(); goToDate(d.dataset.day); }
+        if (e.target.closest('[data-today]')) { close(); goToDate(dateKey()); }
       });
       draw();
     },
   });
+}
+
+// Add a program workout to a day as planned sets (from the program targets or the last session)
+export function startWorkout(program, workout, key = logState.date) {
+  const day = getDay(key, true);
+  if (!day.title) day.title = `${program.name} – ${workout.name}`;
+  workout.exercises.forEach((w) => addEntry(key, w.ex, { sets: w.sets, reps: w.reps }));
+  save();
 }
 
 // Swipe left/right to change day

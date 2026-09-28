@@ -2,7 +2,20 @@
 import { GROUPS } from '../data.js';
 import { allExercises } from '../store.js';
 import { esc, openModal, icon } from '../utils.js';
+import { exerciseThumb, groupIcon } from '../icons.js';
+import { exLabel } from './seteditor.js';
 
+// One exercise row with its thumbnail
+export function exRowHtml(ex, selected = false) {
+  return `<button class="ex-row ${selected ? 'selected' : ''}" data-ex="${esc(ex.id)}">
+    ${exerciseThumb(ex)}
+    <span class="grow"><span class="title">${esc(exLabel(ex))}</span>
+    <span class="sub">${esc(ex.group)}${ex.builtin ? '' : ' · Custom'}</span></span>
+    <span class="check">${icon('check')}</span>
+  </button>`;
+}
+
+// Exercises grouped under muscle-group headings
 export function exerciseListHtml(list, selected = new Set()) {
   if (!list.length) return '<p class="empty">No exercises found.</p>';
   let html = '';
@@ -11,17 +24,9 @@ export function exerciseListHtml(list, selected = new Set()) {
   for (const ex of sorted) {
     if (ex.group !== group) {
       group = ex.group;
-      html += `<div class="list-heading">${esc(group || 'Other')}</div>`;
+      html += `<div class="list-heading row gap">${groupIcon(group, 18)}${esc(group || 'Other')}</div>`;
     }
-    html += `
-      <button class="list-item ${selected.has(ex.id) ? 'selected' : ''}" data-ex="${esc(ex.id)}">
-        <span class="avatar">${esc(ex.name[0])}</span>
-        <span class="grow">
-          <span class="title">${esc(ex.name)}</span>
-          <span class="sub">${esc(ex.equip)}${ex.builtin ? '' : ' · Custom'}</span>
-        </span>
-        <span class="check">${icon('check')}</span>
-      </button>`;
+    html += exRowHtml(ex, selected.has(ex.id));
   }
   return html;
 }
@@ -54,7 +59,7 @@ export function openExercisePicker({ title = 'Add exercises', multi = true, onPi
     <div class="list scroll"></div>
     ${multi ? '<button class="btn primary block" data-add disabled>Select exercises</button>' : ''}
   `, {
-    className: 'tall',
+    className: 'sheet',
     onMount(m, close) {
       const list = m.querySelector('.list');
       const chipWrap = m.querySelector('.chip-wrap');

@@ -146,11 +146,11 @@ export function confirmDialog(message, okLabel = 'Delete') {
   return new Promise((resolve) => {
     openModal(`
       <p class="confirm-text">${esc(message)}</p>
-      <div class="row gap end">
-        <button class="btn ghost" data-close>Cancel</button>
-        <button class="btn danger" data-ok>${esc(okLabel)}</button>
+      <div class="dialog-actions">
+        <button class="text-btn" data-close>Cancel</button>
+        <button class="text-btn danger-text" data-ok>${esc(okLabel)}</button>
       </div>`, {
-      className: 'small',
+      className: 'dialog',
       onMount(m, close) {
         let ok = false;
         m.querySelector('[data-ok]').onclick = () => { ok = true; close(); };
@@ -164,3 +164,73 @@ export function confirmDialog(message, okLabel = 'Delete') {
 }
 
 export const icon = (name) => `<svg class="ico" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+
+// ---------- Layout helpers ----------
+// Standard top bar for a view: ☰, title, optional action buttons on the right
+export function topBar(title, actions = '') {
+  return `<header class="topbar">
+    <button class="icon-btn" data-open-drawer aria-label="Menu">${icon('menu')}</button>
+    <h1 class="topbar-title">${title}</h1>
+    <div class="topbar-actions">${actions}</div>
+  </header>`;
+}
+
+// Navigate to another view (handled in app.js)
+export const go = (view) => window.dispatchEvent(new CustomEvent('gym:navigate', { detail: view }));
+
+// Small text input dialog. Resolves with the text, or null on cancel.
+export function promptDialog(title, value = '', { placeholder = '', okLabel = 'Save', multiline = false } = {}) {
+  return new Promise((resolve) => {
+    let result = null;
+    openModal(`
+      <h2 class="dialog-title">${esc(title)}</h2>
+      <form class="form">
+        ${multiline
+          ? `<textarea class="input" rows="3" placeholder="${esc(placeholder)}">${esc(value)}</textarea>`
+          : `<input class="input" value="${esc(value)}" placeholder="${esc(placeholder)}">`}
+        <div class="dialog-actions">
+          <button type="button" class="text-btn" data-close>Cancel</button>
+          <button type="submit" class="text-btn accent">${esc(okLabel)}</button>
+        </div>
+      </form>`, {
+      className: 'dialog',
+      onMount(m, close) {
+        const inp = m.querySelector('.input');
+        setTimeout(() => { inp.focus(); inp.select?.(); }, 50);
+        m.querySelector('form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          result = inp.value.trim();
+          close();
+        });
+        const obs = new MutationObserver(() => {
+          if (!document.body.contains(m)) { obs.disconnect(); resolve(result); }
+        });
+        obs.observe(document.body, { childList: true });
+      },
+    });
+  });
+}
+
+// Pick one option from a list. Resolves with the chosen value, or null.
+export function menuDialog(title, items) {
+  return new Promise((resolve) => {
+    let result = null;
+    openModal(`
+      ${title ? `<h2 class="dialog-title">${esc(title)}</h2>` : ''}
+      <div class="menu">${items.map((it) => `<button data-v="${esc(it.value)}" class="${it.danger ? 'danger-text' : ''}">${it.icon ? icon(it.icon) : ''}${esc(it.label)}</button>`).join('')}</div>`, {
+      className: 'dialog',
+      onMount(m, close) {
+        m.querySelector('.menu').addEventListener('click', (e) => {
+          const b = e.target.closest('[data-v]');
+          if (!b) return;
+          result = b.dataset.v;
+          close();
+        });
+        const obs = new MutationObserver(() => {
+          if (!document.body.contains(m)) { obs.disconnect(); resolve(result); }
+        });
+        obs.observe(document.body, { childList: true });
+      },
+    });
+  });
+}

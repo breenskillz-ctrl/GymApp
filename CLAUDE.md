@@ -37,15 +37,20 @@ plain HTML/CSS/JavaScript (ES modules). There is no build step, there are no dep
 All data is stored in `localStorage` on the device.
 
 ```
-index.html            App shell, SVG icon sprite (<symbol id="i-…">), bottom nav, rest bar, toast
-css/styles.css        All styles; colours are CSS variables on :root (dark default, light via prefers-color-scheme)
-js/app.js             Startup, tab navigation (navigate(view)), service worker registration
-js/data.js            Built-in EXERCISES, PROGRAMS, GROUPS, EQUIPMENT, TYPES
-js/store.js           State, load/save, exercises/programs CRUD, history(), records(), isPR(), makeSets() autofill
-js/utils.js           Dates, formatting, esc(), openModal(), confirmDialog(), toast(), beep(), icon()
-js/timer.js           Global rest timer (bottom bar)
+index.html            App shell, SVG icon sprite (<symbol id="i-…">), side drawer, rest bar, toast
+css/styles.css        All styles: GymKeeper-like black/green dark theme (DECISIONS #14)
+js/app.js             Startup, navigation (navigate(view); views call go(view) from utils), drawer
+js/data.js            EXERCISES, PROGRAMS, GROUPS (9) + GROUP_COLORS, LEVELS (set intensity), EQUIPMENT, TYPES
+js/store.js           State, load/save + migrate(), CRUD, history(), records(), isPR(), daySummary(), daysSinceGroups()
+js/utils.js           Dates, formatting, esc(), openModal(), confirmDialog(), promptDialog(), menuDialog(), topBar(), toast()
+js/icons.js           Our own SVG art: groupIcon(), exerciseThumb(), programArt(), sleepArt
+js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart() and barChart() on canvas
-js/views/*.js         One file per screen: log, programs, exercises, progress (+settings), timers, picker
+js/views/log.js       Day view (cards with sets as KG/REP columns, FAB, day menu, calendar, records)
+js/views/seteditor.js Set editor dialog (fields, −/+, comment, levels, history/1RM/plate tools)
+js/views/addsheet.js  "+" sheet: quick tiles, muscle groups, exercise lists, search, copy another day
+js/views/programs.js  Program grid (page + sheet), detail, ⋮ menu (rename/edit/copy/export/delete), import, editor
+js/views/*.js         exercises (library + detail + editor), progress (+ settings, body weight), timers, picker
 sw.js                 Network-first service worker with an offline cache
 ```
 

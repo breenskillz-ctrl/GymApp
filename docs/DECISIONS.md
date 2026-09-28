@@ -5,9 +5,32 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #16 · 2026-09-28 · Adding exercises and sets works like GymKeeper
+**Decision:** The + button opens an "Exercises" sheet (four quick tiles, then muscle groups showing days since last trained).
+Picking an exercise adds an empty card and opens the set editor. Sets are entered in a dialog, not typed inline.
+Sets from a program or another day are added as *planned* sets (`done: false`, no dot) and become done when saved in the editor.
+**Reason:** The user wants the app to work like GymKeeper (screenshots in DESIGN-REFERENCE.md).
+**Status:** Active
+
+## #15 · 2026-09-28 · Nine muscle groups
+**Decision:** Chest, Arms, Back, Legs, Shoulders, Core, Full-Body, Cardio, Other, each with its own colour (`GROUP_COLORS`).
+Biceps/Triceps/Forearms became Arms, and Glutes/Calves became Legs. Exercise ids are unchanged, and `migrate()` in `store.js`
+converts old saved data.
+**Reason:** It matches GymKeeper's group list.
+**Status:** Active
+
+## #14 · 2026-09-28 · GymKeeper-style look: black and green, drawer navigation
+**Decision:** Pure black background, dark grey cards and a green accent (`#3bb54a`), dark theme only. Navigation uses a ☰ side
+drawer and a top bar; there is no bottom tab bar. Programs are shown as a two-column card grid with our own SVG artwork.
+The app icon is green.
+**Reason:** The user said the first version looked like a different app. The design now follows their GymKeeper screenshots.
+We use our own artwork and never GymKeeper's images or icons (#4).
+**Status:** Active. Replaces the first version's orange theme with a bottom nav.
+
 ## #13 · 2026-09-28 · Set intensity levels, with failure in purple
 **Decision:** Each set gets an intensity level shown as a coloured dot: **grey = warm-up, green = easy, yellow = normal,
-red = hard, purple = failure**. Failure is a full level of its own and is shown in purple.
+red = hard, purple = failure, blue = drop**. Failure is a full level of its own and is shown in purple. The user approved keeping
+GymKeeper's DROP level too, shown in blue.
 **Reason:** It matches GymKeeper's dots (grey/green/yellow/red), as confirmed by the user. The user misses failure as a level
 there and suggested purple. Purple is also clearly different from red, so the two are easy to tell apart.
 **Status:** Active

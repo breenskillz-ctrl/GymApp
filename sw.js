@@ -1,5 +1,5 @@
 // Service worker: makes the app available offline.
-const CACHE = 'gymapp-v2';
+const CACHE = 'gymapp-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -14,12 +14,15 @@ const ASSETS = [
   './js/utils.js',
   './js/charts.js',
   './js/timer.js',
+  './js/icons.js',
   './js/views/log.js',
   './js/views/programs.js',
   './js/views/exercises.js',
   './js/views/progress.js',
   './js/views/timers.js',
   './js/views/picker.js',
+  './js/views/addsheet.js',
+  './js/views/seteditor.js',
 ];
 
 self.addEventListener('install', (e) => {

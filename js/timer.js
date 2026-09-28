@@ -12,6 +12,7 @@ export function startRest(sec = state.settings.rest) {
   total = sec;
   endAt = Date.now() + sec * 1000;
   bar().classList.add('show');
+  document.body.classList.add('resting');
   clearInterval(tick);
   tick = setInterval(update, 250);
   update();
@@ -28,6 +29,7 @@ export function stopRest() {
   clearInterval(tick);
   endAt = 0;
   bar().classList.remove('show');
+  document.body.classList.remove('resting');
 }
 
 function update() {
