@@ -162,8 +162,9 @@ export function readGymKeeperCsv(text) {
         else if (u2 === 'rep') set.r = b || null;
       } else {
         set.w = u1 === 'kg' && a ? a : null;
-        set.r = u2 === 'rep' ? b : null;
+        set.r = u2 === 'rep' && b ? b : null;
       }
+      if (![set.w, set.r, set.t, set.d].some(Boolean)) continue; // an empty planned set (0 kg × 0 reps) was never done
       entry.sets.push(set);
       sets++;
       const info = units.get(name.trim().toLowerCase()) || { kinds: new Set(), weighted: false };

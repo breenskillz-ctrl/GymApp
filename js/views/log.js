@@ -22,7 +22,8 @@ let rootEl;
 
 export function goToDate(key) {
   logState.date = key;
-  if (rootEl && document.body.contains(rootEl)) renderLog(rootEl);
+  if (rootEl && document.body.dataset.screen === 'log') renderLog(rootEl);
+  else go('log');
 }
 
 const rerender = () => renderLog(rootEl);
@@ -30,6 +31,16 @@ const rerender = () => renderLog(rootEl);
 // Copy performed sets as planned (not yet done) sets
 const asPlanned = (sets) => sets.filter((s) => s.done)
   .map((s) => ({ w: s.w ?? null, r: s.r ?? null, t: s.t ?? null, d: s.d ?? null, done: false, lvl: s.lvl }));
+
+// Copy a day's exercises to today as planned sets
+export function copyToToday(key) {
+  const day = getDay(key);
+  const today = dateKey();
+  const target = getDay(today, true);
+  if (!target.title && day.title) target.title = day.title;
+  for (const x of day.entries) addEntry(today, x.ex, null, false).sets = asPlanned(x.sets);
+  save();
+}
 
 // One set as a compact two-line column: "120 KG / 2 REP"
 function setColHtml(ex, s, i) {
@@ -234,12 +245,8 @@ async function openDayMenu() {
   if (v === 'comment') editComment();
   if (v === 'today') goToDate(dateKey());
   if (v === 'copy') {
-    const today = dateKey();
-    const target = getDay(today, true);
-    if (!target.title && day.title) target.title = day.title;
-    for (const x of day.entries) addEntry(today, x.ex, null, false).sets = asPlanned(x.sets);
-    save();
-    goToDate(today);
+    copyToToday(key);
+    goToDate(dateKey());
     toast('Copied to today – tap a set to log it');
   }
   if (v === 'clear' && await confirmDialog('Remove all exercises and the comment from this day?', 'Clear')) {
@@ -328,7 +335,7 @@ function openDayRecords() {
   });
 }
 
-function openCalendar() {
+export function openCalendar() {
   let cur = parseKey(logState.date);
   cur = new Date(cur.getFullYear(), cur.getMonth(), 1);
 

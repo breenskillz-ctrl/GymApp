@@ -5,6 +5,22 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #37 · 2026-09-28 · Phone back button stays inside the app
+**Decision:** app.js keeps one "guard" history entry above the app's own entry. Back pops it; the app then closes the drawer or the
+top dialog, or goes from any page to History, and pushes the guard again. On History with nothing open it shows "Press back again
+to exit", and the next back leaves. The guard is renewed on every tap because Chrome skips entries made without a user gesture.
+**Reason:** The user found that the phone's back button closed the app ("fryktelig irriterende").
+**Status:** Active
+
+## #36 · 2026-09-28 · History page, and the app opens there
+**Decision:** New History view (drawer, above Workout log): compact cards per workout day, newest first, grouped by month, loaded 25
+at a time. Each card: title (day comment, else Morning/Afternoon/Evening Workout from set times), date, duration, volume, PRs, and
+"n × exercise | best set". Tap opens the day; ⋮ = open, repeat today, delete. The app starts on History; "Start workout" (bottom
+right, "Continue workout" when today has exercises) opens today's log. Also: empty 0 kg × 0 rep sets from GymKeeper are skipped on
+import and removed from already imported data (they were planned sets that were never done).
+**Reason:** The user asked for it with a screenshot from another app (Strong-style history).
+**Status:** Active
+
 ## #35 · 2026-09-28 · Separate export/import file for progress photos
 **Decision:** Photos get their own file (`gymapp-photos-YYYY-MM-DD.json`, images as data URLs) from Settings or the ⬇/⬆ buttons in
 Progress photos. Import merges: photos with an id already on the device are skipped. Choosing a photo file under "Import backup"

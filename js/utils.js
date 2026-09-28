@@ -130,12 +130,20 @@ export function openModal(html, { onMount, className = '' } = {}) {
     setTimeout(() => wrap.remove(), 200);
   };
   modalStack.push(close);
+  window.dispatchEvent(new Event('gym:modal')); // app.js keeps a history entry so the phone's back button closes it
   wrap.addEventListener('click', (e) => {
     if (e.target === wrap || e.target.closest('[data-close]')) close();
   });
   requestAnimationFrame(() => wrap.classList.add('open'));
   onMount?.(modal, close);
   return { modal, close };
+}
+
+// Close the top-most dialog; false when none is open (used by the back button in app.js)
+export function closeTopModal() {
+  if (!modalStack.length) return false;
+  modalStack[modalStack.length - 1]();
+  return true;
 }
 
 document.addEventListener('keydown', (e) => {

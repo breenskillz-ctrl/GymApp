@@ -47,11 +47,17 @@ function migrate() {
   for (const day of Object.values(state.log)) {
     if (!day.title && day.note) day.title = day.note;
     delete day.note;
+    const emptied = new Set();
     for (const e of day.entries) {
+      // Logged sets without any numbers (e.g. empty 0 × 0 sets from the first GymKeeper import) are dropped
+      const n = e.sets.length;
+      e.sets = e.sets.filter((st) => !st.done || [st.w, st.r, st.t, st.d].some(Boolean));
+      if (n && !e.sets.length) emptied.add(e);
       for (const st of e.sets) {
         if (st.done && !st.lvl) st.lvl = 'normal';
       }
     }
+    day.entries = day.entries.filter((e) => !emptied.has(e));
   }
 }
 
@@ -62,6 +68,7 @@ export function load() {
       const saved = JSON.parse(raw);
       state = { ...defaults(), ...saved, settings: { ...defaults().settings, ...saved.settings } };
       migrate();
+      save();
     }
   } catch {
     state = defaults();

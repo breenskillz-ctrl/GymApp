@@ -521,3 +521,24 @@ textarea.input { resize: vertical; }
 .cs-tag.r { right: 8px; }
 .compare-slider input[type="range"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; cursor: ew-resize; }
 .file-icon { cursor: pointer; }
+
+/* ---------- History (DECISIONS #36) ---------- */
+.h-list { padding-bottom: 96px; }
+.h-month { font-size: calc(13px * var(--fs)); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 18px 4px 8px; }
+.h-card { background: var(--card); border-radius: var(--radius); padding: 14px 16px 12px; margin-bottom: 12px; cursor: pointer; }
+.h-card:active { background: #252525; }
+.h-head { display: flex; align-items: flex-start; gap: 8px; }
+.h-head h3 { font-size: calc(17px * var(--fs)); font-weight: 600; margin: 0; }
+.h-more { margin: -6px -8px 0 0; }
+.h-stats { display: flex; gap: 18px; margin: 8px 0 10px; color: #cfcfcf; font-size: calc(14px * var(--fs)); flex-wrap: wrap; }
+.h-stats span { display: inline-flex; align-items: center; gap: 5px; }
+.h-stats .ico { width: 17px; height: 17px; color: var(--muted); }
+.h-stats .gold, .h-stats .gold .ico { color: var(--gold); }
+.h-row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 10px; font-size: calc(14px * var(--fs)); line-height: 1.6; color: #bdbdbd; }
+.h-row span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.h-th { color: var(--text); font-weight: 600; }
+.fab-ext {
+  display: inline-flex; align-items: center; gap: 8px; height: 56px; padding: 0 22px 0 16px; border-radius: 18px;
+  background: var(--accent); color: #fff; font-size: calc(16px * var(--fs)); font-weight: 600; box-shadow: 0 6px 18px rgba(0,0,0,.5);
+}
+.fab-ext .ico { width: 26px; height: 26px; }

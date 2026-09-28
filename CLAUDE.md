@@ -42,7 +42,7 @@ All data is stored in `localStorage` on the device.
 ```
 index.html            App shell, SVG icon sprite (<symbol id="i-…">), side drawer, rest bar, toast
 css/styles.css        All styles: GymKeeper-like black/green dark theme (DECISIONS #14)
-js/app.js             Startup, navigation (navigate(view); views call go(view) from utils), drawer
+js/app.js             Startup, navigation (navigate(view); views call go(view) from utils), drawer, back-button guard (DECISIONS #37)
 js/data.js            EXERCISES (231, curated order, with sub + equip), PROGRAMS, GROUPS (9) + GROUP_COLORS, SUBGROUPS,
                       LEVELS (set intensity), EQUIPMENT, TYPES
 js/store.js           State, load/save + migrate(), CRUD, history(), records(), isPR(), daySummary(), daysSinceGroups(),
@@ -56,6 +56,7 @@ js/photodb.js         Progress photos in IndexedDB (addPhoto/allPhotos/deletePho
 js/wakelock.js        Screen wake lock while today has exercises (settings.keepAwake)
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart(), barChart(), multiLineChart(), stackedBarChart() on canvas
+js/views/history.js   History (start page): compact workout cards, "Start workout" → today's log
 js/views/log.js       Day view (cards with sets as KG/REP columns, FAB, day menu, calendar, records)
 js/views/seteditor.js Set editor dialog (fields, −/+, comment, levels, history/1RM/plate tools)
 js/views/addsheet.js  "+" sheet and exercise browser: quick tiles, group rows, filtered exercise lists (★/region/equipment), ⋮ menu
