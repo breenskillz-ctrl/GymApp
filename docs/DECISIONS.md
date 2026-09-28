@@ -5,6 +5,15 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #34 · 2026-09-28 · Progress photos in IndexedDB
+**Decision:** Front/side/back photos per date (drawer → Progress photos, also from Progress and Body measurements). Images are
+scaled to 1400 px (plus a 320 px thumbnail), stored as JPEG blobs in IndexedDB (`gymapp-photos`, `js/photodb.js`), never
+uploaded and not part of the JSON backup. Compare picks a pose and two dates: side by side or a before/after slider, with days
+apart and the body-weight change. "Delete all data" also clears the photos.
+**Reason:** The user asked for progress photos that can be compared. localStorage (~5 MB) is too small for images; keeping them
+on the device keeps private photos private.
+**Status:** Active
+
 ## #33 · 2026-09-28 · Left and right arm and thigh
 **Decision:** Body measurements have `armL`/`armR` and `thighL`/`thighR` instead of `arm`/`thigh`. `migrate()` moves an old
 single value to the right side.

@@ -9,6 +9,8 @@ import {
   e1rm, MONTHS, pad, menuDialog,
 } from '../utils.js';
 import { readGymKeeperCsv, applyImport } from '../import.js';
+import { openProgressPhotos } from './photos.js';
+import { clearPhotos } from '../photodb.js';
 import { lineChart, barChart, multiLineChart, stackedBarChart } from '../charts.js';
 import { openExerciseDetail } from './exercises.js';
 import { updateWakeLock } from '../wakelock.js';
@@ -212,7 +214,8 @@ export function renderProgress(root) {
         <button class="btn primary" type="submit">Save</button>
       </form>
       <div class="chart-box"><canvas id="c-body"></canvas></div>
-      <button class="btn ghost sm" data-act="body-list">All measurements</button>
+      <div class="row gap"><button class="btn ghost sm" data-act="body-list">All measurements</button>
+        <button class="btn ghost sm" data-act="photos">${icon('camera')} Photos</button></div>
     </section>
 
     <section class="card">
@@ -252,6 +255,7 @@ export function renderProgress(root) {
     const a = e.target.closest('[data-act]')?.dataset.act;
     if (a === 'settings') openSettings(() => renderProgress(root));
     if (a === 'body-list') openBodyWeight(() => renderProgress(root));
+    if (a === 'photos') openProgressPhotos();
   };
 }
 
@@ -267,10 +271,12 @@ export function openBodyWeight(onChange) {
         <input class="input" name="${k}" inputmode="decimal" value="${today()[k] ?? ''}"></label>`).join('')}</div>
       <button class="btn primary block" type="submit">Save today</button>
     </form>
+    <button class="btn ghost block" data-photos>${icon('camera')} Progress photos</button>
     <div class="list scroll body-list"></div>`, {
     className: 'tall',
     onMount(m) {
       const box = m.querySelector('.list');
+      m.querySelector('[data-photos]').addEventListener('click', openProgressPhotos);
       m.querySelector('.body-add').addEventListener('submit', (e) => {
         e.preventDefault();
         for (const [k] of MEASURES) saveMeasure(k, num(e.target[k].value));
@@ -344,7 +350,7 @@ export function openSettings(onChange) {
       <label class="switch"><input type="checkbox" data-sound ${st.sound ? 'checked' : ''}> Play a sound when the timer finishes</label>
       <label class="switch"><input type="checkbox" data-awake ${st.keepAwake ? 'checked' : ''}> Keep the screen on during a workout</label>
       <h3 class="section-title">Data</h3>
-      <p class="muted small">All data is stored only on this device. Back it up regularly.</p>
+      <p class="muted small">All data is stored only on this device. Back it up regularly. Progress photos are not part of the backup file.</p>
       <button class="btn ghost block" data-export>${icon('download')} Export backup</button>
       <label class="btn ghost block file-btn">${icon('upload')} Import backup<input type="file" accept="application/json,.json" data-import hidden></label>
       <label class="btn ghost block file-btn">${icon('import')} Import from GymKeeper (CSV)<input type="file" accept=".csv,text/csv" data-gk hidden></label>
@@ -414,8 +420,9 @@ export function openSettings(onChange) {
         onChange();
       });
       m.querySelector('[data-reset]').addEventListener('click', async () => {
-        if (await confirmDialog('Delete all workout data, custom exercises and programs? This cannot be undone.', 'Delete all')) {
+        if (await confirmDialog('Delete all workout data, custom exercises, programs and progress photos? This cannot be undone.', 'Delete all')) {
           resetState();
+          await clearPhotos().catch(() => {});
           close();
           location.reload();
         }

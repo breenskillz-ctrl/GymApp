@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-09-28 (v16: left/right arm and thigh)_
+_Last updated: 2026-09-28 (v17: progress photos)_
 
 ## About the user
 
@@ -52,6 +52,8 @@ _Last updated: 2026-09-28 (v16: left/right arm and thigh)_
 - [ ] User: import their GymKeeper CSV on the phone (Settings → Import from GymKeeper). Tested locally with their file:
       320 days, 7512 sets, 22 new custom exercises. The file must never be committed.
 - [ ] Imported custom exercises have guessed groups/equipment; the user may want to fix some (e.g. Bayesian Curls → Cable).
+- [x] Left/right arm and thigh (v16, DECISIONS #33). Progress photos with compare (v17, DECISIONS #34).
+- [ ] Possible: export/import progress photos (they are not in the JSON backup today).
 - [ ] Ideas for blocks (not requested): RPE-based prescriptions, exporting/sharing block templates, a warm-up set generator.
 - [ ] Possible later: the user buys Gym visual illustrations (the GymKeeper look). Swap files in img/ex/, and check the licence re: public repo.
 - [ ] 33 exercises still have no photo (list in docs/photo-sources.json → ids not in map).

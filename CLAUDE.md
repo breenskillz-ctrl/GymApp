@@ -52,6 +52,7 @@ js/icons.js           Our own SVG art: groupIcon(), exerciseThumb() (uses a phot
 js/photos.js          PHOTOS: ids that have photos in img/ex/<id>-t.jpg, -0.jpg, -1.jpg (public domain, DECISIONS #19)
 js/blocks.js          Block training: templates (Russian, 5/3/1, Smolov Jr), setWeight(), addBlockWorkout(), moveBlock()
 js/import.js          GymKeeper CSV import: readGymKeeperCsv() (alias table, level mapping), applyImport() (DECISIONS #27)
+js/photodb.js         Progress photos in IndexedDB (addPhoto/allPhotos/deletePhoto); views/photos.js = timeline + compare
 js/wakelock.js        Screen wake lock while today has exercises (settings.keepAwake)
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart(), barChart(), multiLineChart(), stackedBarChart() on canvas

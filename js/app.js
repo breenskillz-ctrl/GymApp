@@ -8,6 +8,7 @@ import { renderPrograms } from './views/programs.js';
 import { renderExercises } from './views/exercises.js';
 import { renderProgress, openSettings, openBodyWeight } from './views/progress.js';
 import { renderTimers } from './views/timers.js';
+import { openProgressPhotos } from './views/photos.js';
 
 load();
 applyTextScale(state.settings.textScale);
@@ -62,6 +63,7 @@ drawer.addEventListener('click', (e) => {
   const refresh = () => navigate(current);
   if (a === 'settings') openSettings(refresh);
   if (a === 'body') openBodyWeight(refresh);
+  if (a === 'photos') openProgressPhotos();
 });
 
 enableSwipe(main, () => current === 'log');
