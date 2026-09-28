@@ -5,12 +5,19 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #11 · 2026-09-28 · `Main` (capital M) is the main and deploy branch
+**Decision:** `Main` is the single main branch. The Pages workflow deploys on pushes to `Main`. Lowercase `main` is obsolete.
+**Reason:** The `github-pages` environment only allows deploys from `Main` (it was the default branch when Pages was
+enabled). The deploy from `main` failed with "Branch main is not allowed to deploy to github-pages due to environment
+protection rules". The user could not delete `Main` and did not want to be asked to change more settings.
+**Status:** Active. Supersedes #10.
+
 ## #10 · 2026-09-28 · Use lowercase `main`; `Main` to be removed
 **Decision:** Fast-forward `main` to the full app instead of a new PR. Lowercase `main` is the only main branch;
 the user deletes the accidental `Main` branch and sets `main` as the default.
 **Reason:** PR #1 closed when the feature branch was renamed to `Main`. The user chose option 1 (fast-forward `main`).
 Branch names are case-sensitive, and the Pages workflow listens on `main`.
-**Status:** Active
+**Status:** Superseded by #11
 
 ## #9 · 2026-09-27 · Hosting on GitHub Pages via Actions
 **Decision:** A workflow (`.github/workflows/pages.yml`) deploys the app files to GitHub Pages on every push to `main`.

@@ -20,8 +20,10 @@ if you made or were given a decision. Keep entries short and dated (YYYY-MM-DD).
   so a key that must stay secret belongs on a server, never in the front-end code.
 - **The app UI is in English.** The user writes in Norwegian: reply to the user in Norwegian, but
   write all app text, code, comments, commit messages and docs in English.
-- Develop on the branch the session specifies (currently `claude/gymkeeper-app-pq7o0u`). Do not open a pull
-  request unless the user asks.
+- **The main branch is `Main` (capital M).** It deploys to GitHub Pages; the `github-pages` environment only allows `Main`.
+  The lowercase `main` is an obsolete leftover that neither the user nor Claude can delete. Don't use it for new work (see DECISIONS #11).
+  Work on the branch the session specifies. Do not open a pull request unless the user asks.
+- Don't ask the user to change GitHub settings unless there is no other way. Solve it in the repo when possible.
 
 ## Project
 

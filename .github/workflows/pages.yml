@@ -1,10 +1,11 @@
-# Deploys the app to GitHub Pages on every push to main.
+# Deploys the app to GitHub Pages on every push to Main.
+# Note: the branch is `Main` (capital M). The github-pages environment only allows deploys from it.
 # Uses only the built-in GITHUB_TOKEN – no secrets required.
 name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [Main]
   workflow_dispatch:
 
 permissions:
