@@ -9,7 +9,7 @@ import {
   e1rm, MONTHS, pad, menuDialog,
 } from '../utils.js';
 import { readGymKeeperCsv, applyImport } from '../import.js';
-import { openProgressPhotos } from './photos.js';
+import { openProgressPhotos, exportPhotos, importPhotosFile } from './photos.js';
 import { clearPhotos } from '../photodb.js';
 import { lineChart, barChart, multiLineChart, stackedBarChart } from '../charts.js';
 import { openExerciseDetail } from './exercises.js';
@@ -350,9 +350,11 @@ export function openSettings(onChange) {
       <label class="switch"><input type="checkbox" data-sound ${st.sound ? 'checked' : ''}> Play a sound when the timer finishes</label>
       <label class="switch"><input type="checkbox" data-awake ${st.keepAwake ? 'checked' : ''}> Keep the screen on during a workout</label>
       <h3 class="section-title">Data</h3>
-      <p class="muted small">All data is stored only on this device. Back it up regularly. Progress photos are not part of the backup file.</p>
+      <p class="muted small">All data is stored only on this device. Back it up regularly. Progress photos have their own export file.</p>
       <button class="btn ghost block" data-export>${icon('download')} Export backup</button>
       <label class="btn ghost block file-btn">${icon('upload')} Import backup<input type="file" accept="application/json,.json" data-import hidden></label>
+      <button class="btn ghost block" data-exportp>${icon('camera')} Export progress photos</button>
+      <label class="btn ghost block file-btn">${icon('camera')} Import progress photos<input type="file" accept="application/json,.json" data-importp hidden></label>
       <label class="btn ghost block file-btn">${icon('import')} Import from GymKeeper (CSV)<input type="file" accept=".csv,text/csv" data-gk hidden></label>
       <button class="btn danger block" data-reset>${icon('trash')} Delete all data</button>
       <h3 class="section-title">About</h3>
@@ -385,6 +387,7 @@ export function openSettings(onChange) {
         if (!file) return;
         try {
           const data = JSON.parse(await file.text());
+          if (data?.type === 'gymapp-photos') { e.target.value = ''; await importPhotosFile(file); return; } // a photo export
           if (typeof data !== 'object' || !data.log) throw new Error('Invalid file');
           if (!await confirmDialog('This replaces all current data with the backup. Continue?', 'Import')) return;
           replaceState(data);
@@ -394,6 +397,12 @@ export function openSettings(onChange) {
         } catch {
           toast('Could not read the file');
         }
+      });
+      m.querySelector('[data-exportp]').addEventListener('click', exportPhotos);
+      m.querySelector('[data-importp]').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        await importPhotosFile(f);
       });
       m.querySelector('[data-gk]').addEventListener('change', async (e) => {
         const file = e.target.files[0];

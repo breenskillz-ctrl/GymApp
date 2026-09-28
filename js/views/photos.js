@@ -1,7 +1,7 @@
 // Progress photos: add front/side/back photos per date and compare two dates (DECISIONS #34).
 import { state } from '../store.js';
 import { esc, icon, openModal, dateKey, fmtDate, fmtNum, toast, confirmDialog, parseKey } from '../utils.js';
-import { POSES, addPhoto, allPhotos, deletePhoto } from '../photodb.js';
+import { POSES, addPhoto, allPhotos, deletePhoto, exportPhotosBlob, importPhotos } from '../photodb.js';
 
 const poseLabel = (p) => POSES.find(([k]) => k === p)?.[1] || p;
 const poseIndex = (p) => POSES.findIndex(([k]) => k === p);
@@ -32,13 +32,40 @@ function weightNear(date) {
   return hit?.weight ?? null;
 }
 
+// Download all progress photos as one file (they are not in the JSON backup)
+export async function exportPhotos() {
+  const { count, blob } = await exportPhotosBlob();
+  if (!count) { toast('No photos to export'); return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `gymapp-photos-${dateKey()}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast(`${count} photo${count === 1 ? '' : 's'} exported`);
+}
+
+// Read a photo export file chosen in an <input type="file">; returns true when photos were added
+export async function importPhotosFile(file) {
+  if (!file) return false;
+  try {
+    const n = await importPhotos(await file.text());
+    toast(n ? `${n} photo${n === 1 ? '' : 's'} imported` : 'No new photos in the file');
+    return n > 0;
+  } catch {
+    toast('This is not a GymApp photo export');
+    return false;
+  }
+}
+
 const daysBetween = (a, b) => Math.round((parseKey(b) - parseKey(a)) / 86400000);
 
 export function openProgressPhotos() {
   const pool = urlPool();
   let photos = [];
   openModal(`
-    <div class="modal-head"><h2>Progress photos</h2>
+    <div class="modal-head"><h2 class="grow">Progress photos</h2>
+      <button class="icon-btn" data-export aria-label="Export photos">${icon('download')}</button>
+      <label class="icon-btn file-icon" aria-label="Import photos">${icon('upload')}<input type="file" accept="application/json,.json" data-importp hidden></label>
       <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
     <div class="photo-add">
       <label class="photo-date">Date<input class="input" type="date" data-date value="${dateKey()}" max="${dateKey()}"></label>
@@ -72,6 +99,12 @@ export function openProgressPhotos() {
       };
 
       m.addEventListener('change', async (e) => {
+        if (e.target.matches('[data-importp]')) {
+          const f = e.target.files[0];
+          e.target.value = '';
+          if (await importPhotosFile(f)) draw();
+          return;
+        }
         const inp = e.target.closest('[data-pose]');
         if (!inp?.files[0]) return;
         const date = m.querySelector('[data-date]').value || dateKey();
@@ -88,6 +121,7 @@ export function openProgressPhotos() {
         const t = e.target.closest('[data-id]');
         if (t) openPhotoViewer(photos.find((p) => p.id === t.dataset.id), draw);
         if (e.target.closest('[data-compare]')) openCompare(photos);
+        if (e.target.closest('[data-export]')) exportPhotos();
       });
       draw();
     },

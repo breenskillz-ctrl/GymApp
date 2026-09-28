@@ -59,3 +59,39 @@ export async function allPhotos() {
 
 export const deletePhoto = (id) => run('readwrite', (s) => s.delete(id));
 export const clearPhotos = () => run('readwrite', (s) => s.clear());
+
+// ---------- Export and import (DECISIONS #35) ----------
+// File: { type: 'gymapp-photos', version: 1, photos: [{ id, date, pose, added, full, thumb }] } with images as data URLs
+const toDataUrl = (blob) => new Promise((resolve, reject) => {
+  const r = new FileReader();
+  r.onload = () => resolve(r.result);
+  r.onerror = () => reject(r.error);
+  r.readAsDataURL(blob);
+});
+
+export async function exportPhotosBlob() {
+  const photos = [];
+  for (const p of await allPhotos()) {
+    photos.push({ id: p.id, date: p.date, pose: p.pose, added: p.added, full: await toDataUrl(p.full), thumb: await toDataUrl(p.thumb) });
+  }
+  return { count: photos.length, blob: new Blob([JSON.stringify({ type: 'gymapp-photos', version: 1, photos })], { type: 'application/json' }) };
+}
+
+// Adds the photos from an export file; photos that are already here (same id) are skipped. Returns the number added.
+export async function importPhotos(text) {
+  const data = JSON.parse(text);
+  if (data?.type !== 'gymapp-photos' || !Array.isArray(data.photos)) throw new Error('Not a photo export');
+  const have = new Set((await allPhotos()).map((p) => p.id));
+  let added = 0;
+  for (const p of data.photos) {
+    if (have.has(p.id) || !/^\d{4}-\d{2}-\d{2}$/.test(p.date) || !POSES.some(([k]) => k === p.pose)) continue;
+    if (!/^data:image\//.test(p.full) || !/^data:image\//.test(p.thumb)) continue;
+    const rec = {
+      id: String(p.id), date: p.date, pose: p.pose, added: Number(p.added) || Date.now(),
+      full: await (await fetch(p.full)).blob(), thumb: await (await fetch(p.thumb)).blob(),
+    };
+    await run('readwrite', (s) => s.put(rec));
+    added++;
+  }
+  return added;
+}

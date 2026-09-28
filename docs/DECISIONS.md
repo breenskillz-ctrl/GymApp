@@ -5,6 +5,13 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #35 · 2026-09-28 · Separate export/import file for progress photos
+**Decision:** Photos get their own file (`gymapp-photos-YYYY-MM-DD.json`, images as data URLs) from Settings or the ⬇/⬆ buttons in
+Progress photos. Import merges: photos with an id already on the device are skipped. Choosing a photo file under "Import backup"
+imports the photos instead of failing. The workout backup stays small and separate.
+**Reason:** The user wanted photos to survive a phone change (follow-up to #34).
+**Status:** Active
+
 ## #34 · 2026-09-28 · Progress photos in IndexedDB
 **Decision:** Front/side/back photos per date (drawer → Progress photos, also from Progress and Body measurements). Images are
 scaled to 1400 px (plus a 320 px thumbnail), stored as JPEG blobs in IndexedDB (`gymapp-photos`, `js/photodb.js`), never
