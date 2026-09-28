@@ -9,6 +9,7 @@ Guidance for Claude when working in this repository. Read this first in every se
 | `CLAUDE.md` | Stable rules, conventions and how the project works (this file). |
 | `docs/DECISIONS.md` | Decision log: what was decided, when and why. Add a new entry for every non-trivial decision. Never delete old entries; mark them superseded instead. |
 | `docs/MEMORY.md` | Working memory: current status, open issues, the user's preferences and the next steps. Update it at the end of each task. |
+| `docs/DESIGN-REFERENCE.md` | What GymKeeper looks like, from the user's screenshots, and the planned UI changes. Read it before any UI work. |
 
 Before you finish a task: update `docs/MEMORY.md` (status and next steps) and add to `docs/DECISIONS.md`
 if you made or were given a decision. Keep entries short and dated (YYYY-MM-DD).
