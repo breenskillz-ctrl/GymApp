@@ -20,9 +20,9 @@ _Last updated: 2026-09-28_
   If a push returns 403 again, check the app's repository access at
   https://github.com/apps/claude/installations/select_target.
 - The repo is public. PR #1 was closed without merging when the user renamed the feature branch to `Main`.
-- **`Main` (capital M) is the main branch and deploys to GitHub Pages** (DECISIONS #11). Lowercase `main` is an obsolete
-  leftover. Neither the user nor Claude can delete it (branch deletion returns 403), and it is harmless.
-- Pages URL: https://breenskillz-ctrl.github.io/GymApp/
+- **LIVE:** https://breenskillz-ctrl.github.io/GymApp/ (first deployed 2026-09-28 from commit 848cb47).
+- The deploy branch is `claude/gymkeeper-app-pq7o0u` (DECISIONS #12). Every push to it deploys. `Main`/`main` are
+  leftovers kept in sync. Branch deletion returns 403 for both the user and Claude.
 
 ## Next steps / ideas (not yet requested unless noted)
 
@@ -30,7 +30,8 @@ _Last updated: 2026-09-28_
 - [x] Open a PR to `main` (done 2026-09-27; closed, then `main` fast-forwarded instead on 2026-09-28).
 - [x] Add a GitHub Pages deploy workflow (requested, done 2026-09-27).
 - [x] Get the Pages deploy working without the user changing settings (2026-09-28).
-- [ ] Verify that the deployed site works once it is live.
+- [x] Deploy succeeded (verified via the Actions run and the deployments API; the sandbox can't open github.io).
+- [ ] User: test the app on the phone and give feedback.
 - [ ] Optional: commit an automated Playwright smoke test under `tests/`.
 - [ ] Optional ideas: exercise illustrations, supersets, plate calculator, workout duration, cloud sync
       (cloud sync would need a backend and secrets → GitHub Secrets / server-side only).

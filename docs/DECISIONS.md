@@ -5,12 +5,21 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #12 · 2026-09-28 · Deploy from `claude/gymkeeper-app-pq7o0u`
+**Decision:** The Pages workflow deploys on pushes to `claude/gymkeeper-app-pq7o0u`. `Main` and `main` are kept in sync as
+harmless leftovers.
+**Reason:** The `github-pages` environment rejected both `main` and `Main` ("not allowed to deploy to github-pages due to
+environment protection rules"). A test deploy from `claude/gymkeeper-app-pq7o0u` succeeded, because that was the default
+branch when Pages was enabled. The user wanted it solved without changing GitHub settings. It is also the session's
+designated work branch.
+**Status:** Active. Supersedes #11.
+
 ## #11 · 2026-09-28 · `Main` (capital M) is the main and deploy branch
 **Decision:** `Main` is the single main branch. The Pages workflow deploys on pushes to `Main`. Lowercase `main` is obsolete.
 **Reason:** The `github-pages` environment only allows deploys from `Main` (it was the default branch when Pages was
 enabled). The deploy from `main` failed with "Branch main is not allowed to deploy to github-pages due to environment
 protection rules". The user could not delete `Main` and did not want to be asked to change more settings.
-**Status:** Active. Supersedes #10.
+**Status:** Superseded by #12 (Main was also rejected).
 
 ## #10 · 2026-09-28 · Use lowercase `main`; `Main` to be removed
 **Decision:** Fast-forward `main` to the full app instead of a new PR. Lowercase `main` is the only main branch;

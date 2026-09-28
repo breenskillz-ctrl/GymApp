@@ -1,11 +1,12 @@
-# Deploys the app to GitHub Pages on every push to Main.
-# Note: the branch is `Main` (capital M). The github-pages environment only allows deploys from it.
+# Deploys the app to GitHub Pages on every push to the deploy branch.
+# The github-pages environment only allows deploys from `claude/gymkeeper-app-pq7o0u`
+# (it was the default branch when Pages was enabled). Deploys from `main`/`Main` are rejected.
 # Uses only the built-in GITHUB_TOKEN – no secrets required.
 name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [Main]
+    branches: [claude/gymkeeper-app-pq7o0u]
   workflow_dispatch:
 
 permissions:
