@@ -234,3 +234,10 @@ export function menuDialog(title, items) {
     });
   });
 }
+
+// Text and number size (80–150 %), applied to every font size through the --fs CSS variable
+export function applyTextScale(pct) {
+  document.documentElement.style.setProperty('--fs', String((Number(pct) || 100) / 100));
+}
+
+export const textScale = () => Number(getComputedStyle(document.documentElement).getPropertyValue('--fs')) || 1;

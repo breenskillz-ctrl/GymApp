@@ -5,7 +5,7 @@ import {
   state, save, dayHasWork, getExercise, records, setVolume, replaceState, resetState,
 } from '../store.js';
 import {
-  esc, icon, topBar, dateKey, addDays, weekStart, parseKey, fmtDate, fmtNum, num, toast, confirmDialog, openModal,
+  esc, icon, topBar, applyTextScale, dateKey, addDays, weekStart, parseKey, fmtDate, fmtNum, num, toast, confirmDialog, openModal,
 } from '../utils.js';
 import { lineChart, barChart } from '../charts.js';
 import { openExerciseDetail } from './exercises.js';
@@ -214,6 +214,15 @@ export function openSettings(onChange) {
           <button class="${st.unit === 'lb' ? 'active' : ''}" data-v="lb">lb</button>
         </div>
       </label>
+      <label>Text and number size
+        <div class="scale-row">
+          <span class="small">A</span>
+          <input type="range" min="80" max="150" step="5" value="${st.textScale || 100}" data-scale aria-label="Text and number size">
+          <span style="font-size:20px">A</span>
+          <span class="scale-val">${st.textScale || 100} %</span>
+        </div>
+        <span class="scale-preview">Bench Press · Barbell &nbsp; <span class="v">110</span><span class="u">kg</span> <span class="v">4</span><span class="u">rep</span></span>
+      </label>
       <label>Default rest time (seconds)<input class="input" type="number" min="5" step="5" data-rest value="${st.rest}"></label>
       <label class="switch"><input type="checkbox" data-auto ${st.autoRest ? 'checked' : ''}> Start rest timer automatically when a set is completed</label>
       <label class="switch"><input type="checkbox" data-sound ${st.sound ? 'checked' : ''}> Play a sound when the timer finishes</label>
@@ -236,6 +245,12 @@ export function openSettings(onChange) {
         save();
         onChange();
       });
+      const scale = m.querySelector('[data-scale]');
+      scale.addEventListener('input', () => {
+        applyTextScale(scale.value);
+        m.querySelector('.scale-val').textContent = `${scale.value} %`;
+      });
+      scale.addEventListener('change', () => { st.textScale = Number(scale.value); save(); onChange(); });
       m.querySelector('[data-rest]').addEventListener('change', (e) => { st.rest = Math.max(5, Number(e.target.value) || 90); save(); });
       m.querySelector('[data-auto]').addEventListener('change', (e) => { st.autoRest = e.target.checked; save(); });
       m.querySelector('[data-sound]').addEventListener('change', (e) => { st.sound = e.target.checked; save(); });

@@ -43,6 +43,7 @@ _Last updated: 2026-09-28 (redesign)_
 - [x] "Last time → Suggestion" deltas on cards and in the set editor (2026-09-28, DECISIONS #22).
 - [x] Block training built (2026-09-28, DECISIONS #23): Russian Squat, 5/3/1, Smolov Jr, custom builder, schedule table,
       1RM update at the end. The user chose a 90 % training max, sequential progress and all three templates.
+- [x] Text/number size slider in Settings, 80–150 % (2026-09-28, DECISIONS #24).
 - [ ] Ideas for blocks (not requested): RPE-based prescriptions, exporting/sharing block templates, a warm-up set generator.
 - [ ] Possible later: the user buys Gym visual illustrations (the GymKeeper look). Swap files in img/ex/, and check the licence re: public repo.
 - [ ] 33 exercises still have no photo (list in docs/photo-sources.json → ids not in map).

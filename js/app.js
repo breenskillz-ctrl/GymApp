@@ -1,5 +1,6 @@
 // Startup, navigation between views and the side drawer.
-import { load } from './store.js';
+import { load, state } from './store.js';
+import { applyTextScale } from './utils.js';
 import { initRestBar } from './timer.js';
 import { renderLog, enableSwipe } from './views/log.js';
 import { renderPrograms } from './views/programs.js';
@@ -9,6 +10,7 @@ import { renderTimers } from './views/timers.js';
 import { renderBlocks } from './views/blocks.js';
 
 load();
+applyTextScale(state.settings.textScale);
 
 const main = document.getElementById('main');
 const drawer = document.getElementById('drawer');

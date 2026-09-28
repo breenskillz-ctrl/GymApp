@@ -1,3 +1,4 @@
+import { textScale } from './utils.js';
 // Simple charts drawn on <canvas>, with no external libraries.
 
 function css(name) {
@@ -26,7 +27,7 @@ function niceMax(v) {
 
 function empty(ctx, w, h, text) {
   ctx.fillStyle = css('--muted');
-  ctx.font = '14px system-ui, sans-serif';
+  ctx.font = `${14 * textScale()}px system-ui, sans-serif`;
   ctx.textAlign = 'center';
   ctx.fillText(text, w / 2, h / 2);
 }
@@ -57,7 +58,7 @@ export function lineChart(canvas, points, { height = 200, format: fmt = (v) => v
   // Grid
   ctx.strokeStyle = css('--line');
   ctx.fillStyle = css('--muted');
-  ctx.font = '11px system-ui, sans-serif';
+  ctx.font = `${11 * textScale()}px system-ui, sans-serif`;
   ctx.lineWidth = 1;
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
@@ -121,7 +122,7 @@ export function barChart(canvas, bars, { height = 180, format = (v) => v } = {})
 
   ctx.strokeStyle = css('--line');
   ctx.fillStyle = css('--muted');
-  ctx.font = '11px system-ui, sans-serif';
+  ctx.font = `${11 * textScale()}px system-ui, sans-serif`;
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
   for (let i = 0; i <= 2; i++) {

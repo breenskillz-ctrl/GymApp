@@ -5,6 +5,13 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #24 · 2026-09-28 · Adjustable text and number size
+**Decision:** Settings has a "Text and number size" slider (80–150 %, step 5, live preview), stored as `settings.textScale`. Every
+font size in `styles.css` is written as `calc(Npx * var(--fs))`, and `applyTextScale()` sets `--fs` on `<html>` at startup and while
+dragging. The canvas charts scale their fonts too. Only text and numbers scale; icons, buttons and spacing stay the same.
+**Reason:** The user asked for a slider to change the text and number size.
+**Status:** Active
+
 ## #23 · 2026-09-28 · Block training
 **Decision:** A new "Blocks" page (drawer). A block is weeks × days × items. An item is either sets × reps @ % (with optional AMRAP
 "+" and weight steps) or "normal progression" for accessories. Weight = 1RM × base % × set % (+ steps), rounded to the exercise's

@@ -73,7 +73,7 @@ sw.js                 Network-first service worker with an offline cache
   progression: { 'exercise-id': { min, max, inc, auto } },
   blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],
   blockTemplates: [ /* the user's own templates, compact items */ ],
-  settings: { unit: 'kg'|'lb', rest: 90, sound: true, autoRest: true }
+  settings: { unit: 'kg'|'lb', rest: 90, sound: true, autoRest: true, textScale: 100 }
 }
 ```
 
@@ -94,6 +94,8 @@ For `t` exercises in programs, `reps` means seconds.
   Reason: GitHub Pages lets browsers cache files for 10 minutes. Without this, a phone once loaded a new index.html with
   an old stylesheet and app.js, and showed an unstyled, broken page (2026-09-28). The service worker fetches with
   `cache: 'no-cache'` and reloads once when a new version takes over.
+- **Font sizes: always write them as `font-size: calc(Npx * var(--fs))`** so the Settings text-size slider works (DECISIONS #24).
+  Canvas fonts use `textScale()` from utils.
 - Match the existing style: 2-space indent, single quotes, semicolons, short comments only where they help.
 
 ## Running and testing

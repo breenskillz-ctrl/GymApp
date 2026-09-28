@@ -15,7 +15,7 @@ const defaults = () => ({
   progression: {}, // per exercise: { min, max, inc, auto } – overrides the defaults in getProgression()
   blocks: [], // running and finished training blocks (js/blocks.js)
   blockTemplates: [], // the user's own block templates
-  settings: { unit: 'kg', rest: 90, sound: true, autoRest: true },
+  settings: { unit: 'kg', rest: 90, sound: true, autoRest: true, textScale: 100 },
 });
 
 export let state = defaults();
