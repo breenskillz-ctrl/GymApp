@@ -10,6 +10,7 @@ _Last updated: 2026-09-28 (redesign)_
 - Security-conscious: no secrets in GitHub, ever (see DECISIONS #6).
 - Wants Claude to keep notes and decisions in these Markdown files.
 - Loves being able to create programs with their own nicknames in GymKeeper. Keep that front and centre.
+- Trains with wide, exercise-specific rep ranges (deadlift 1–5, sometimes 10 at lighter weight; bench 1–12; triceps 10–30).
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
@@ -38,7 +39,7 @@ _Last updated: 2026-09-28 (redesign)_
 - [x] Exercise library expanded to 231 exercises, with GymKeeper-style group lists (2026-09-28).
 - [x] Exercise photos added: 198/231 from free-exercise-db (public domain), 2026-09-28 (DECISIONS #19).
 - [x] Progressive overload suggestions: +1 rep per working set, warm-ups unchanged (2026-09-28, DECISIONS #20).
-- [ ] Idea (not requested): let the user choose the progression rule (e.g. +2.5 kg once a rep target is reached).
+- [x] Per-exercise rep ranges with double progression (2026-09-28, DECISIONS #21). User's ranges: DL 1–5, bench 1–12, triceps 10–30.
 - [ ] Possible later: the user buys Gym visual illustrations (the GymKeeper look). Swap files in img/ex/, and check the licence re: public repo.
 - [ ] 33 exercises still have no photo (list in docs/photo-sources.json → ids not in map).
 - [ ] Not yet seen: GymKeeper lists for Back, Legs, Core and Other. Ask for screenshots if the user wants those matched too.

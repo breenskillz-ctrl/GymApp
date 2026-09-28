@@ -12,6 +12,7 @@ const defaults = () => ({
   log: {},
   body: [], // [{ date, weight }]
   favorites: [], // exercise ids marked with ★
+  progression: {}, // per exercise: { min, max, inc, auto } – overrides the defaults in getProgression()
   settings: { unit: 'kg', rest: 90, sound: true, autoRest: true },
 });
 
@@ -159,18 +160,56 @@ export function lastSets(exId, beforeKey) {
 }
 
 // Create sets for a new exercise, pre-filled from last time (smart autofill)
-// Suggested next set (progressive overload, DECISIONS #20): same weight, +1 rep (or +5 s for timed exercises).
-// Warm-up sets are repeated unchanged.
-export function progressSet(s, type) {
-  const warmup = s.lvl === 'warmup';
-  return {
-    w: s.w ?? null,
-    r: s.r != null && !warmup ? s.r + 1 : s.r ?? null,
-    t: s.t != null && !warmup && type === 't' ? s.t + 5 : s.t ?? null,
-    d: s.d ?? null,
-    done: false,
-    lvl: s.lvl,
-  };
+// ---------- Progression (DECISIONS #21) ----------
+// Default rep ranges. The user's own: deadlift 1–5, bench press 1–12, triceps 10–30.
+const DEFAULT_RANGES = { deadlift: [1, 5], 'bench-press': [1, 12] };
+
+// Rep range (min–max), weight step and on/off for one exercise
+export function getProgression(exId) {
+  const ex = getExercise(exId);
+  const lb = state.settings.unit === 'lb';
+  const inc = lb ? 5 : ({ Dumbbell: 2, Kettlebell: 4 }[ex.equip] || 2.5);
+  const [min, max] = DEFAULT_RANGES[exId]
+    || (ex.group === 'Arms' && ex.sub === 'Triceps' ? [10, 30] : ex.type === 'r' ? [5, 20] : [6, 12]);
+  return { min, max, inc, auto: true, ...state.progression[exId] };
+}
+
+export function setProgression(exId, p) {
+  state.progression[exId] = p;
+  save();
+}
+
+// Suggested next set with double progression:
+// - below the top of the rep range: same weight, +1 rep
+// - at or above the top: add weight and work out the reps for the same estimated 1RM, kept inside the range
+//   (if last time was far above the range, the weight jumps to where the top of the range fits)
+// Warm-up sets are repeated unchanged. Timed exercises get +5 s.
+export function progressSet(s, ex) {
+  const next = { w: s.w ?? null, r: s.r ?? null, t: s.t ?? null, d: s.d ?? null, done: false, lvl: s.lvl };
+  const p = getProgression(ex.id);
+  if (s.lvl === 'warmup' || !p.auto) return next;
+  if (ex.type === 't') {
+    if (next.t != null) next.t += 5;
+    return next;
+  }
+  if (next.r == null) return next;
+  if (next.r < p.max) {
+    next.r += 1;
+    return next;
+  }
+  if (!next.w) { // bodyweight without added weight: stay at the top of the range
+    next.r = p.max;
+    return next;
+  }
+  const oneRm = e1rm(next.w, next.r);
+  const inc = p.inc || 2.5;
+  const fits = Math.floor(oneRm / (1 + p.max / 30) / inc) * inc;
+  const jump = fits > next.w + inc; // last time was far above the range
+  const w = jump ? fits : next.w + inc;
+  const reps = jump ? p.max : Math.min(p.max - 1, Math.round(30 * (oneRm / w - 1)));
+  next.w = Math.round(w * 100) / 100;
+  next.r = Math.max(p.min, reps);
+  return next;
 }
 
 // Planned sets for an exercise: the last session's sets with progression, else the program target.
@@ -178,7 +217,7 @@ export function progressSet(s, type) {
 export function makeSets(exId, beforeKey, target) {
   const ex = getExercise(exId);
   const prev = lastSets(exId, beforeKey);
-  if (prev) return prev.map((s) => progressSet(s, ex.type));
+  if (prev) return prev.map((s) => progressSet(s, ex));
   if (!target) return [];
   const n = target?.sets || 3;
   return Array.from({ length: n }, () => ({

@@ -10,7 +10,9 @@ import {
   esc, icon, openModal, fmtDate, promptDialog, menuDialog, confirmDialog, toast, dateKey, parseKey,
 } from '../utils.js';
 import { groupIcon, exerciseThumb } from '../icons.js';
-import { openExerciseEditor, openExerciseDetail } from './exercises.js';
+import {
+  openExerciseEditor, openExerciseDetail, openProgressionDialog, hasRange, progressionText,
+} from './exercises.js';
 import { openProgramsSheet } from './programs.js';
 import { exLabel } from './seteditor.js';
 
@@ -35,10 +37,12 @@ export async function exerciseMenu(id, refresh) {
     { value: 'fav', label: isFavorite(id) ? 'Remove from favourites' : 'Add to favourites', icon: 'trophy' },
     { value: 'info', label: 'History and records', icon: 'chart' },
   ];
+  if (hasRange(ex)) items.push({ value: 'range', label: `Rep range ${progressionText(id)}`, icon: 'edit' });
   if (!ex.builtin) items.push({ value: 'edit', label: 'Edit', icon: 'edit' }, { value: 'del', label: 'Delete', icon: 'trash', danger: true });
   const v = await menuDialog(exLabel(ex), items);
   if (v === 'fav') { toggleFavorite(id); refresh(); }
   if (v === 'info') openExerciseDetail(id, refresh);
+  if (v === 'range') openProgressionDialog(id, refresh);
   if (v === 'edit') openExerciseEditor(ex, refresh);
   if (v === 'del' && await confirmDialog(`Delete "${ex.name}"? Logged sets are kept.`)) {
     deleteExercise(id);

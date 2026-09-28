@@ -1,7 +1,7 @@
 // Day view: the workout log for one day, styled after GymKeeper (see docs/DESIGN-REFERENCE.md).
 import { GROUP_COLORS } from '../data.js';
 import {
-  state, save, getDay, cleanupDay, addEntry, getExercise, dayHasWork, isPR, daySummary, records,
+  state, save, getDay, cleanupDay, addEntry, getExercise, dayHasWork, isPR, daySummary, records, makeSets,
 } from '../store.js';
 import {
   esc, icon, openModal, confirmDialog, dateKey, addDays, fmtTime, fmtNum, toast,
@@ -9,7 +9,7 @@ import {
 } from '../utils.js';
 import { exerciseThumb, sleepArt } from '../icons.js';
 import { openExercisePicker } from './picker.js';
-import { openExerciseDetail } from './exercises.js';
+import { openExerciseDetail, openProgressionDialog, hasRange, progressionText } from './exercises.js';
 import { openSetEditor, levelColor, exLabel } from './seteditor.js';
 import { openAddSheet } from './addsheet.js';
 
@@ -192,12 +192,21 @@ async function openEntryMenu(entry) {
   const day = getDay(logState.date);
   const idx = day.entries.indexOf(entry);
   const items = [{ value: 'info', label: 'History and records', icon: 'chart' }];
+  if (hasRange(ex)) items.push({ value: 'range', label: `Rep range ${progressionText(ex.id)}`, icon: 'edit' });
   if (idx > 0) items.push({ value: 'up', label: 'Move up', icon: 'up' });
   if (idx < day.entries.length - 1) items.push({ value: 'down', label: 'Move down', icon: 'down' });
   items.push({ value: 'swap', label: 'Replace exercise', icon: 'repeat' });
   items.push({ value: 'del', label: 'Remove from day', icon: 'trash', danger: true });
   const a = await menuDialog(exLabel(ex), items);
   if (a === 'info') openExerciseDetail(entry.ex);
+  if (a === 'range') {
+    openProgressionDialog(ex.id, () => {
+      // Recalculate the suggestions if nothing has been logged on this card yet
+      if (!entry.sets.some((s) => s.done)) entry.sets = makeSets(entry.ex, logState.date);
+      save();
+      rerender();
+    });
+  }
   if (a === 'up' || a === 'down') {
     const j = idx + (a === 'up' ? -1 : 1);
     [day.entries[idx], day.entries[j]] = [day.entries[j], day.entries[idx]];

@@ -5,6 +5,20 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #21 · 2026-09-28 · Per-exercise rep ranges with double progression
+**Decision:** Each exercise has a rep range (min–max), a weight step and an on/off switch (`state.progression[exId]`,
+defaults in `getProgression()`). Suggestions per working set:
+- below max: same weight, +1 rep
+- at max: + weight step, with reps from the same estimated 1RM (Epley), rounded, capped at max−1 and at least min
+- far above max (e.g. 10 reps on deadlift with a 1–5 range): jump to the weight where max reps fits
+- warm-ups are unchanged; bodyweight without added weight stays at max; timed exercises get +5 s
+Defaults are the user's own ranges: Deadlift 1–5, Bench Press (barbell) 1–12, all triceps 10–30. Otherwise 6–12 (weight + reps)
+or 5–20 (reps only). The weight step is 2.5 kg (dumbbell 2, kettlebell 4, lb 5). Edit it via the card or list ⋮ → "Rep range", or in
+the exercise details. Changing the range recalculates today's suggestions if nothing has been logged on that card yet.
+Examples: DL 180×5 → 182.5×4; Bench 110×12 → 112.5×11; Triceps 20×30 → 22.5×23.
+**Reason:** The user pointed out that different exercises have different rep targets.
+**Status:** Active. Extends #20 (the flat +1 rep rule).
+
 ## #20 · 2026-09-28 · Progressive overload suggestions
 **Decision:** When an exercise is added manually or from a program and it has history, the card gets *suggested* (planned) sets
 copied from the last session with progression: **same weight, same number of sets, +1 rep** on every working set (+5 s for timed
@@ -12,7 +26,7 @@ exercises; distance unchanged). **Warm-up sets (grey) are repeated unchanged.** 
 level colour; tapping one opens the editor pre-filled, and saving marks it done. Exercises without history still open the set
 editor directly. "From another day" and "Copy to today" copy sets exactly, without progression. The logic is in `progressSet()` / `makeSets()` in `store.js`.
 **Reason:** The user asked for it. Example: last time 3 × 110 kg × 3 → suggestion 3 × 110 kg × 4.
-**Status:** Active
+**Status:** Active, refined by #21 (rep ranges)
 
 ## #19 · 2026-09-28 · Exercise photos from free-exercise-db (public domain) for now
 **Decision:** 198 of 231 exercises show photos from free-exercise-db (Unlicense / public domain): a 144px thumbnail and
