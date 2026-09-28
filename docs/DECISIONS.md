@@ -5,6 +5,13 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #13 · 2026-09-28 · Set intensity levels, with failure in purple
+**Decision:** Each set gets an intensity level shown as a coloured dot: **grey = warm-up, green = easy, yellow = normal,
+red = hard, purple = failure**. Failure is a full level of its own and is shown in purple.
+**Reason:** It matches GymKeeper's dots (grey/green/yellow/red), as confirmed by the user. The user misses failure as a level
+there and suggested purple. Purple is also clearly different from red, so the two are easy to tell apart.
+**Status:** Active
+
 ## #12 · 2026-09-28 · Deploy from `claude/gymkeeper-app-pq7o0u`
 **Decision:** The Pages workflow deploys on pushes to `claude/gymkeeper-app-pq7o0u`. `Main` and `main` are kept in sync as
 harmless leftovers.

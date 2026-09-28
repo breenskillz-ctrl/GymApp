@@ -93,10 +93,10 @@ A previous day (25 Sep) with 9 exercises. **This is the most important screen.**
     - the top line is a big bold number with a small grey uppercase unit: **"120 KG"**
     - the bottom line is **"2 REP"**
     - an empty value shows as **"- KG"** / **"- REP"** (e.g. bodyweight exercises: "- KG / 15 REP")
-    - there is a **small coloured dot above each set**: **yellow/orange** on most sets and **red** on some (e.g. the heaviest
-      single "130 KG / 1 REP", and the last two cable crunch sets). Sets with no dot look like planned but not yet
-      performed sets (e.g. Leg Press, all "- KG / - REP"). **The exact meaning of the dots needs confirming with the user.**
-    - some sets have a **red "FAILURE" pill** above them (a set tagged as taken to failure).
+    - there is a **small coloured dot above each set showing the set's intensity** (confirmed by the user):
+      **grey = warm-up**, **green = easy**, **yellow = normal**, **red = hard**. Sets with no dot are planned but not yet performed.
+    - some sets have a **red "FAILURE" pill** above them. In GymKeeper, failure is a separate tag and **not an intensity
+      level**. The user misses that: **our version adds purple = failure as a fifth intensity level** (DECISIONS #13).
   - Planned sets from a program show the target reps (e.g. "- KG / 20 REP") before they are filled in.
 - **Bottom right:** a round grey **🏆 trophy** button (records) next to the green **+** FAB.
 - Sets are edited by tapping, not typed inline (the set editor screenshot is still to come).
@@ -105,7 +105,6 @@ A previous day (25 Sep) with 9 exercises. **This is the most important screen.**
 
 - 3b. Inside a program: the list of workouts/days
 - 5. The set editor: what opens when you tap + on an exercise or tap a set
-- The meaning of the yellow and red dots above sets (ask the user)
 - Probably: set logging for an exercise, exercise list within a group, exercise details/stats, calendar, timers, drawer menu.
 
 ## Planned changes (not started; wait for all screenshots)
@@ -116,6 +115,7 @@ A previous day (25 Sep) with 9 exercises. **This is the most important screen.**
 - Add "days since last trained" per group, and "Recent exercises".
 - New "Empty Day" empty state with our own sleep graphic.
 - Day view: summary line, coloured group tags, day comment as the title, exercise cards with a thumbnail, "Name · Equipment",
-  + / ⋮, and sets as wrapping KG/REP columns with status dots and a FAILURE tag. Trophy button next to the FAB.
+  + / ⋮, and sets as wrapping KG/REP columns with intensity dots
+  (grey warm-up, green easy, yellow normal, red hard, purple failure). Trophy button next to the FAB.
 - Our own exercise thumbnails (simple SVG pictograms per exercise or equipment type; never GymKeeper's illustrations).
 - Programs screen as a two-column image-card grid with level badges and a ⋮ menu (rename/edit/delete/export), plus program import.
