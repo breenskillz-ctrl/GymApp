@@ -162,6 +162,7 @@ textarea.input { resize: vertical; }
 .form label.switch { flex-direction: row; align-items: center; gap: 10px; color: var(--text); font-size: calc(14px * var(--fs)); }
 .switch input { width: 20px; height: 20px; accent-color: var(--accent); }
 .file-btn { cursor: pointer; color: var(--text) !important; font-size: calc(15px * var(--fs)) !important; }
+.form label.file-btn { flex-direction: row; align-items: center; justify-content: center; }
 
 /* ---------- Cards and lists ---------- */
 .card { background: var(--card); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
@@ -593,3 +594,7 @@ body.has-tabbar { --tabbar-h: calc(62px + var(--safe-b)); }
 body.has-tabbar .main { padding-bottom: calc(120px + var(--tabbar-h)); }
 body.has-tabbar .fab-wrap { bottom: calc(14px + var(--tabbar-h)); }
 body.has-tabbar .restbar { bottom: calc(8px + var(--tabbar-h)); }
+.storage-status { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; background: var(--card2); font-size: calc(13px * var(--fs)); color: var(--text2); }
+.storage-status .ico { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+.storage-status.ok .ico { color: #43c463; }
+.storage-status.warn { background: rgba(242, 183, 5, .1); color: var(--gold); }

@@ -5,6 +5,15 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #41 · 2026-09-29 · Persistent storage and one backup file with photos
+**Decision:** On start the app calls `navigator.storage.persist()`. Settings shows whether storage is protected (and warns on
+iPhone Safari when the app is not opened from the home screen, because of Safari's 7-day rule). A backup is one JSON file: the
+state plus `photos` (data URLs) and `backupVersion: 2`; old backups without photos still restore. "Back up to Drive, iCloud…"
+uses the Web Share API with the file (shown only where file sharing works); "Download backup" saves to downloads; the weekly
+reminder uses sharing when available. Restore replaces workout data and adds the photos. Code: `js/backup.js`.
+**Reason:** The user asked whether data can disappear and wanted both protections (2026-09-29).
+**Status:** Active (the separate photo export from #35 stays as an extra)
+
 ## #40 · 2026-09-29 · "Steel & orange" look, bottom tab bar
 **Decision:** Replace the GymKeeper-like black/green look with the user's pick from a preview of three options:
 slate greys (#15181c background, #1e2329 cards with a thin edge) and one orange accent (#ff7a1a, dark text on it). Type is Barlow

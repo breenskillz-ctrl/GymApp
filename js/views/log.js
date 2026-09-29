@@ -14,7 +14,7 @@ import { openExercisePicker } from './picker.js';
 import { openExerciseDetail, openProgressionDialog, progressionText } from './exercises.js';
 import { openSetEditor, levelColor, exLabel, suggestionDelta } from './seteditor.js';
 import { openAddSheet } from './addsheet.js';
-import { backupDue, exportBackup } from './progress.js';
+import { backupDue, shareBackup, downloadBackup, canShareFiles } from '../backup.js';
 
 export const logState = { date: dateKey() };
 
@@ -168,9 +168,8 @@ function onClick(e) {
     case 'add-set': return openSetEditor(date, entry, null, rerender);
     case 'log-all': return logAll(entry);
     case 'backup':
-      exportBackup();
-      toast('Backup saved to your downloads');
-      return rerender();
+      (canShareFiles() ? shareBackup() : downloadBackup()).then(rerender);
+      return undefined;
     case 'backup-later':
       state.backupSnooze = Date.now();
       save();

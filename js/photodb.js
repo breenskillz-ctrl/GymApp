@@ -69,11 +69,17 @@ const toDataUrl = (blob) => new Promise((resolve, reject) => {
   r.readAsDataURL(blob);
 });
 
-export async function exportPhotosBlob() {
+// All photos as plain objects with data-URL images (used by the photo export and the full backup)
+export async function exportPhotoList() {
   const photos = [];
   for (const p of await allPhotos()) {
     photos.push({ id: p.id, date: p.date, pose: p.pose, added: p.added, full: await toDataUrl(p.full), thumb: await toDataUrl(p.thumb) });
   }
+  return photos;
+}
+
+export async function exportPhotosBlob() {
+  const photos = await exportPhotoList();
   return { count: photos.length, blob: new Blob([JSON.stringify({ type: 'gymapp-photos', version: 1, photos })], { type: 'application/json' }) };
 }
 
@@ -81,6 +87,11 @@ export async function exportPhotosBlob() {
 export async function importPhotos(text) {
   const data = JSON.parse(text);
   if (data?.type !== 'gymapp-photos' || !Array.isArray(data.photos)) throw new Error('Not a photo export');
+  return importPhotoList(data.photos);
+}
+
+export async function importPhotoList(list) {
+  const data = { photos: list };
   const have = new Set((await allPhotos()).map((p) => p.id));
   let added = 0;
   for (const p of data.photos) {

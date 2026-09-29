@@ -10,9 +10,11 @@ import { renderProgress, openSettings, openBodyWeight } from './views/progress.j
 import { renderTimers } from './views/timers.js';
 import { renderHistory } from './views/history.js';
 import { openProgressPhotos } from './views/photos.js';
+import { requestPersist } from './backup.js';
 
 load();
 applyTextScale(state.settings.textScale);
+requestPersist(); // ask the browser not to clear our storage (DECISIONS #41)
 
 const main = document.getElementById('main');
 const drawer = document.getElementById('drawer');

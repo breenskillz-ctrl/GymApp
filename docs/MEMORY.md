@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-09-29 (v22: steel & orange theme)_
+_Last updated: 2026-09-29 (v23: persistent storage, full backup)_
 
 ## About the user
 
@@ -61,6 +61,11 @@ _Last updated: 2026-09-29 (v22: steel & orange theme)_
 - [x] Failure rule: failure at a weight → all sets there repeat at the best reps before progressing (v21, DECISIONS #38).
 - [x] New look "Steel & orange" with bottom tab bar and self-hosted Barlow fonts (v22, DECISIONS #40). Preview page of the
       three options: https://claude.ai/artifact/LE1Tts48g3CwKzv79Z4Ff2 (private to the user).
+- [x] Persistent storage request + status in Settings, one backup file incl. photos, share to Drive/iCloud (v23, DECISIONS #41).
+- [ ] OPEN (asked 2026-09-29): exercise images look messy. User asked about Gym Visual thumbnails for personal use and about
+      look-alike alternatives. Options given; waiting for the user's choice.
+- [ ] OPEN (asked 2026-09-29): what it takes to make a downloadable app for phone and PC. Explained PWA install, store apps
+      (Capacitor/Tauri) and sync between devices; waiting for the user's choice.
 - [ ] Ideas offered, not yet requested: supersets, goals ("bench 120 by Christmas"), Monday weekly summary, voice logging,
       shareable workout card, long-press plate calculator.
 - [x] RIR/RPE: declined by the user (2026-09-29, DECISIONS #39). Don't suggest it again.

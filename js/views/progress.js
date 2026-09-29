@@ -2,7 +2,7 @@
 import { GROUPS, GROUP_COLORS } from '../data.js';
 import { groupIcon } from '../icons.js';
 import {
-  state, save, dayHasWork, getExercise, records, setVolume, replaceState, resetState,
+  state, save, dayHasWork, getExercise, records, setVolume, resetState,
 } from '../store.js';
 import {
   esc, icon, topBar, applyTextScale, dateKey, addDays, weekStart, parseKey, fmtDate, fmtNum, num, toast, confirmDialog, openModal,
@@ -11,6 +11,7 @@ import {
 import { readGymKeeperCsv, applyImport } from '../import.js';
 import { openProgressPhotos, exportPhotos, importPhotosFile } from './photos.js';
 import { clearPhotos } from '../photodb.js';
+import { downloadBackup, shareBackup, canShareFiles, restoreBackup, storageStatus, requestPersist } from '../backup.js';
 import { lineChart, barChart, multiLineChart, stackedBarChart } from '../charts.js';
 import { openExerciseDetail } from './exercises.js';
 import { updateWakeLock } from '../wakelock.js';
@@ -304,26 +305,6 @@ export function openBodyWeight(onChange) {
   });
 }
 
-// Download all data as a JSON file and remember when (for the weekly reminder, DECISIONS #32)
-export function exportBackup() {
-  state.lastBackup = Date.now();
-  save();
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `gymapp-backup-${dateKey()}.json`;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
-
-// Show the backup reminder when there is data and no backup (or snooze) in the last 7 days
-export function backupDue() {
-  const week = 7 * 86400000;
-  const last = Math.max(state.lastBackup || 0, state.backupSnooze || 0);
-  if (Date.now() - last < week) return false;
-  return Object.keys(state.log).filter(dayHasWork).length >= 3;
-}
-
 export function openSettings(onChange) {
   const st = state.settings;
   openModal(`
@@ -350,9 +331,11 @@ export function openSettings(onChange) {
       <label class="switch"><input type="checkbox" data-sound ${st.sound ? 'checked' : ''}> Play a sound when the timer finishes</label>
       <label class="switch"><input type="checkbox" data-awake ${st.keepAwake ? 'checked' : ''}> Keep the screen on during a workout</label>
       <h3 class="section-title">Data</h3>
-      <p class="muted small">All data is stored only on this device. Back it up regularly. Progress photos have their own export file.</p>
-      <button class="btn ghost block" data-export>${icon('download')} Export backup</button>
-      <label class="btn ghost block file-btn">${icon('upload')} Import backup<input type="file" accept="application/json,.json" data-import hidden></label>
+      <p class="muted small">All data is stored only on this device. A backup file holds everything, progress photos included.</p>
+      <div class="storage-status" data-storage><span class="muted small">Checking storage…</span></div>
+      ${canShareFiles() ? `<button class="btn primary block" data-share>${icon('upload')} Back up to Drive, iCloud…</button>` : ''}
+      <button class="btn ghost block" data-export>${icon('download')} Download backup</button>
+      <label class="btn ghost block file-btn">${icon('import')} Restore backup<input type="file" accept="application/json,.json" data-import hidden></label>
       <button class="btn ghost block" data-exportp>${icon('camera')} Export progress photos</button>
       <label class="btn ghost block file-btn">${icon('camera')} Import progress photos<input type="file" accept="application/json,.json" data-importp hidden></label>
       <label class="btn ghost block file-btn">${icon('import')} Import from GymKeeper (CSV)<input type="file" accept=".csv,text/csv" data-gk hidden></label>
@@ -381,7 +364,18 @@ export function openSettings(onChange) {
       m.querySelector('[data-auto]').addEventListener('change', (e) => { st.autoRest = e.target.checked; save(); });
       m.querySelector('[data-sound]').addEventListener('change', (e) => { st.sound = e.target.checked; save(); });
       m.querySelector('[data-awake]').addEventListener('change', (e) => { st.keepAwake = e.target.checked; save(); updateWakeLock(); });
-      m.querySelector('[data-export]').addEventListener('click', exportBackup);
+      m.querySelector('[data-export]').addEventListener('click', () => downloadBackup());
+      m.querySelector('[data-share]')?.addEventListener('click', () => shareBackup());
+      // Storage protection status (DECISIONS #41)
+      (async () => {
+        await requestPersist();
+        const st2 = await storageStatus();
+        const box = m.querySelector('[data-storage]');
+        if (!box) return;
+        const mb = st2.used != null ? ` · ${fmtNum(st2.used / 1048576, 1)} MB used` : '';
+        box.className = `storage-status ${st2.level}`;
+        box.innerHTML = `${icon(st2.level === 'ok' ? 'check' : 'close')}<span>${esc(st2.text)}${mb}</span>`;
+      })();
       m.querySelector('[data-import]').addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -389,11 +383,11 @@ export function openSettings(onChange) {
           const data = JSON.parse(await file.text());
           if (data?.type === 'gymapp-photos') { e.target.value = ''; await importPhotosFile(file); return; } // a photo export
           if (typeof data !== 'object' || !data.log) throw new Error('Invalid file');
-          if (!await confirmDialog('This replaces all current data with the backup. Continue?', 'Import')) return;
-          replaceState(data);
+          if (!await confirmDialog('This replaces all current workout data with the backup. Photos in the file are added. Continue?', 'Restore')) return;
+          const n = await restoreBackup(data);
           close();
-          toast('Data imported');
-          location.reload();
+          toast(`Backup restored${n ? ` with ${n} photo${n === 1 ? '' : 's'}` : ''}`);
+          setTimeout(() => location.reload(), 600);
         } catch {
           toast('Could not read the file');
         }
