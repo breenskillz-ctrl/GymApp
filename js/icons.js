@@ -1,5 +1,6 @@
 // Our own SVG artwork: muscle-group icons, exercise thumbnails, program card backgrounds and the empty-day graphic.
 import { GROUP_COLORS } from './data.js';
+import { muscleSvg } from './musclemap.js';
 import { PHOTOS } from './photos.js';
 
 const svg = (vb, body, cls = '') => `<svg class="${cls}" viewBox="${vb}" aria-hidden="true">${body}</svg>`;
@@ -23,30 +24,14 @@ export function groupIcon(group, size = 30) {
   return `<svg class="group-ico" width="${size}" height="${size}" viewBox="0 0 32 32" style="color:${color}" aria-hidden="true">${GROUP_PATHS[group] || GROUP_PATHS.Other}</svg>`;
 }
 
-// ---------- Exercise thumbnails: a pictogram of the equipment ----------
-const EQUIP_ART = {
-  Barbell: '<rect x="4" y="22.5" width="40" height="3" rx="1.5" fill="#555"/><rect x="7" y="14" width="5" height="20" rx="1.5"/><rect x="12.5" y="17" width="3" height="14" rx="1"/><rect x="36" y="14" width="5" height="20" rx="1.5"/><rect x="32.5" y="17" width="3" height="14" rx="1"/>',
-  Dumbbell: '<rect x="14" y="22.5" width="20" height="3" rx="1.5" fill="#555"/><rect x="9" y="15" width="6" height="18" rx="2"/><rect x="33" y="15" width="6" height="18" rx="2"/><rect x="5.5" y="18.5" width="4" height="11" rx="1.5"/><rect x="38.5" y="18.5" width="4" height="11" rx="1.5"/>',
-  Machine: '<rect x="8" y="6" width="4" height="36" rx="1.5" fill="#555"/><rect x="8" y="6" width="26" height="4" rx="1.5" fill="#555"/><rect x="14" y="12" width="9" height="16" rx="1.5"/><path d="M14 16h9M14 20h9M14 24h9" stroke="#e6e6e6" stroke-width="1.2"/><rect x="24" y="30" width="16" height="5" rx="2"/><rect x="36" y="18" width="4" height="13" rx="1.5"/>',
-  Cable: '<circle cx="24" cy="9" r="5" fill="none" stroke="#555" stroke-width="3"/><path d="M24 14v18" stroke="#555" stroke-width="2"/><rect x="15" y="31" width="18" height="4" rx="2"/><rect x="20" y="35" width="8" height="7" rx="2"/>',
-  Bodyweight: '<circle cx="24" cy="9" r="4.5"/><path d="M24 15v13M13 20h22M24 28l-7 13M24 28l7 13" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"/>',
-  Band: '<path d="M12 12c-6 4-6 20 0 24 7 5 17 5 24 0 6-4 6-20 0-24-7-5-17-5-24 0z" fill="none" stroke="currentColor" stroke-width="4"/><rect x="5" y="20" width="6" height="8" rx="2" fill="#555"/><rect x="37" y="20" width="6" height="8" rx="2" fill="#555"/>',
-  Kettlebell: '<path d="M17 18c-1-9 15-9 14 0" fill="none" stroke="#555" stroke-width="4"/><path d="M13 30c0-8 5-12 11-12s11 4 11 12c0 5-3 9-6 10H19c-3-1-6-5-6-10z"/>',
-  'Smith Machine': '<rect x="7" y="5" width="4" height="38" rx="1.5" fill="#555"/><rect x="37" y="5" width="4" height="38" rx="1.5" fill="#555"/><rect x="4" y="20" width="40" height="3" rx="1.5"/><rect x="11.5" y="13" width="4" height="17" rx="1.5"/><rect x="32.5" y="13" width="4" height="17" rx="1.5"/>',
-  Plate: '<circle cx="24" cy="24" r="17"/><circle cx="24" cy="24" r="11" fill="#e6e6e6" fill-opacity=".35"/><circle cx="24" cy="24" r="4" fill="#e6e6e6"/>',
-  Other: '<rect x="10" y="10" width="28" height="28" rx="8" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="24" cy="24" r="5"/>',
-};
 
 export const photoUrl = (id, frame = 't') => `img/ex/${id}-${frame}.jpg`;
 export const hasPhoto = (id) => PHOTOS.has(id);
 
+// List thumbnail: our own muscle-map drawing for every exercise (DECISIONS #42). Photos are shown on the detail page only.
 export function exerciseThumb(ex) {
   const color = GROUP_COLORS[ex.group] || GROUP_COLORS.Other;
-  if (PHOTOS.has(ex.id)) {
-    return `<span class="thumb photo" style="--g:${color}"><img src="${photoUrl(ex.id)}" alt="" loading="lazy" decoding="async"></span>`;
-  }
-  const art = EQUIP_ART[ex.equip] || EQUIP_ART.Other;
-  return `<span class="thumb" style="--g:${color}">${svg('0 0 48 48', `<g fill="currentColor">${art}</g>`)}</span>`;
+  return `<span class="thumb mmap" style="--g:${color}">${muscleSvg(ex)}</span>`;
 }
 
 // ---------- Program card backgrounds ----------

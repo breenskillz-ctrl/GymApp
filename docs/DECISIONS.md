@@ -5,6 +5,16 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #42 · 2026-09-29 · Own muscle-map thumbnails for every exercise
+**Decision:** List and card thumbnails are our own drawings (`js/musclemap.js`): a front or back body figure where the trained
+muscles are lit (orange = primary, faded orange = secondary) and a small badge for the equipment. Muscles come from an id
+override, else the muscle region (`group|sub`), else keywords in the name (covers custom and imported exercises). The
+free-exercise-db photos (#19) stay on the exercise detail page only.
+**Reason:** The user found the photo thumbnails messy and wanted one style for all exercises. Gym Visual images cannot be used:
+the app and repo are public, so even "personal use" would redistribute them (#4). The legal route, if the user ever buys a
+Gym Visual licence, is a local image-pack import that never goes into the repo.
+**Status:** Active (supersedes the thumbnail part of #19)
+
 ## #41 · 2026-09-29 · Persistent storage and one backup file with photos
 **Decision:** On start the app calls `navigator.storage.persist()`. Settings shows whether storage is protected (and warns on
 iPhone Safari when the app is not opened from the home screen, because of Safari's 7-day rule). A backup is one JSON file: the

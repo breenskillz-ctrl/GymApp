@@ -598,3 +598,15 @@ body.has-tabbar .restbar { bottom: calc(8px + var(--tabbar-h)); }
 .storage-status .ico { width: 18px; height: 18px; flex: none; margin-top: 1px; }
 .storage-status.ok .ico { color: #43c463; }
 .storage-status.warn { background: rgba(242, 183, 5, .1); color: var(--gold); }
+
+/* ---------- Exercise thumbnails: muscle map + equipment badge (DECISIONS #42) ---------- */
+.thumb.mmap { background: linear-gradient(160deg, var(--card3), var(--card2)); color: var(--text2); border-left: 0; overflow: hidden; }
+.thumb.mmap svg.mm { width: 100%; height: 100%; }
+.mm { --mm-gap: var(--card2); }
+.mm-base { fill: #454f5c; }
+.mm-muscles > * { stroke: var(--mm-gap); stroke-width: .9; }
+.mm .mn { fill: #56616f; }
+.mm .ms { fill: color-mix(in srgb, var(--accent) 45%, #56616f); }
+.mm .mp { fill: var(--accent); }
+.mm-badge > circle { fill: var(--bg); stroke: var(--card3); stroke-width: 1.2; }
+.mm-badge g { stroke: var(--text2); stroke-width: 2.1; }
