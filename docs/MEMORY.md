@@ -2,10 +2,12 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-09-29 (v24: muscle-map thumbnails)_
+_Last updated: 2026-09-29 (v25: redrawn muscle figure + detail close-up)_
 
 ## About the user
 
+- **Wants to approve before anything is published (2026-09-29):** build locally, show screenshots/preview, and only push/deploy
+  after the user says they are happy.
 - Writes in Norwegian → reply in Norwegian. App and code are in English.
 - Security-conscious: no secrets in GitHub, ever (see DECISIONS #6).
 - Wants Claude to keep notes and decisions in these Markdown files.
@@ -63,6 +65,7 @@ _Last updated: 2026-09-29 (v24: muscle-map thumbnails)_
       three options: https://claude.ai/artifact/LE1Tts48g3CwKzv79Z4Ff2 (private to the user).
 - [x] Persistent storage request + status in Settings, one backup file incl. photos, share to Drive/iCloud (v23, DECISIONS #41).
 - [x] Own muscle-map thumbnails for all 231 exercises + custom ones (v24, DECISIONS #42). Photos only on the detail page.
+- [x] Figure redrawn and approved by the user; zoomed thumbnails, muscle close-up + equipment on the detail page (v25, DECISIONS #43).
 - [ ] Possible: if the user buys a Gym Visual licence, add a local image-pack import (files stay on the device, never in git).
 - [ ] OPEN (asked 2026-09-29): what it takes to make a downloadable app for phone and PC. Explained PWA install, store apps
       (Capacitor/Tauri) and sync between devices; waiting for the user's choice.

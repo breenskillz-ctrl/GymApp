@@ -6,6 +6,7 @@ import {
 import { esc, openModal, confirmDialog, icon, fmtDate, fmtNum, fmtTime, e1rm, toast, parseKey, topBar, menuDialog } from '../utils.js';
 import { lineChart } from '../charts.js';
 import { hasPhoto, photoUrl } from '../icons.js';
+import { muscleDetail, muscleLists } from '../musclemap.js';
 import { openAddSheet, groupRowsHtml } from './addsheet.js';
 
 // Exercises page: muscle groups like the + sheet. Opening a group shows the GymKeeper-style list in browse mode.
@@ -75,6 +76,20 @@ const METRICS = {
   dt: [['d', 'Longest distance'], ['t', 'Longest time']],
 };
 
+// Close-up of the trained muscles with their names and the equipment (DECISIONS #42)
+function musclesCard(ex) {
+  const { primary, secondary } = muscleLists(ex);
+  const row = (label, v) => (v ? `<div class="mc-row"><span class="mc-label">${label}</span><span class="mc-val">${v}</span></div>` : '');
+  return `<div class="card muscle-card">
+    <div class="mc-art">${muscleDetail(ex)}</div>
+    <div class="mc-info">
+      ${row('Primary', primary.map((m) => `<span class="mc-chip p">${esc(m)}</span>`).join(''))}
+      ${row('Secondary', secondary.map((m) => `<span class="mc-chip">${esc(m)}</span>`).join(''))}
+      ${row('Equipment', `<span class="mc-equip">${esc(ex.equip || 'Other')}</span>`)}
+    </div>
+  </div>`;
+}
+
 export function openExerciseDetail(id, onChange) {
   const ex = getExercise(id);
   const hist = history(id);
@@ -107,7 +122,8 @@ export function openExerciseDetail(id, onChange) {
       <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button>
     </div>
     <div class="scroll">
-      ${hasPhoto(ex.id) ? `<div class="ex-photo"><img src="${photoUrl(ex.id, 0)}" alt="${esc(ex.name)}, start position">
+      ${musclesCard(ex)}
+      ${hasPhoto(ex.id) ? `<h3 class="section-title">How to</h3><div class="ex-photo"><img src="${photoUrl(ex.id, 0)}" alt="${esc(ex.name)}, start position">
         <img src="${photoUrl(ex.id, 1)}" alt="${esc(ex.name)}, end position"></div>` : ''}
       ${ex.desc ? `<p class="desc">${esc(ex.desc)}</p>` : ''}
       <button class="card prog-row" data-prog>${icon('settings')}<span class="grow">

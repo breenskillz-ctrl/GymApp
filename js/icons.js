@@ -28,10 +28,11 @@ export function groupIcon(group, size = 30) {
 export const photoUrl = (id, frame = 't') => `img/ex/${id}-${frame}.jpg`;
 export const hasPhoto = (id) => PHOTOS.has(id);
 
-// List thumbnail: our own muscle-map drawing for every exercise (DECISIONS #42). Photos are shown on the detail page only.
+// List thumbnail: our own muscle-map drawing for every exercise, zoomed to the upper or lower body (DECISIONS #42, #43).
+// Photos are shown on the detail page only.
 export function exerciseThumb(ex) {
   const color = GROUP_COLORS[ex.group] || GROUP_COLORS.Other;
-  return `<span class="thumb mmap" style="--g:${color}">${muscleSvg(ex)}</span>`;
+  return `<span class="thumb mmap" style="--g:${color}">${muscleSvg(ex, true)}</span>`;
 }
 
 // ---------- Program card backgrounds ----------

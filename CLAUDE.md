@@ -49,8 +49,8 @@ js/data.js            EXERCISES (231, curated order, with sub + equip), PROGRAMS
 js/store.js           State, load/save + migrate(), CRUD, history(), records(), isPR(), daySummary(), daysSinceGroups(),
                       getProgression()/progressSet()/makeSets(): suggested sets via per-exercise rep ranges (DECISIONS #20, #21)
 js/utils.js           Dates, formatting, esc(), openModal(), confirmDialog(), promptDialog(), menuDialog(), topBar(), toast()
-js/icons.js           Our own SVG art: groupIcon(), exerciseThumb() (muscle map), programArt(), sleepArt
-js/musclemap.js       Exercise thumbnails: body figure with trained muscles lit + equipment badge; musclesFor(ex) (DECISIONS #42)
+js/icons.js           Our own SVG art: groupIcon(), exerciseThumb() (zoomed muscle map), programArt(), sleepArt
+js/musclemap.js       Muscle maps: muscleSvg(ex, crop) thumbnails, muscleDetail(ex) close-up, musclesFor(ex) (DECISIONS #42, #43)
 js/photos.js          PHOTOS: ids with photos in img/ex/<id>-0.jpg, -1.jpg, shown on the exercise detail page (public domain, #19)
 js/blocks.js          Block training: templates (Russian, 5/3/1, Smolov Jr), setWeight(), addBlockWorkout(), moveBlock()
 js/import.js          GymKeeper CSV import: readGymKeeperCsv() (alias table, level mapping), applyImport() (DECISIONS #27)

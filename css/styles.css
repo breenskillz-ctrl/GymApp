@@ -599,14 +599,26 @@ body.has-tabbar .restbar { bottom: calc(8px + var(--tabbar-h)); }
 .storage-status.ok .ico { color: #43c463; }
 .storage-status.warn { background: rgba(242, 183, 5, .1); color: var(--gold); }
 
-/* ---------- Exercise thumbnails: muscle map + equipment badge (DECISIONS #42) ---------- */
-.thumb.mmap { background: linear-gradient(160deg, var(--card3), var(--card2)); color: var(--text2); border-left: 0; overflow: hidden; }
+/* ---------- Exercise muscle maps (DECISIONS #42) ---------- */
+.thumb.mmap { background: linear-gradient(160deg, var(--card3), var(--card2)); border-left: 0; overflow: hidden; }
 .thumb.mmap svg.mm { width: 100%; height: 100%; }
-.mm { --mm-gap: var(--card2); }
-.mm-base { fill: #454f5c; }
-.mm-muscles > * { stroke: var(--mm-gap); stroke-width: .9; }
-.mm .mn { fill: #56616f; }
-.mm .ms { fill: color-mix(in srgb, var(--accent) 45%, #56616f); }
+.mm { --mm-body: #8a94a2; --mm-line: #c9d0d8; }
+.mm-sil { fill: var(--mm-line); }
+.mm-muscles path { stroke: var(--mm-line); stroke-width: .8; stroke-linejoin: round; }
+.mm .mn { fill: var(--mm-body); }
+.mm .ms { fill: color-mix(in srgb, var(--accent) 50%, var(--mm-body)); }
 .mm .mp { fill: var(--accent); }
-.mm-badge > circle { fill: var(--bg); stroke: var(--card3); stroke-width: 1.2; }
-.mm-badge g { stroke: var(--text2); stroke-width: 2.1; }
+.mm .mm-line { fill: none; stroke-width: .6; }
+.mm-detail .mm-muscles path { stroke-width: .7; }
+.mm-detail .mf { stroke: none; pointer-events: none; }
+.mm-detail pattern path { stroke: rgba(22, 26, 32, .3); stroke-width: .26; }
+.muscle-card { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; align-items: center; padding: 10px; }
+.mc-art { aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: linear-gradient(160deg, var(--card3), var(--card2)); }
+.mc-art svg { width: 100%; height: 100%; display: block; }
+.mc-info { display: grid; gap: 12px; align-content: center; min-width: 0; }
+.mc-row { display: grid; gap: 5px; }
+.mc-label { font-size: calc(11px * var(--fs)); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.mc-val { display: flex; flex-wrap: wrap; gap: 5px; }
+.mc-chip { padding: 3px 10px; border-radius: 99px; background: color-mix(in srgb, var(--accent) 22%, var(--card2)); color: var(--text); font-size: calc(13px * var(--fs)); font-weight: 600; }
+.mc-chip.p { background: var(--accent); color: var(--accent-ink); }
+.mc-equip { font-family: var(--f-num); font-weight: 700; font-size: calc(20px * var(--fs)); text-transform: uppercase; letter-spacing: .03em; }

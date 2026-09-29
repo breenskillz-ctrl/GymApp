@@ -5,6 +5,17 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #43 · 2026-09-29 · Muscle-map figure redrawn with the user, plus a detail close-up
+**Decision:** The body figure was redrawn over several rounds with the user, using their reference pictures for proportions
+only (no copied artwork): a muscular build with a larger head, thick arms and legs, light outline between the muscles; then
+20 % shorter (option 3 of 3) and about 8 % narrower with the arms moved in, because the shoulders looked too wide. Thumbnails
+have no equipment badge and zoom to the upper or lower body when all primary muscles are there (option B), else show the whole
+body. The exercise detail page opens with a close-up of the trained body part with muscle fibres (inspired by the user's
+engraving-style reference), the primary and secondary muscles as chips and the equipment in large type; photos follow under
+"How to". Code: `muscleSvg(ex, crop)`, `muscleDetail(ex)`, `muscleLists(ex)` in `js/musclemap.js`.
+**Reason:** The user found the first figure blocky, the head too small and the arms too thin, and approved this version.
+**Status:** Active (updates #42)
+
 ## #42 · 2026-09-29 · Own muscle-map thumbnails for every exercise
 **Decision:** List and card thumbnails are our own drawings (`js/musclemap.js`): a front or back body figure where the trained
 muscles are lit (orange = primary, faded orange = secondary) and a small badge for the equipment. Muscles come from an id
