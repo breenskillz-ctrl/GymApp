@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-09-28 (v21: failure rule)_
+_Last updated: 2026-09-29 (v22: steel & orange theme)_
 
 ## About the user
 
@@ -10,6 +10,7 @@ _Last updated: 2026-09-28 (v21: failure rule)_
 - Security-conscious: no secrets in GitHub, ever (see DECISIONS #6).
 - Wants Claude to keep notes and decisions in these Markdown files.
 - Loves being able to create programs with their own nicknames in GymKeeper. Keep that front and centre.
+- Chose the "Steel & orange" look (slate + #ff7a1a, Barlow / Barlow Condensed); keep new UI in that style.
 - Does not want RIR/RPE; the set levels are enough.
 - Progression rule: after a failure set, fill all sets up to the same reps at the same weight before adding reps or weight.
 - Trains with wide, exercise-specific rep ranges (deadlift 1–5, sometimes 10 at lighter weight; bench 1–12; triceps 10–30).
@@ -58,6 +59,10 @@ _Last updated: 2026-09-28 (v21: failure rule)_
 - [x] Left/right arm and thigh (v16, DECISIONS #33). Progress photos with compare (v17, DECISIONS #34).
 - [x] Export/import of progress photos (v18, DECISIONS #35).
 - [x] Failure rule: failure at a weight → all sets there repeat at the best reps before progressing (v21, DECISIONS #38).
+- [x] New look "Steel & orange" with bottom tab bar and self-hosted Barlow fonts (v22, DECISIONS #40). Preview page of the
+      three options: https://claude.ai/artifact/LE1Tts48g3CwKzv79Z4Ff2 (private to the user).
+- [ ] Ideas offered, not yet requested: supersets, goals ("bench 120 by Christmas"), Monday weekly summary, voice logging,
+      shareable workout card, long-press plate calculator.
 - [x] RIR/RPE: declined by the user (2026-09-29, DECISIONS #39). Don't suggest it again.
 - [x] History page as the start screen + "Start workout", and the phone back button no longer closes the app (v19, DECISIONS #36, #37).
 - [ ] Ideas for blocks (not requested): RPE-based prescriptions, exporting/sharing block templates, a warm-up set generator.

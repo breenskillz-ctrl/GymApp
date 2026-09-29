@@ -5,6 +5,15 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #40 · 2026-09-29 · "Steel & orange" look, bottom tab bar
+**Decision:** Replace the GymKeeper-like black/green look with the user's pick from a preview of three options:
+slate greys (#15181c background, #1e2329 cards with a thin edge) and one orange accent (#ff7a1a, dark text on it). Type is Barlow
+for the UI and Barlow Condensed for numbers and page titles (uppercase), self-hosted in `fonts/` (SIL OFL, `fonts/OFL.txt`) so
+they work offline. A bottom tab bar (History, Log, Programs, Progress) sits on every page; the drawer keeps the rest. Round FAB,
+pill "Start workout", orange app icon. Set level colours and muscle-group colours are unchanged. All colours are tokens in `:root`.
+**Reason:** The user wanted the app to look less like GymKeeper and chose option 1 of 3 from a preview (2026-09-29).
+**Status:** Active (supersedes the colour part of #14)
+
 ## #39 · 2026-09-29 · No RIR/RPE
 **Decision:** The app does not get RIR or RPE. Effort stays as the six set levels (warm-up, easy, normal, hard, failure, drop).
 **Reason:** The user decided against it after the proposal (2026-09-29).

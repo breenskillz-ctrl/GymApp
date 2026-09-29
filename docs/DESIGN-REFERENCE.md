@@ -1,3 +1,7 @@
+> **2026-09-29:** The app no longer copies GymKeeper's colours. It uses the "Steel & orange" theme (DECISIONS #40): slate
+> greys, orange accent #ff7a1a, Barlow / Barlow Condensed, bottom tab bar. The GymKeeper notes below still describe layout and
+> flows the user likes.
+
 # Design reference: GymKeeper screenshots
 
 The user sent screenshots from GymKeeper on their phone (Android) so the app can match its layout and flow.

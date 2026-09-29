@@ -1,9 +1,9 @@
 // Startup, navigation between views and the side drawer.
 import { load, state } from './store.js';
-import { applyTextScale, closeTopModal, toast } from './utils.js';
+import { applyTextScale, closeTopModal, toast, dateKey } from './utils.js';
 import { initRestBar } from './timer.js';
 import { initWakeLock } from './wakelock.js';
-import { renderLog, enableSwipe } from './views/log.js';
+import { renderLog, enableSwipe, goToDate } from './views/log.js';
 import { renderPrograms } from './views/programs.js';
 import { renderExercises } from './views/exercises.js';
 import { renderProgress, openSettings, openBodyWeight } from './views/progress.js';
@@ -28,11 +28,14 @@ const VIEWS = {
   blocks: (el) => renderPrograms(el, { tab: 'blocks' }), // old links: Blocks now lives under Programs
 };
 
+const tabbar = document.getElementById('tabbar');
+document.body.classList.add('has-tabbar');
+
 export function navigate(view) {
   current = view;
   document.body.dataset.screen = view;
   closeDrawer();
-  drawer.querySelectorAll('[data-view]').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+  document.querySelectorAll('#drawer [data-view], #tabbar [data-view]').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
   main.onclick = main.oninput = main.onchange = main.onfocusin = null;
   VIEWS[view](main);
   window.scrollTo(0, 0);
@@ -87,6 +90,13 @@ drawer.addEventListener('click', (e) => {
   if (a === 'settings') openSettings(refresh);
   if (a === 'body') openBodyWeight(refresh);
   if (a === 'photos') openProgressPhotos();
+});
+
+// Bottom tab bar (DECISIONS #40). The Log tab always opens today.
+tabbar.addEventListener('click', (e) => {
+  const v = e.target.closest('[data-view]')?.dataset.view;
+  if (v === 'log') goToDate(dateKey());
+  else if (v) navigate(v);
 });
 
 enableSwipe(main, () => current === 'log');

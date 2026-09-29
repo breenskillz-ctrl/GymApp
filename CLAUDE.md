@@ -40,8 +40,9 @@ plain HTML/CSS/JavaScript (ES modules). There is no build step, there are no dep
 All data is stored in `localStorage` on the device.
 
 ```
-index.html            App shell, SVG icon sprite (<symbol id="i-…">), side drawer, rest bar, toast
-css/styles.css        All styles: GymKeeper-like black/green dark theme (DECISIONS #14)
+index.html            App shell, SVG icon sprite (<symbol id="i-…">), side drawer, bottom tab bar, rest bar, toast
+css/styles.css        All styles: "Steel & orange" dark theme, colour tokens in :root (DECISIONS #40)
+fonts/                Barlow + Barlow Condensed woff2 (SIL OFL, fonts/OFL.txt); --f-ui for text, --f-num for numbers/titles
 js/app.js             Startup, navigation (navigate(view); views call go(view) from utils), drawer, back-button guard (DECISIONS #37)
 js/data.js            EXERCISES (231, curated order, with sub + equip), PROGRAMS, GROUPS (9) + GROUP_COLORS, SUBGROUPS,
                       LEVELS (set intensity), EQUIPMENT, TYPES
@@ -103,6 +104,9 @@ For `t` exercises in programs, `reps` means seconds.
   `cache: 'no-cache'` and reloads once when a new version takes over.
 - **Font sizes: always write them as `font-size: calc(Npx * var(--fs))`** so the Settings text-size slider works (DECISIONS #24).
   Canvas fonts use `textScale()` from utils.
+- **Colours: use the tokens in `:root` (`--bg`, `--card`, `--card2`, `--text`, `--muted`, `--accent`, `--accent-ink` …), never new
+  hard-coded greys.** Text on an orange background uses `--accent-ink`. Set-level and muscle-group colours stay as they are.
+- The Pages workflow copies `index.html manifest.webmanifest sw.js css js icons img fonts`. Add any new top-level folder there.
 - Match the existing style: 2-space indent, single quotes, semicolons, short comments only where they help.
 
 ## Running and testing
