@@ -60,9 +60,9 @@ js/wakelock.js        Screen wake lock while today has exercises (settings.keepA
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart(), barChart(), multiLineChart(), stackedBarChart() on canvas
 js/views/history.js   History (start page): compact workout cards, "Start workout" → today's log
-js/views/log.js       Day view (cards with sets as KG/REP columns, FAB, day menu, calendar, records)
+js/views/log.js       Day view (cards with set chips + "+" chip, ‹ day › nav, "Add exercise" pill, day menu, calendar, records)
 js/views/seteditor.js Set editor dialog (fields, −/+, comment, levels, history/1RM/plate tools)
-js/views/addsheet.js  "+" sheet and exercise browser: quick tiles, group rows, filtered exercise lists (★/region/equipment), ⋮ menu
+js/views/addsheet.js  "+" sheet and exercise browser: shortcut links, plain muscle-group list, filtered exercise lists (★/region/equipment), ⋮ menu
 js/views/programs.js  Program grid (page + sheet), detail, ⋮ menu (rename/edit/copy/export/delete), import, editor
 js/views/blocks.js    Blocks tab inside Programs (renderBlocks(el, {embedded})), activeBlocksHtml() cards, schedule, start/1RM dialogs;
                       blockeditor.js = custom block builder
@@ -109,6 +109,8 @@ For `t` exercises in programs, `reps` means seconds.
 - **Colours: use the tokens in `:root` (`--bg`, `--card`, `--card2`, `--text`, `--muted`, `--accent`, `--accent-ink` …), never new
   hard-coded greys.** Text on an orange background uses `--accent-ink`. Set-level and muscle-group colours stay as they are.
 - The Pages workflow copies `index.html manifest.webmanifest sw.js css js icons img fonts`. Add any new top-level folder there.
+- **Keep the UI minimal (DECISIONS #44):** small controls, hairlines over fills, one accent colour. Show new designs to the
+  user as screenshots before publishing.
 - Match the existing style: 2-space indent, single quotes, semicolons, short comments only where they help.
 
 ## Running and testing

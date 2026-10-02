@@ -16,7 +16,7 @@ export function renderExercises(root) {
       ${topBar('Exercises', `<button class="icon-btn" data-act="new" aria-label="New exercise">${icon('plus')}</button>
         <button class="icon-btn" data-act="search" aria-label="Search">${icon('search')}</button>`)}
       <p class="sub center" style="margin:0 0 12px">${allExercises().length} exercises</p>
-      ${groupRowsHtml(null)}`;
+      <div class="group-list">${groupRowsHtml(null)}</div>`;
   };
   root.onclick = async (e) => {
     const act = e.target.closest('[data-act]')?.dataset.act;

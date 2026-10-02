@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/styles.css?v=25">
+  <link rel="stylesheet" href="css/styles.css?v=26">
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
@@ -65,10 +65,12 @@
   </nav>
 
   <div id="restbar" class="restbar" aria-live="polite">
-    <div class="rest-progress"></div>
     <div class="rest-inner">
+      <div class="rest-ring">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><circle class="ring-bg" cx="24" cy="24" r="21"/><circle class="ring-fg" cx="24" cy="24" r="21"/></svg>
+        <span class="rest-time">0:00</span>
+      </div>
       <span class="rest-label">Rest</span>
-      <span class="rest-time">0:00</span>
       <button class="rest-btn" data-rest="-15">−15</button>
       <button class="rest-btn" data-rest="15">+15</button>
       <button class="rest-btn skip" data-rest="skip">Skip</button>
@@ -96,6 +98,6 @@
 
   <div id="toast" class="toast" role="status"></div>
 
-  <script type="module" src="js/app.js?v=25"></script>
+  <script type="module" src="js/app.js?v=26"></script>
 </body>
 </html>

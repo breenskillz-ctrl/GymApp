@@ -1,6 +1,5 @@
 // Progress: statistics, charts, records, body weight and settings.
 import { GROUPS, GROUP_COLORS } from '../data.js';
-import { groupIcon } from '../icons.js';
 import {
   state, save, dayHasWork, getExercise, records, setVolume, resetState,
 } from '../store.js';
@@ -201,7 +200,7 @@ export function renderProgress(root) {
     <section class="card">
       <h3>Sets per muscle group <span class="muted">(30 days)</span></h3>
       ${groupsSorted.length ? groupsSorted.map((g) => `
-        <div class="hbar"><span class="hbar-label">${groupIcon(g, 18)}${esc(g)}</span>
+        <div class="hbar"><span class="hbar-label"><i class="gdot" style="--c:${GROUP_COLORS[g] || GROUP_COLORS.Other}"></i>${esc(g)}</span>
           <span class="hbar-track"><span class="hbar-fill" style="width:${(s.groupSets[g] / maxGroup) * 100}%;background:${GROUP_COLORS[g] || GROUP_COLORS.Other}"></span></span>
           <span class="hbar-val">${s.groupSets[g]}</span></div>`).join('') : '<p class="empty">Complete some sets to see the breakdown.</p>'}
     </section>

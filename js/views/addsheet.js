@@ -9,7 +9,7 @@ import {
 import {
   esc, icon, openModal, fmtDate, promptDialog, menuDialog, confirmDialog, toast, dateKey, parseKey,
 } from '../utils.js';
-import { groupIcon, exerciseThumb } from '../icons.js';
+import { exerciseThumb } from '../icons.js';
 import {
   openExerciseEditor, openExerciseDetail, openProgressionDialog, progressionText,
 } from './exercises.js';
@@ -55,11 +55,11 @@ export async function exerciseMenu(id, refresh) {
 export function groupRowsHtml(date) {
   const days = daysSinceGroups(date || dateKey());
   return GROUPS.map((g) => `
-    <div class="group-row" data-group="${esc(g)}" role="button" tabindex="0">
-      ${groupIcon(g, 40)}
+    <div class="group-item" data-group="${esc(g)}" role="button" tabindex="0">
+      <i class="gdot" style="--c:${GROUP_COLORS[g] || GROUP_COLORS.Other}"></i>
       <span class="name">${esc(g)}</span>
       <span class="days">${daysText(days[g])}</span>
-      <button class="icon-btn" data-gmenu="${esc(g)}" aria-label="${esc(g)} menu">${icon('more')}</button>
+      <button class="icon-btn sm" data-gmenu="${esc(g)}" aria-label="${esc(g)} menu">${icon('more')}</button>
     </div>`).join('');
 }
 
@@ -74,7 +74,7 @@ export function openAddSheet(date, onAdded, { mode = 'add', page: startPage = nu
   let query = '';
   const filter = { fav: false, sub: '', equip: '' };
 
-  openModal('<div class="sheet-body editor"></div><button class="close-float" data-close>Close</button>', {
+  openModal('<div class="sheet-grip" aria-hidden="true"></div><div class="sheet-body editor"></div>', {
     className: 'sheet',
     onMount(m, close) {
       const body = m.querySelector('.sheet-body');
@@ -87,6 +87,7 @@ export function openAddSheet(date, onAdded, { mode = 'add', page: startPage = nu
           <div class="actions">
             <button class="icon-btn" data-new aria-label="New exercise">${icon('plus')}</button>
             <button class="icon-btn" data-search aria-label="Search">${icon('search')}</button>
+            <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button>
           </div>
         </div>`;
 
@@ -106,13 +107,13 @@ export function openAddSheet(date, onAdded, { mode = 'add', page: startPage = nu
         if (page.kind === 'home') {
           body.innerHTML = `${header('Exercises', false)}
             <div class="scroll">
-              ${mode === 'add' ? `<div class="quick-tiles">
-                <button class="quick-tile qt-program" data-q="program">${icon('flex')}From program</button>
-                <button class="quick-tile qt-day" data-q="day">${icon('calendar')}From another day</button>
-                <button class="quick-tile qt-recent" data-q="recent">${icon('history')}Recent exercises</button>
-                <button class="quick-tile qt-comment" data-q="comment">${icon('comment')}${getDay(date)?.title ? 'Edit comment' : 'Add comment'}</button>
+              ${mode === 'add' ? `<div class="quick-pills">
+                <button class="quick-pill" data-q="recent">${icon('history')}Recent</button>
+                <button class="quick-pill" data-q="program">${icon('dumbbell')}Program</button>
+                <button class="quick-pill" data-q="day">${icon('copy')}Copy a day</button>
+                <button class="quick-pill" data-q="comment">${icon('comment')}${getDay(date)?.title ? 'Comment' : 'Add comment'}</button>
               </div>` : ''}
-              ${groupRowsHtml(date)}
+              <div class="group-list">${groupRowsHtml(date)}</div>
             </div>`;
           return;
         }

@@ -1,8 +1,8 @@
 // Modal for picking one or more exercises from the library.
-import { GROUPS } from '../data.js';
+import { GROUPS, GROUP_COLORS } from '../data.js';
 import { allExercises } from '../store.js';
 import { esc, openModal, icon } from '../utils.js';
-import { exerciseThumb, groupIcon } from '../icons.js';
+import { exerciseThumb } from '../icons.js';
 import { exLabel } from './seteditor.js';
 
 // One exercise row with its thumbnail
@@ -24,7 +24,7 @@ export function exerciseListHtml(list, selected = new Set()) {
   for (const ex of sorted) {
     if (ex.group !== group) {
       group = ex.group;
-      html += `<div class="list-heading row gap">${groupIcon(group, 18)}${esc(group || 'Other')}</div>`;
+      html += `<div class="list-heading row gap"><i class="gdot" style="--c:${GROUP_COLORS[group] || GROUP_COLORS.Other}"></i>${esc(group || 'Other')}</div>`;
     }
     html += exRowHtml(ex, selected.has(ex.id));
   }

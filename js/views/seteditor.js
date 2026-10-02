@@ -99,6 +99,7 @@ export function openSetEditor(date, entry, index, onDone) {
           ${tools.includes('plates') ? `<button type="button" class="icon-btn" data-tool="plates" aria-label="Plate calculator">${icon('plates')}</button>` : ''}
           ${tools.includes('calc') ? `<button type="button" class="icon-btn" data-tool="calc" aria-label="1RM calculator">${icon('calc')}</button>` : ''}
           <button type="button" class="icon-btn" data-tool="history" aria-label="History">${icon('history')}</button>
+          ${editing ? `<button type="button" class="icon-btn danger-text" data-del aria-label="Delete set">${icon('trash')}</button>` : ''}
         </div>
       </div>
       ${existing && !existing.done && existing.last ? `<table class="se-compare">
@@ -106,24 +107,22 @@ export function openSetEditor(date, entry, index, onDone) {
         <tr><td>${esc(setText(ex, existing.last))}</td><td>${esc(setText(ex, existing))}${suggestionDelta(existing) ? ` <span class="delta">${esc(suggestionDelta(existing))}</span>` : ''}</td></tr>
       </table>` : ''}
       <div class="se-tool-panel" hidden></div>
-      ${fields.map(([f, label], i) => `
+      <div class="se-fields">${fields.map(([f, label], i) => `
         <div class="se-row" data-f="${f}">
           <label for="se-${f}">${label}</label>
-          <input id="se-${f}" data-f="${f}" inputmode="${f === 'r' ? 'numeric' : 'decimal'}" enterkeyhint="${i < fields.length - 1 ? 'next' : 'done'}"
-            placeholder="${f === 't' ? 'm:ss' : '0'}" value="${esc(show(f, values[f]))}">
-          <button type="button" class="icon-btn" data-step="-1" aria-label="Decrease">−</button>
-          <button type="button" class="icon-btn" data-step="1" aria-label="Increase">+</button>
-        </div>`).join('')}
+          <div class="se-stepper">
+            <button type="button" class="step-btn" data-step="-1" aria-label="Decrease ${label}">−</button>
+            <input id="se-${f}" data-f="${f}" inputmode="${f === 'r' ? 'numeric' : 'decimal'}" enterkeyhint="${i < fields.length - 1 ? 'next' : 'done'}"
+              placeholder="${f === 't' ? 'm:ss' : '0'}" value="${esc(show(f, values[f]))}">
+            <button type="button" class="step-btn" data-step="1" aria-label="Increase ${label}">+</button>
+          </div>
+        </div>`).join('')}</div>
       <label class="se-comment">${icon('comment')}<input data-comment placeholder="Add comment" value="${esc(existing?.c || '')}"></label>
       <div class="lvl-row">
         ${LEVELS.map((l) => `<button type="button" class="lvl-btn ${l.id === lvl ? 'active' : ''}" style="--c:${l.color}" data-lvl="${l.id}">
           <span class="dot" style="background:${l.color}"></span>${l.label}</button>`).join('')}
       </div>
-      <div class="dialog-actions">
-        ${editing ? '<button type="button" class="text-btn danger-text" data-del style="margin-right:auto">Delete</button>' : ''}
-        <button type="button" class="text-btn" data-close>Cancel</button>
-        <button type="submit" class="text-btn accent">${editing ? 'Save' : 'Add'}</button>
-      </div>
+      <button type="submit" class="btn primary block save-set">${icon('check')} ${editing ? 'Save set' : 'Add set'}</button>
     </form>`, {
     className: 'dialog set-dialog',
     onMount(m, close) {
@@ -141,6 +140,9 @@ export function openSetEditor(date, entry, index, onDone) {
       };
 
       setTimeout(() => { inputs[0]?.focus(); inputs[0]?.select(); }, 60);
+      // Show the chosen level even when the chip row has to scroll
+      const activeLvl = m.querySelector('.lvl-btn.active');
+      if (activeLvl) activeLvl.parentElement.scrollLeft = activeLvl.offsetLeft - activeLvl.parentElement.offsetLeft - 8;
       m.addEventListener('focusin', (e) => { if (e.target.matches('.se-row input')) e.target.select(); });
       m.addEventListener('input', () => { if (tool === 'calc' || tool === 'plates') drawTool(); });
 

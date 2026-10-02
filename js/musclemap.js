@@ -198,8 +198,9 @@ const fibreDefs = () => `<defs>${Array.from({ length: 12 }, (_, i) => i * 15).ma
 
 // Small thumbnail: the whole body, or (crop = true) only the upper or lower half when all primary muscles are there
 const LOWER = ['quads', 'adductors', 'hamstrings', 'glutes', 'calves'];
-export function muscleSvg(ex, crop = false) {
-  const m = musclesFor(ex);
+export const muscleSvg = (ex, crop = false) => mapSvg(musclesFor(ex), crop);
+
+function mapSvg(m, crop) {
   const lit = m.p; // the primary muscles decide the crop; secondary ones may fall outside it
   let vb = fitRect([-6, 0, 132, 240], false);
   if (crop && lit.length && lit.every((x) => !LOWER.includes(x))) vb = fitRect([-8, 1, 136, 150]);

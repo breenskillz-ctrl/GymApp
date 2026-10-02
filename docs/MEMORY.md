@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-09-29 (v25: redrawn muscle figure + detail close-up)_
+_Last updated: 2026-10-02 (v26: own minimal controls)_
 
 ## About the user
 
@@ -13,6 +13,7 @@ _Last updated: 2026-09-29 (v25: redrawn muscle figure + detail close-up)_
 - Wants Claude to keep notes and decisions in these Markdown files.
 - Loves being able to create programs with their own nicknames in GymKeeper. Keep that front and centre.
 - Chose the "Steel & orange" look (slate + #ff7a1a, Barlow / Barlow Condensed); keep new UI in that style.
+- Wants a **minimal, calm** UI: small controls, few colours, no figures except in exercise lists/search and the detail page.
 - Does not want RIR/RPE; the set levels are enough.
 - Progression rule: after a failure set, fill all sets up to the same reps at the same weight before adding reps or weight.
 - Trains with wide, exercise-specific rep ranges (deadlift 1–5, sometimes 10 at lighter weight; bench 1–12; triceps 10–30).
@@ -65,6 +66,7 @@ _Last updated: 2026-09-29 (v25: redrawn muscle figure + detail close-up)_
       three options: https://claude.ai/artifact/LE1Tts48g3CwKzv79Z4Ff2 (private to the user).
 - [x] Persistent storage request + status in Settings, one backup file incl. photos, share to Drive/iCloud (v23, DECISIONS #41).
 - [x] Own muscle-map thumbnails for all 231 exercises + custom ones (v24, DECISIONS #42). Photos only on the detail page.
+- [x] Own minimal buttons/controls, approved after two preview rounds (v26, DECISIONS #44).
 - [x] Figure redrawn and approved by the user; zoomed thumbnails, muscle close-up + equipment on the detail page (v25, DECISIONS #43).
 - [ ] Possible: if the user buys a Gym Visual licence, add a local image-pack import (files stay on the device, never in git).
 - [ ] OPEN (asked 2026-09-29): what it takes to make a downloadable app for phone and PC. Explained PWA install, store apps

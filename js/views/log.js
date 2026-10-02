@@ -1,5 +1,4 @@
 // Day view: the workout log for one day, styled after GymKeeper (see docs/DESIGN-REFERENCE.md).
-import { GROUP_COLORS } from '../data.js';
 import {
   state, save, getDay, cleanupDay, addEntry, getExercise, dayHasWork, isPR, daySummary, records, makeSets,
   warmupSets, getRest, dayDuration, isStalled, deloadEntry, setHasData,
@@ -59,10 +58,10 @@ function setColHtml(ex, s, i) {
     l2 = val(s.r, 'rep', String);
   }
   const pr = s.done && isPR(ex.id, logState.date, s);
-  // Filled dot = done; hollow dot = suggested set with the level it had last time
+  // Solid edge = done; dashed edge = suggested set, in the colour of the level it had last time (DECISIONS #44)
   const color = s.done ? levelColor(s.lvl || 'normal') : s.lvl ? levelColor(s.lvl) : null;
-  return `<button class="set-col ${s.done ? '' : 'planned'} ${pr ? 'pr' : ''}" data-act="edit-set" data-set="${i}">
-    ${color ? `<span class="dot ${s.done ? '' : 'hollow'}" style="--c:${color}"></span>` : ''}
+  return `<button class="set-col ${s.done ? '' : 'planned'} ${pr ? 'pr' : ''}" data-act="edit-set" data-set="${i}"
+    ${color ? `style="--c:${color}"` : ''}>
     <span class="line">${l1}</span>${l2 ? `<span class="line">${l2}</span>` : ''}
     ${s.c ? `<span class="set-note">${esc(s.c)}</span>` : ''}
     ${suggestionDelta(s) ? `<span class="set-delta">${esc(suggestionDelta(s))}</span>` : ''}
@@ -78,14 +77,13 @@ function entryHtml(entry) {
   const stalled = !entry.block && !entry.deload && !entry.sets.some((s) => s.done) && isStalled(entry.ex, logState.date);
   return `
     <section class="ex-card" data-entry="${entry.id}">
-      <button data-act="info" aria-label="Exercise details">${exerciseThumb(ex)}</button>
       <div class="ex-body">
         <div class="ex-head">
           <button class="ex-title" data-act="info">${esc(exLabel(ex))}</button>
-          <button class="icon-btn" data-act="add-set" aria-label="Add set">${icon('plus')}</button>
           <button class="icon-btn" data-act="entry-menu" aria-label="Menu">${icon('more')}</button>
         </div>
-        <div class="sets">${entry.sets.map((s, i) => setColHtml(ex, s, i)).join('')}</div>
+        <div class="sets">${entry.sets.map((s, i) => setColHtml(ex, s, i)).join('')}
+          <button class="set-col add-chip" data-act="add-set" aria-label="Add set">${icon('plus')}<span>Set</span></button></div>
         ${stalled ? `<div class="stall">No progress in 3 sessions.
           <button class="text-btn accent" data-act="deload">Deload −10&nbsp;%</button></div>` : ''}
         ${planned > 1 ? `<button class="log-all" data-act="log-all">${icon('check')} Log all ${planned} as suggested</button>` : ''}
@@ -114,10 +112,13 @@ export function renderLog(root) {
   root.innerHTML = `
     <header class="topbar">
       <button class="icon-btn" data-open-drawer aria-label="Menu">${icon('menu')}</button>
-      <button class="${isToday ? 'date-pill' : 'date-text'}" data-act="calendar">${esc(dateLabel(key))}</button>
-      <span class="spacer"></span>
+      <div class="day-nav">
+        <button class="icon-btn sm" data-act="prev-day" aria-label="Previous day">${icon('left')}</button>
+        <button class="day-label ${isToday ? 'today' : ''}" data-act="calendar">${esc(dateLabel(key))}</button>
+        <button class="icon-btn sm" data-act="next-day" aria-label="Next day">${icon('right')}</button>
+      </div>
+      ${entries.length ? `<button class="icon-btn" data-act="records" aria-label="Records">${icon('trophy')}</button>` : ''}
       <button class="icon-btn" data-act="timers" aria-label="Timers">${icon('timer')}</button>
-      <button class="icon-btn" data-act="calendar" aria-label="Calendar">${icon('calendar')}</button>
       <button class="icon-btn" data-act="day-menu" aria-label="More">${icon('more')}</button>
     </header>
     ${isToday && backupDue() ? `<div class="backup-banner">${icon('download')}
@@ -126,15 +127,11 @@ export function renderLog(root) {
       <button class="icon-btn sm" data-act="backup-later" aria-label="Remind me later">${icon('close')}</button></div>` : ''}
     ${entries.length ? `
       <p class="day-summary">${sum.exs} exs · ${sum.sets} sets${sum.vol ? ` · ${fmtNum(sum.vol, 0)} ${state.settings.unit}` : ''}${mins ? ` · ${mins} min` : ''}</p>
-      ${sum.groups.length ? `<div class="group-tags">${sum.groups.map((g) => `<span style="color:${GROUP_COLORS[g]}">${esc(g)}</span>`).join('')}</div>` : ''}
       ${day.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
       <div class="entries">${entries.map(entryHtml).join('')}</div>` : `
       ${day?.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
       <div class="empty-day">${sleepArt}<h2>Empty Day</h2></div>`}
-    <div class="fab-wrap">
-      ${entries.length ? `<button class="fab-round" data-act="records" aria-label="Records">${icon('trophy')}</button>` : ''}
-      <button class="fab" data-act="add" aria-label="Add exercise">${icon('plus')}</button>
-    </div>`;
+    <div class="fab-wrap wide"><button class="add-bar" data-act="add">${icon('plus')}Add exercise</button></div>`;
 
   root.onclick = onClick;
 }
@@ -152,6 +149,8 @@ function onClick(e) {
 
   switch (b.dataset.act) {
     case 'calendar': return openCalendar();
+    case 'prev-day': return goToDate(addDays(logState.date, -1));
+    case 'next-day': return goToDate(addDays(logState.date, 1));
     case 'timers': return go('timers');
     case 'day-menu': return openDayMenu();
     case 'records': return openDayRecords();

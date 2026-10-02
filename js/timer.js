@@ -5,6 +5,7 @@ import { beep, vibrate, fmtTime } from './utils.js';
 let endAt = 0;
 let total = 0;
 let tick = null;
+const RING = 2 * Math.PI * 21; // circumference of the timer ring
 
 const bar = () => document.getElementById('restbar');
 
@@ -42,7 +43,8 @@ function update() {
     return;
   }
   el.querySelector('.rest-time').textContent = fmtTime(Math.ceil(left));
-  el.querySelector('.rest-progress').style.width = `${(1 - left / total) * 100}%`;
+  // The ring empties as the rest runs out (DECISIONS #44)
+  el.querySelector('.ring-fg').style.strokeDashoffset = String(RING * (1 - left / total));
 }
 
 export function initRestBar() {

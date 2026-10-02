@@ -5,6 +5,21 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #44 · 2026-10-02 · Own, minimal controls instead of GymKeeper's
+**Decision:** After two preview rounds with the user (first version felt "big and noisy"):
+- Sets are hairline chips; the set level is a thin coloured line at the bottom; suggested sets have a dashed edge. A small
+  dashed "+" chip ends the row (no "+" icon in the card header). Log cards have no muscle figure and no group tags.
+- Set editor: round outline −/+ steppers around an underlined number, levels as one row of text chips, one "Save set" button;
+  delete is a trash icon in the header, cancel = tap outside / back.
+- Log: day label with ‹ › arrows (tap the label for the calendar), trophy in the top bar, a small "Add exercise" pill
+  bottom-right instead of the round FAB.
+- "+" sheet: shortcut text links (Recent, Program, Copy a day, Comment), muscle groups as a plain list with a colour dot;
+  closed with ✕ in the header and a grip (no floating "CLOSE").
+- Rest timer: a small ring that empties, text buttons.
+- Muscle-figure thumbnails stay only in exercise lists/search and on the exercise detail page.
+**Reason:** The user did not want the app to be a copy of GymKeeper and asked for a calmer, minimalist look.
+**Status:** Active
+
 ## #43 · 2026-09-29 · Muscle-map figure redrawn with the user, plus a detail close-up
 **Decision:** The body figure was redrawn over several rounds with the user, using their reference pictures for proportions
 only (no copied artwork): a muscular build with a larger head, thick arms and legs, light outline between the muscles; then
