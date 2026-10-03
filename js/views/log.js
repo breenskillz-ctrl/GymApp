@@ -8,7 +8,8 @@ import {
   esc, icon, openModal, confirmDialog, dateKey, addDays, fmtTime, fmtNum, toast,
   parseKey, MONTHS, pad, go, promptDialog, menuDialog,
 } from '../utils.js';
-import { exerciseThumb, sleepArt } from '../icons.js';
+import { exerciseThumb } from '../icons.js';
+import { profileName } from '../profile.js';
 import { openExercisePicker } from './picker.js';
 import { openExerciseDetail, openProgressionDialog, progressionText } from './exercises.js';
 import { openSetEditor, levelColor, exLabel, suggestionDelta } from './seteditor.js';
@@ -100,6 +101,31 @@ function dateLabel(key) {
   return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}${y}`;
 }
 
+// Empty day: a motivating line for today, calmer text for past and future days (replaces "Empty Day zzz", 2026-10-03)
+const PUSH_LINES = [
+  ['The bar is loaded.', 'Are you?'],
+  ['Today is a blank page.', 'Write a PR on it.'],
+  ['Show up. Lift. Repeat.', 'Every set counts.'],
+  ['Strong is built one set at a time.', 'Start with the first one.'],
+  ['No zero days.', 'Even one exercise beats none.'],
+  ['Small plates add up.', 'Add one today.'],
+  ['Ready to grind{name}?', "Let's make today count."],
+];
+
+function emptyDayHtml(key) {
+  const today = dateKey();
+  let head;
+  let sub;
+  if (key < today) [head, sub] = ['Rest day', 'Recovery is part of the plan.'];
+  else if (key > today) [head, sub] = ['Nothing planned yet', 'Add exercises now and they are ready when the day comes.'];
+  else {
+    const n = Math.floor(parseKey(key).getTime() / 86400000) % PUSH_LINES.length; // a new line each day
+    const name = profileName();
+    [head, sub] = PUSH_LINES[n].map((t) => t.replace('{name}', name ? `, ${name}` : ''));
+  }
+  return `<div class="empty-day log-empty"><h2>${esc(head)}</h2><p>${esc(sub)}</p></div>`;
+}
+
 export function renderLog(root) {
   rootEl = root;
   const key = logState.date;
@@ -130,7 +156,7 @@ export function renderLog(root) {
       ${day.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
       <div class="entries">${entries.map(entryHtml).join('')}</div>` : `
       ${day?.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
-      <div class="empty-day">${sleepArt}<h2>Empty Day</h2></div>`}
+      ${emptyDayHtml(logState.date)}`}
     <div class="fab-wrap wide"><button class="add-bar" data-act="add">${icon('plus')}Add exercise</button></div>`;
 
   root.onclick = onClick;

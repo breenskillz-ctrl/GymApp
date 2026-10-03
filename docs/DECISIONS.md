@@ -5,6 +5,17 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #48 · 2026-10-03 · Accent colour changed from orange to the icon's plate blue; icon with four plates
+**Decision:** `--accent` is now `#2c5aa8`, the dark blue of the plates in the app icon, with white `--accent-ink` on it. A lighter
+tint of the same blue, `--accent-hi` (`#6b97e0`), is used wherever the accent is text, an icon or a thin line on the dark
+background (tabs, text buttons, the name in the greeting, rest ring, charts, muscle highlights), because `#2c5aa8` alone is too
+dark to read there (contrast about 2.6:1, vs about 6:1). The app icon now has four plates instead of five.
+**Reason:** The user asked for the orange in the app (e.g. "Add exercise" and the active "Log" tab) to use the same blue as the
+plates, and changed their mind from five to four plates.
+The empty log day no longer says "Empty Day" with a zzz drawing: today shows a short motivating line (a new one each day,
+one uses the profile name), past days say "Rest day", future days "Nothing planned yet" (asked by the user the same day).
+**Status:** Active (approved and published 2026-10-03, v29). Supersedes the orange accent of #40.
+
 ## #47 · 2026-10-03 · "What's new" note after every update
 **Decision:** `js/changelog.js` holds `APP_VERSION` and a `CHANGELOG` list (version, date, short user-facing points). On start the
 app compares `APP_VERSION` with `localStorage['gymapp.seenVersion']` and, after an update, shows the entries the user has not
@@ -13,14 +24,14 @@ whole list again. Every release that bumps the cache version must add an entry.
 **Reason:** The user asked for an update message listing the changes, pushed out with every update.
 **Status:** Active (approved and published 2026-10-03, v28).
 
-## #46 · 2026-10-03 · New app icon: five dark-blue plates on a bar, on graphite
+## #46 · 2026-10-03 · New app icon: dark-blue plates on a bar, on graphite
 **Decision:** The orange dumbbell icon is replaced by our own drawing: a loaded barbell sleeve seen from the side: a grey bar that runs out of the left edge, with the
 stopper (collar) on the left, five equal dark-blue plates with black outlines, pressed together, that the bar runs through, and a clip on the short right end, on a
 graphite gradient. `icons/icon.svg` keeps rounded corners; the PNGs are full
 squares so Android and iOS can apply their own mask. The icon URLs carry `?v=2` so phones fetch the new files.
 **Reason:** The user wanted a black/white/grey icon without a dumbbell. They picked option A ("Stack") from four drafts and
 asked for it turned 90° to the right, with three equal plates in one colour, the bar going through them, a stopper and a clip. After seeing
-blue variants they chose dark blue (#2c5aa8) plates with a black outline, pressed together, and five plates (of 2–6 shown).
+blue variants they chose dark blue (#2c5aa8) plates with a black outline, pressed together, and five plates (of 2–6 shown); changed to four plates in #48.
 **Status:** Active (approved and published 2026-10-03, v28).
 
 ## #45 · 2026-10-03 · Local profile with optional password, greeting and muscle-group mix on History

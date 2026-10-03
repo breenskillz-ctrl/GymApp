@@ -66,7 +66,7 @@ function stats() {
 
 
 // ---------- Strength trend and weekly sets (DECISIONS #29) ----------
-const LINE_COLORS = ['#ff7a1a', '#3d8bff', '#f2b705', '#43c463'];
+const LINE_COLORS = ['#6b97e0', '#ff8a3d', '#f2b705', '#43c463'];
 
 // Best estimated 1RM per month for the four weighted lifts trained most often in the last 12 months.
 // Sets above 12 reps are left out, because the 1RM estimate gets unreliable there.

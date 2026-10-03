@@ -41,7 +41,7 @@ All data is stored in `localStorage` on the device.
 
 ```
 index.html            App shell, SVG icon sprite (<symbol id="i-…">), side drawer, bottom tab bar, rest bar, toast
-css/styles.css        All styles: "Steel & orange" dark theme, colour tokens in :root (DECISIONS #40)
+css/styles.css        All styles: "Steel" dark theme with the plate-blue accent, colour tokens in :root (DECISIONS #40, #48)
 fonts/                Barlow + Barlow Condensed woff2 (SIL OFL, fonts/OFL.txt); --f-ui for text, --f-num for numbers/titles
 js/app.js             Startup, navigation (navigate(view); views call go(view) from utils), drawer, back-button guard (DECISIONS #37)
 js/data.js            EXERCISES (231, curated order, with sub + equip), PROGRAMS, GROUPS (9) + GROUP_COLORS, SUBGROUPS,
@@ -110,8 +110,9 @@ For `t` exercises in programs, `reps` means seconds.
   `cache: 'no-cache'` and reloads once when a new version takes over.
 - **Font sizes: always write them as `font-size: calc(Npx * var(--fs))`** so the Settings text-size slider works (DECISIONS #24).
   Canvas fonts use `textScale()` from utils.
-- **Colours: use the tokens in `:root` (`--bg`, `--card`, `--card2`, `--text`, `--muted`, `--accent`, `--accent-ink` …), never new
-  hard-coded greys.** Text on an orange background uses `--accent-ink`. Set-level and muscle-group colours stay as they are.
+- **Colours: use the tokens in `:root` (`--bg`, `--card`, `--card2`, `--text`, `--muted`, `--accent`, `--accent-hi`, `--accent-ink` …),
+  never new hard-coded greys.** `--accent` (plate blue) is for fills; accent-coloured text, icons and thin lines on the dark
+  background use `--accent-hi`; text on an `--accent` fill uses `--accent-ink`. Set-level and muscle-group colours stay as they are.
 - The Pages workflow copies `index.html manifest.webmanifest sw.js css js icons img fonts`. Add any new top-level folder there.
 - **Keep the UI minimal (DECISIONS #44):** small controls, hairlines over fills, one accent colour. Show new designs to the
   user as screenshots before publishing.

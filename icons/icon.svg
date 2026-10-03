@@ -3,11 +3,11 @@
   <clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath>
   <rect width="512" height="512" rx="112" fill="url(#g)"/>
   <g clip-path="url(#c)">
-  <!-- a loaded barbell sleeve: stopper, five equal plates, clip (DECISIONS #46) -->
-  <rect x="-20" y="241" width="492" height="30" rx="15" fill="#85878c"/>
-  <rect x="78" y="200" width="44" height="112" rx="9" fill="#85878c"/>
-  <g fill="#2c5aa8" stroke="#000" stroke-width="8"><rect x="128" y="112" width="52" height="288" rx="12"/><rect x="180" y="112" width="52" height="288" rx="12"/><rect x="232" y="112" width="52" height="288" rx="12"/><rect x="284" y="112" width="52" height="288" rx="12"/><rect x="336" y="112" width="52" height="288" rx="12"/></g>
-  <rect x="394" y="212" width="28" height="88" rx="8" fill="#b4b6ba"/>
-  <rect x="414" y="166" width="16" height="58" rx="8" fill="#b4b6ba" transform="rotate(28 422 220)"/>
+  <!-- a loaded barbell sleeve: stopper, four equal plates, clip (DECISIONS #46) -->
+  <rect x="-20" y="241" width="466" height="30" rx="15" fill="#85878c"/>
+  <rect x="104" y="200" width="44" height="112" rx="9" fill="#85878c"/>
+  <g fill="#2c5aa8" stroke="#000" stroke-width="8"><rect x="154" y="112" width="52" height="288" rx="12"/><rect x="206" y="112" width="52" height="288" rx="12"/><rect x="258" y="112" width="52" height="288" rx="12"/><rect x="310" y="112" width="52" height="288" rx="12"/></g>
+  <rect x="368" y="212" width="28" height="88" rx="8" fill="#b4b6ba"/>
+  <rect x="388" y="166" width="16" height="58" rx="8" fill="#b4b6ba" transform="rotate(28 396 220)"/>
   </g>
 </svg>

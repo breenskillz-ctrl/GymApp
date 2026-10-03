@@ -1,4 +1,4 @@
-// Our own SVG artwork: muscle-group icons, exercise thumbnails, program card backgrounds and the empty-day graphic.
+// Our own SVG artwork: muscle-group icons, exercise thumbnails, and program card backgrounds.
 import { GROUP_COLORS } from './data.js';
 import { muscleSvg } from './musclemap.js';
 import { PHOTOS } from './photos.js';
@@ -53,9 +53,3 @@ export function programArt(id) {
   const art = ART[hash(id) % ART.length];
   return svg('0 0 240 180', `<defs><radialGradient id="pg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#303030"/><stop offset="1" stop-color="#0d0d0d"/></radialGradient></defs><rect width="240" height="180" fill="url(#pg)"/>${art}`, 'prog-art');
 }
-
-// ---------- Empty day ----------
-export const sleepArt = svg('0 0 120 120', `<g fill="#333" font-family="system-ui, sans-serif" font-weight="900">
-  <text x="18" y="52" font-size="44" transform="rotate(-14 30 40)">Z</text>
-  <text x="50" y="80" font-size="30" transform="rotate(-8 60 70)">Z</text>
-  <text x="74" y="104" font-size="22" transform="rotate(10 80 96)">Z</text></g>`, 'sleep-art');

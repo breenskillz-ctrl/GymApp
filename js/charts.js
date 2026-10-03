@@ -81,7 +81,7 @@ export function lineChart(canvas, points, { height = 200, format: fmt = (v) => v
   });
 
   // Fill under the line
-  const accent = css('--accent');
+  const accent = css('--accent-hi');
   const grad = ctx.createLinearGradient(0, pad.t, 0, h - pad.b);
   grad.addColorStop(0, accent + '55');
   grad.addColorStop(1, accent + '00');
@@ -135,7 +135,7 @@ export function barChart(canvas, bars, { height = 180, format = (v) => v } = {})
     ctx.fillText(format(v), pad.l - 6, yy);
   }
 
-  const accent = css('--accent');
+  const accent = css('--accent-hi');
   ctx.textAlign = 'center';
   const every = Math.ceil(bars.length / Math.max(2, Math.floor(cw / 48)));
   bars.forEach((b, i) => {

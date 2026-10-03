@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-03 (v28: new app icon + "What's new" sheet)_
+_Last updated: 2026-10-03 (v29: blue accent, 4-plate icon, motivating empty day)_
 
 ## About the user
 
@@ -12,7 +12,8 @@ _Last updated: 2026-10-03 (v28: new app icon + "What's new" sheet)_
 - Security-conscious: no secrets in GitHub, ever (see DECISIONS #6).
 - Wants Claude to keep notes and decisions in these Markdown files.
 - Loves being able to create programs with their own nicknames in GymKeeper. Keep that front and centre.
-- Chose the "Steel & orange" look (slate + #ff7a1a, Barlow / Barlow Condensed); keep new UI in that style.
+- Chose the "Steel & orange" look (slate greys, Barlow / Barlow Condensed); since 2026-10-03 the accent is the icon's plate blue
+  #2c5aa8 (lighter #6b97e0 for text/lines), not orange (DECISIONS #48). Keep new UI in that style.
 - Wants a **minimal, calm** UI: small controls, few colours, no figures except in exercise lists/search and the detail page.
 - Does not want RIR/RPE; the set levels are enough.
 - Progression rule: after a failure set, fill all sets up to the same reps at the same weight before adding reps or weight.
@@ -71,6 +72,8 @@ _Last updated: 2026-10-03 (v28: new app icon + "What's new" sheet)_
       DECISIONS #45). Approved and published 2026-10-03.
 - [x] New app icon: five dark-blue plates with black outlines on a bar, stopper + clip (v28, DECISIONS #46). Published 2026-10-03.
 - [x] "What's new" sheet after each update (v28, DECISIONS #47). Add a CHANGELOG entry with every release.
+- [x] Blue accent instead of orange, icon with four plates, motivating text on an empty day (v29, DECISIONS #48).
+      Published 2026-10-03.
 - [x] Figure redrawn and approved by the user; zoomed thumbnails, muscle close-up + equipment on the detail page (v25, DECISIONS #43).
 - [ ] Possible: if the user buys a Gym Visual licence, add a local image-pack import (files stay on the device, never in git).
 - [ ] OPEN (asked 2026-09-29): what it takes to make a downloadable app for phone and PC. Explained PWA install, store apps
