@@ -31,17 +31,16 @@ export const LEVELS = [
 // Set variants (DECISIONS #51): optional tags on a set. `note` finds the variant in an old free-text set note.
 export const SET_TAGS = [
   { id: 'paused', label: 'Paused', note: /\bpau[sz]e[ds]?\b|\bpausert\b/i },
-  { id: 'tempo', label: 'Tempo', note: /\btempo\b/i },
-  { id: 'speed', label: 'Speed', note: /\bspeed\b/i },
-  { id: 'backoff', label: 'Backoff', note: /\bback\s*-?\s*off\b/i },
+  { id: 'tempo', label: 'Tempo', note: /\btempo\b|\bspeed\b/i },
   { id: 'beltless', label: 'Beltless', note: /belteløs|beltless|no belt|uten belte/i },
   { id: 'deficit', label: 'Deficit', note: /\bdeficit\b/i },
   { id: 'close-grip', label: 'Close grip', note: /\bclose\s*-?\s*grip\b/i },
   { id: 'wide-grip', label: 'Wide grip', note: /\bwide\s*-?\s*grip\b/i },
-  { id: 'touch-go', label: 'Touch & go', note: /\btouch\s*(?:and|&|n)?\s*go\b|\btng\b/i },
   { id: 'sumo', label: 'Sumo', note: /\bsumo\b/i },
   { id: 'unilateral', label: 'Unilateral', note: /\bunilateral\b|\bsingle[\s-]*(?:arm|leg)\b|\bone[\s-]*(?:arm|leg)(?:ed)?\b/i },
 ];
+// Tags that were dropped (2026-10-03): Speed became Tempo; Backoff and Touch & go go back into the set note
+export const RETIRED_TAGS = { speed: { to: 'tempo' }, backoff: { note: 'backoff' }, 'touch-go': { note: 'touch and go' } };
 
 export const EQUIPMENT = [
   'Bodyweight', 'Barbell', 'Dumbbell', 'Cable', 'Machine', 'Smith Machine', 'Kettlebell', 'Band', 'Plate', 'Other',

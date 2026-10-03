@@ -7,7 +7,10 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ## #51 · 2026-10-03 · Set variants as tags
 **Decision:** A set can carry tags from `SET_TAGS` in data.js: Paused, Tempo, Speed, Backoff, Beltless, Deficit, and (added at the user's yes the same day) Close grip, Wide grip,
-Touch & go, Sumo, and Unilateral (asked for later the same day, v33) (`set.tags`, ids in that order). The set editor has a row of toggle chips under the levels; a new set takes the tags of the set before it, and
+Touch & go, Sumo, and Unilateral (asked for later the same day, v33) (`set.tags`, ids in that order).
+Update v34 (user, same day): Speed merged into Tempo ("speed" notes and tags become Tempo); Backoff and Touch & go removed,
+their sets get the word back in the note (`RETIRED_TAGS` in data.js). Current tags: Paused, Tempo, Beltless, Deficit,
+Close grip, Wide grip, Sumo, Unilateral. The set editor has a row of toggle chips under the levels; a new set takes the tags of the set before it, and
 suggested sets for next time keep them (`progressSet`). Set chips in the log show the tags in small blue capitals. Old free-text
 notes are converted once (`tagSetsFromNotes()` in `migrate()` and on GymKeeper import): "paused", "3 sec paused", "backoff",
 "belteløs" … become tags and the words leave the note; the rest of the note stays. The Records page adds a line with the

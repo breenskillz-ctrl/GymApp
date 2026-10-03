@@ -1,5 +1,5 @@
 // Stores all user data in localStorage.
-import { EXERCISES, PROGRAMS, GROUPS, SET_TAGS } from './data.js';
+import { EXERCISES, PROGRAMS, GROUPS, SET_TAGS, RETIRED_TAGS } from './data.js';
 import { uid, e1rm } from './utils.js';
 
 const KEY = 'gymapp.v1';
@@ -41,11 +41,24 @@ export function splitRackPulls(day) {
   day.entries = day.entries.filter((e) => e.sets.length);
 }
 
-// Variants written in a set note ("paused", "3 sec paused", "backoff", "belteløs" …) become set tags (DECISIONS #51).
+// Variants written in a set note ("paused", "3 sec paused", "speed", "belteløs" …) become set tags (DECISIONS #51).
+// Sets with a retired tag (RETIRED_TAGS) get the new tag, or the word back in their note.
 // The words are removed from the note; whatever else the note says stays.
 export function tagSetsFromNotes(day) {
   for (const e of day.entries) {
     for (const st of e.sets) {
+      if (st.tags?.some((t) => RETIRED_TAGS[t])) {
+        const notes = [];
+        const kept = new Set(st.tags.map((t) => {
+          const r = RETIRED_TAGS[t];
+          if (r?.note) notes.push(r.note);
+          return r ? r.to : t;
+        }));
+        st.tags = SET_TAGS.map((t) => t.id).filter((id) => kept.has(id));
+        if (notes.length) st.c = [st.c, ...notes].filter(Boolean).join(', ');
+        if (!st.tags.length) delete st.tags;
+        continue; // the note now holds the dropped tag's word on purpose
+      }
       const found = st.c ? SET_TAGS.filter((t) => t.note.test(st.c)) : [];
       if (!found.length) continue;
       st.tags = [...new Set([...(st.tags || []), ...found.map((t) => t.id)])];
