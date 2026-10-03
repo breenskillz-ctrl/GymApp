@@ -84,6 +84,9 @@ _Last updated: 2026-10-03 (v31: rack pulls split from deadlifts)_
       (Capacitor/Tauri) and sync between devices; waiting for the user's choice.
 - [ ] Ideas offered, not yet requested: supersets, goals ("bench 120 by Christmas"), Monday weekly summary, voice logging,
       shareable workout card, long-press plate calculator.
+- [ ] Ideas offered again 2026-10-03 (after v31), waiting for the user's pick: goals on the Records page, weekly summary on
+      History, set variants as tags (paused/speed/backoff, seen in the user's GymKeeper notes), supersets, Google Drive
+      backup/sync, Android app (APK/Play Store), an automated test suite in the repo.
 - [x] RIR/RPE: declined by the user (2026-09-29, DECISIONS #39). Don't suggest it again.
 - [x] History page as the start screen + "Start workout", and the phone back button no longer closes the app (v19, DECISIONS #36, #37).
 - [ ] Ideas for blocks (not requested): RPE-based prescriptions, exporting/sharing block templates, a warm-up set generator.
