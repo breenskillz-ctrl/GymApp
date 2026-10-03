@@ -2,7 +2,7 @@
 // Columns: Date (dd.mm.yyyy), Type, Name, №, Val_1, Unit_1, Val_2, Unit_2, Comment. Row types:
 //   📅 day (Comment "56 min | Chest/Arms"), 💬 day comment, 🏋️‍♂️ exercise (🔗 = linked in a superset),
 //   🔹 set (Comment "Hard (paused)" = level + note), 📏 body measurement ("Weight").
-import { state, save, allExercises } from './store.js';
+import { state, save, allExercises, splitRackPulls } from './store.js';
 import { uid } from './utils.js';
 
 // GymKeeper names that differ from ours (lower case "Name · Equipment" → our exercise id)
@@ -186,6 +186,7 @@ export function readGymKeeperCsv(text) {
 
   // Drop empty days and cards
   for (const [key, day] of Object.entries(days)) {
+    splitRackPulls(day);
     day.entries = day.entries.filter((e) => e.sets.length);
     if (!day.entries.length && !day.title) delete days[key];
   }

@@ -88,6 +88,7 @@ const BY_GROUP = {
 // Exercises that train more than their region says
 const BY_ID = {
   deadlift: M('b', ['lowerback', 'glutes', 'hamstrings'], ['traps', 'lats', 'forearms']),
+  'rack-pull': M('b', ['lowerback', 'glutes', 'traps'], ['hamstrings', 'lats', 'forearms']),
   'sumo-deadlift': M('b', ['glutes', 'hamstrings', 'lowerback'], ['traps']),
   'romanian-deadlift': M('b', ['hamstrings'], ['glutes', 'lowerback']),
   'db-romanian-deadlift': M('b', ['hamstrings'], ['glutes', 'lowerback']),

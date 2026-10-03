@@ -27,6 +27,20 @@ const GROUP_MIGRATION = {
 };
 
 // Bring data saved by older versions up to date
+// Rack pulls logged as deadlifts with a note ("rackpull", "høy rack pull" …) belong to their own exercise, so they don't count
+// as deadlift records (DECISIONS #50). Moves those sets to a Rack Pull card right after the deadlift card.
+const RACK_NOTE = /rack\s*-?\s*pull/i;
+export function splitRackPulls(day) {
+  for (let i = 0; i < day.entries.length; i++) {
+    const e = day.entries[i];
+    if (e.ex !== 'deadlift' || !e.sets.some((st) => RACK_NOTE.test(st.c || ''))) continue;
+    const rack = e.sets.filter((st) => RACK_NOTE.test(st.c || ''));
+    e.sets = e.sets.filter((st) => !rack.includes(st));
+    day.entries.splice(i + 1, 0, { id: uid(), ex: 'rack-pull', sets: rack });
+  }
+  day.entries = day.entries.filter((e) => e.sets.length);
+}
+
 function migrate() {
   // Russian Squat and Smolov Jr. are written for % of the real 1RM; blocks started with the old 90 % default are corrected (DECISIONS #25)
   for (const b of state.blocks || []) {
@@ -45,6 +59,7 @@ function migrate() {
     if (!GROUPS.includes(ex.group)) ex.group = 'Other';
   }
   for (const day of Object.values(state.log)) {
+    splitRackPulls(day);
     if (!day.title && day.note) day.title = day.note;
     delete day.note;
     const emptied = new Set();

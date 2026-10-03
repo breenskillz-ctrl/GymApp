@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 30;
+export const APP_VERSION = 31;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 31, date: '2026-10-03', items: [
+    'Fix: rack pulls that were logged as deadlifts (with "rack pull" in the set note) now have their own exercise, Rack Pull, so they no longer count as deadlift records.',
+  ] },
   { v: 30, date: '2026-10-03', items: [
     'New Records page (side menu): all your personal records by muscle group, your latest PRs, and your best 1, 3, 5 and 10 rep maxes.',
   ] },

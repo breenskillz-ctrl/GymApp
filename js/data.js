@@ -93,6 +93,7 @@ export const EXERCISES = [
 
   // ---------- Back (Lats / Upper back / Lower back / Traps) ----------
   E('deadlift', 'Deadlift', 'Back', 'Lower back', 'Barbell', 'wr', 'Bar over mid-foot, neutral spine. Lift by pushing the floor away and extending your hips.'),
+  E('rack-pull', 'Rack Pull', 'Back', 'Lower back', 'Barbell', 'wr', 'Deadlift from the pins or blocks, around knee height. The shorter pull lets you handle more weight than a full deadlift.'),
   E('pull-ups', 'Pull Up', 'Back', 'Lats', 'Bodyweight', 'r', 'Overhand grip, pull yourself up until your chin is over the bar.'),
   E('lat-pulldown', 'Lat Pulldown', 'Back', 'Lats', 'Cable', 'wr', 'Pull the bar down to your upper chest with your chest up.'),
   E('machine-pulldown', 'Lat Pulldown', 'Back', 'Lats', 'Machine', 'wr', 'Pulldown in a plate-loaded or selectorised machine.'),

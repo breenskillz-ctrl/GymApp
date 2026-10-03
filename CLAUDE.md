@@ -44,7 +44,7 @@ index.html            App shell, SVG icon sprite (<symbol id="i-…">), side dra
 css/styles.css        All styles: "Steel" dark theme with the plate-blue accent, colour tokens in :root (DECISIONS #40, #48)
 fonts/                Barlow + Barlow Condensed woff2 (SIL OFL, fonts/OFL.txt); --f-ui for text, --f-num for numbers/titles
 js/app.js             Startup, navigation (navigate(view); views call go(view) from utils), drawer, back-button guard (DECISIONS #37)
-js/data.js            EXERCISES (231, curated order, with sub + equip), PROGRAMS, GROUPS (9) + GROUP_COLORS, SUBGROUPS,
+js/data.js            EXERCISES (232, curated order, with sub + equip), PROGRAMS, GROUPS (9) + GROUP_COLORS, SUBGROUPS,
                       LEVELS (set intensity), EQUIPMENT, TYPES
 js/store.js           State, load/save + migrate(), CRUD, history(), records(), isPR(), daySummary(), daysSinceGroups(),
                       getProgression()/progressSet()/makeSets(): suggested sets via per-exercise rep ranges (DECISIONS #20, #21)

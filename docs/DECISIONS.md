@@ -5,6 +5,14 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #50 · 2026-10-03 · Rack pulls get their own exercise
+**Decision:** New built-in exercise `rack-pull` (Back, Barbell). Deadlift sets whose note mentions "rack pull" ("rackpull",
+"høy rackpull", "lav rack pull" …) are moved to a Rack Pull card right after the deadlift card: on import, and once for data
+already on the phone (`splitRackPulls()` in `migrate()`).
+**Reason:** The user's Records page showed a deadlift 3RM of 200 kg, but they have only pulled 200 kg once. In GymKeeper the
+rack pulls on 2025-12-03 were logged as "Deadlift" with a note, so they counted as deadlifts.
+**Status:** Active (approved and published 2026-10-03, v31).
+
 ## #49 · 2026-10-03 · Records page with all personal records
 **Decision:** A new view `records` (side menu "Records", also from "All records" on Progress and in the day's records dialog)
 lists every logged exercise's records, grouped by muscle group and searchable. Each row shows the best set and date, the
