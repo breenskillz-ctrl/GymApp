@@ -8,6 +8,8 @@ import {
 import { logState, copyToToday, openCalendar } from './log.js';
 import { setText } from './exercises.js';
 import { exLabel } from './seteditor.js';
+import { GROUPS, GROUP_COLORS } from '../data.js';
+import { profileName, workoutCount } from '../profile.js';
 
 const PAGE = 25;
 
@@ -25,6 +27,79 @@ function title(day) {
   if (!Number.isFinite(first)) return 'Workout';
   const h = new Date(first).getHours();
   return h < 12 ? 'Morning Workout' : h < 17 ? 'Afternoon Workout' : 'Evening Workout';
+}
+
+// ---------- Greeting and muscle-group mix (DECISIONS #45) ----------
+function greeting() {
+  const h = new Date().getHours();
+  return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 22 ? 'Good evening' : 'Good night';
+}
+
+let mixRange = 'all'; // 'all' | '30'
+
+// Working sets (no warmups) per muscle group, as [group, sets] sorted largest first
+function groupMix(range) {
+  const from = range === '30' ? dateKey(new Date(Date.now() - 30 * 86400000)) : '';
+  const count = {};
+  for (const [k, day] of Object.entries(state.log)) {
+    if (k < from) continue;
+    for (const e of day.entries) {
+      const n = e.sets.filter((s) => s.done && s.lvl !== 'warmup').length;
+      if (!n) continue;
+      const g = getExercise(e.ex).group || 'Other';
+      count[g] = (count[g] || 0) + n;
+    }
+  }
+  return GROUPS.filter((g) => count[g]).map((g) => [g, count[g]]).sort((a, b) => b[1] - a[1]);
+}
+
+// Pizza-style pie: one slice per muscle group, with thin gaps between the slices
+function pieSvg(pct) {
+  const R = 50;
+  if (pct.length === 1) return `<svg class="mix-pie" viewBox="-52 -52 104 104"><circle r="${R}" fill="${GROUP_COLORS[pct[0][0]]}"/></svg>`;
+  let a = -Math.PI / 2;
+  const pt = (ang) => `${(R * Math.cos(ang)).toFixed(2)} ${(R * Math.sin(ang)).toFixed(2)}`;
+  const slices = pct.map(([g, p]) => {
+    const b = a + (p / 100) * 2 * Math.PI;
+    const d = `M0 0L${pt(a)}A${R} ${R} 0 ${b - a > Math.PI ? 1 : 0} 1 ${pt(b)}Z`;
+    a = b;
+    return `<path d="${d}" fill="${GROUP_COLORS[g]}"/>`;
+  }).join('');
+  return `<svg class="mix-pie" viewBox="-52 -52 104 104" aria-hidden="true">${slices}</svg>`;
+}
+
+function mixHtml() {
+  const mix = groupMix(mixRange);
+  const total = mix.reduce((a, [, n]) => a + n, 0);
+  const pct = mix.map(([g, n]) => [g, (n / total) * 100]);
+  const range = `<button class="text-btn hello-range" data-act="mix-range">${mixRange === 'all' ? 'All time' : 'Last 30 days'}</button>`;
+  if (!total) return `<div class="mix"><div class="mix-head"><span>Muscle groups</span>${range}</div><p class="muted mix-empty">No sets logged yet.</p></div>`;
+  return `<div class="mix">
+    <div class="mix-head"><span>Muscle groups</span>${range}</div>
+    <div class="mix-body">${pieSvg(pct)}
+      <div class="mix-legend">${pct.map(([g, p]) => `<span><i class="gdot" style="--c:${GROUP_COLORS[g]}"></i>${esc(g)}<b>${Math.round(p)}%</b></span>`).join('')}</div>
+    </div>
+  </div>`;
+}
+
+function helloHtml() {
+  const name = profileName();
+  const n = workoutCount();
+  const week = weekCount();
+  return `<section class="hello">
+    <div class="hello-greet">${greeting()}</div>
+    <h2 class="hello-title">Are you ready to grind${name ? `, <span>${esc(name)}</span>` : ''}?</h2>
+    <div class="hello-stats"><span><b>${n}</b> workout${n === 1 ? '' : 's'}</span><span><b>${week}</b> this week</span></div>
+    ${mixHtml()}
+  </section>`;
+}
+
+// Workouts since Monday
+function weekCount() {
+  const d = new Date();
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  const from = dateKey(d);
+  return Object.keys(state.log).filter((k) => k >= from && dayHasWork(k)).length;
 }
 
 const fmtDuration = (min) => (min >= 60 ? `${Math.floor(min / 60)}h ${min % 60}m` : `${min}m`);
@@ -71,6 +146,7 @@ export function renderHistory(root) {
       <h1 class="topbar-title">History</h1>
       <div class="topbar-actions"><button class="icon-btn" data-act="calendar" aria-label="Calendar">${icon('calendar')}</button></div>
     </header>
+    ${helloHtml()}
     <div class="h-list">${days.length ? '' : `<div class="empty-day"><h2>No workouts yet</h2>
       <p class="muted">Tap "Start workout" to log your first one.</p></div>`}</div>
     <div class="h-more-sentinel"></div>
@@ -117,6 +193,11 @@ export function renderHistory(root) {
       return;
     }
     const a = e.target.closest('[data-act]')?.dataset.act;
+    if (a === 'mix-range') {
+      mixRange = mixRange === 'all' ? '30' : 'all';
+      root.querySelector('.mix').outerHTML = mixHtml();
+      return;
+    }
     if (a === 'start') return open(today);
     if (a === 'calendar') return openCalendar();
     const card = e.target.closest('[data-day]');

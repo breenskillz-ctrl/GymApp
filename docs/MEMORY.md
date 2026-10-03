@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-02 (v26: own minimal controls)_
+_Last updated: 2026-10-03 (v27: local profile + History greeting with muscle-group pie)_
 
 ## About the user
 
@@ -67,6 +67,9 @@ _Last updated: 2026-10-02 (v26: own minimal controls)_
 - [x] Persistent storage request + status in Settings, one backup file incl. photos, share to Drive/iCloud (v23, DECISIONS #41).
 - [x] Own muscle-map thumbnails for all 231 exercises + custom ones (v24, DECISIONS #42). Photos only on the detail page.
 - [x] Own minimal buttons/controls, approved after two preview rounds (v26, DECISIONS #44).
+- [x] Local profile (name, username, optional password lock), greeting + muscle-group pie at the top of History (v27,
+      DECISIONS #45). Approved and published 2026-10-03.
+- [ ] New app icon: black/white/grey, no dumbbell (asked 2026-10-03). Show options before publishing.
 - [x] Figure redrawn and approved by the user; zoomed thumbnails, muscle close-up + equipment on the detail page (v25, DECISIONS #43).
 - [ ] Possible: if the user buys a Gym Visual licence, add a local image-pack import (files stay on the device, never in git).
 - [ ] OPEN (asked 2026-09-29): what it takes to make a downloadable app for phone and PC. Explained PWA install, store apps

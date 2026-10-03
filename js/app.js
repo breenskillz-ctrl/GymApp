@@ -11,6 +11,7 @@ import { renderTimers } from './views/timers.js';
 import { renderHistory } from './views/history.js';
 import { openProgressPhotos } from './views/photos.js';
 import { requestPersist } from './backup.js';
+import { initProfile, openProfile } from './profile.js';
 
 load();
 applyTextScale(state.settings.textScale);
@@ -92,6 +93,7 @@ drawer.addEventListener('click', (e) => {
   if (a === 'settings') openSettings(refresh);
   if (a === 'body') openBodyWeight(refresh);
   if (a === 'photos') openProgressPhotos();
+  if (a === 'profile') openProfile(refresh);
 });
 
 // Bottom tab bar (DECISIONS #40). The Log tab always opens today.
@@ -112,8 +114,9 @@ window.addEventListener('resize', () => {
   resizeT = setTimeout(() => { if (current === 'progress') navigate('progress'); }, 250);
 });
 
+// First start shows "Create profile"; with a password the lock screen comes first (DECISIONS #45)
 const start = location.hash.slice(1);
-navigate(VIEWS[start] ? start : 'history');
+initProfile().then(() => navigate(VIEWS[start] ? start : 'history'));
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   // Always fetch sw.js fresh, and reload once when a new version takes over so old and new files never mix

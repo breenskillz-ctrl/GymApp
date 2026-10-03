@@ -93,6 +93,7 @@ export const canShareFiles = () => {
 // Restore a backup file: replaces all workout data and adds the photos in it. Returns the number of photos added.
 export async function restoreBackup(data) {
   const { photos, backupVersion, ...rest } = data;
+  if (!rest.profile && state.profile) rest.profile = state.profile; // old backups have no profile: keep the current one
   replaceState(rest);
   return Array.isArray(photos) ? importPhotoList(photos) : 0;
 }

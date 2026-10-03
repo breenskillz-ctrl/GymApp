@@ -5,6 +5,18 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #45 · 2026-10-03 · Local profile with optional password, greeting and muscle-group mix on History
+**Decision:** The user can create a profile (name, username, optional password) on first start or skip it. The profile is stored
+in `state.profile` on the device; the password is saved only as a salted PBKDF2-SHA256 hash (150k iterations). With a password
+the app opens on a sign-in screen ("Stay signed in on this phone" keeps it unlocked; Profile → "Lock app now" signs out).
+"Forgot password" removes the password after the username is typed. History starts with "Good morning/afternoon/evening/night",
+"Are you ready to grind, NAME?", total workouts, workouts this week, and a pizza-style pie (user 2026-10-03) with the share of working sets
+(no warm-ups) per muscle group, all time or last 30 days.
+**Reason:** The user asked for a profile with login, a personal greeting and a percentage split of the muscle groups, placed at the
+top of History. They had no preference between local and cloud login; local needs no server and no secrets (#3, #6).
+The lock keeps casual eyes out but does not encrypt the data, and the app says so in the profile dialog.
+**Status:** Active (approved and published 2026-10-03, v27).
+
 ## #44 · 2026-10-02 · Own, minimal controls instead of GymKeeper's
 **Decision:** After two preview rounds with the user (first version felt "big and noisy"):
 - Sets are hairline chips; the set level is a thin coloured line at the bottom; suggested sets have a dashed edge. A small

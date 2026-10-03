@@ -54,12 +54,13 @@ js/musclemap.js       Muscle maps: muscleSvg(ex, crop) thumbnails, muscleDetail(
 js/photos.js          PHOTOS: ids with photos in img/ex/<id>-0.jpg, -1.jpg, shown on the exercise detail page (public domain, #19)
 js/blocks.js          Block training: templates (Russian, 5/3/1, Smolov Jr), setWeight(), addBlockWorkout(), moveBlock()
 js/import.js          GymKeeper CSV import: readGymKeeperCsv() (alias table, level mapping), applyImport() (DECISIONS #27)
+js/profile.js         Local profile: create/sign-in screens (PBKDF2 hash), Profile dialog, profileName(), workoutCount() (#45)
 js/backup.js          Full backup (state + photos), share/download/restore, storage.persist() + status (DECISIONS #41)
 js/photodb.js         Progress photos in IndexedDB (addPhoto/allPhotos/deletePhoto); views/photos.js = timeline + compare
 js/wakelock.js        Screen wake lock while today has exercises (settings.keepAwake)
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart(), barChart(), multiLineChart(), stackedBarChart() on canvas
-js/views/history.js   History (start page): compact workout cards, "Start workout" → today's log
+js/views/history.js   History (start page): greeting + muscle-group mix, compact workout cards, "Start workout" → today's log
 js/views/log.js       Day view (cards with set chips + "+" chip, ‹ day › nav, "Add exercise" pill, day menu, calendar, records)
 js/views/seteditor.js Set editor dialog (fields, −/+, comment, levels, history/1RM/plate tools)
 js/views/addsheet.js  "+" sheet and exercise browser: shortcut links, plain muscle-group list, filtered exercise lists (★/region/equipment), ⋮ menu
@@ -78,6 +79,7 @@ sw.js                 Network-first service worker with an offline cache
   customPrograms:  [{ id: 'cp-…', name, desc, level, days, workouts: [{ id, name, exercises: [{ ex, sets, reps }] }] }],
   log:  { 'YYYY-MM-DD': { title, duration?, entries: [{ id, ex, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, at?, last?, pct?, amrap?, goal? }] }] } },
   body: [{ date: 'YYYY-MM-DD', weight?, chest?, waist?, armL?, armR?, thighL?, thighR? }],
+  profile: { name, username, passHash?, salt?, iterations?, created },   // or profileSkipped: true (DECISIONS #45)
   favorites: ['exercise-id', …],
   progression: { 'exercise-id': { min, max, inc, auto, rest? } },
   blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],
