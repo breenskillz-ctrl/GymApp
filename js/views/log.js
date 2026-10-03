@@ -9,6 +9,7 @@ import {
   parseKey, MONTHS, pad, go, promptDialog, menuDialog,
 } from '../utils.js';
 import { exerciseThumb } from '../icons.js';
+import { SET_TAGS } from '../data.js';
 import { profileName } from '../profile.js';
 import { openExercisePicker } from './picker.js';
 import { openExerciseDetail, openProgressionDialog, progressionText } from './exercises.js';
@@ -42,6 +43,8 @@ export function copyToToday(key) {
   save();
 }
 
+const tagLabel = (id) => SET_TAGS.find((t) => t.id === id)?.label || id;
+
 // One set as a compact two-line column: "120 KG / 2 REP"
 function setColHtml(ex, s, i) {
   const u = state.settings.unit;
@@ -64,6 +67,7 @@ function setColHtml(ex, s, i) {
   return `<button class="set-col ${s.done ? '' : 'planned'} ${pr ? 'pr' : ''}" data-act="edit-set" data-set="${i}"
     ${color ? `style="--c:${color}"` : ''}>
     <span class="line">${l1}</span>${l2 ? `<span class="line">${l2}</span>` : ''}
+    ${s.tags?.length ? `<span class="set-tags">${s.tags.map(tagLabel).join(' · ')}</span>` : ''}
     ${s.c ? `<span class="set-note">${esc(s.c)}</span>` : ''}
     ${suggestionDelta(s) ? `<span class="set-delta">${esc(suggestionDelta(s))}</span>` : ''}
   </button>`;

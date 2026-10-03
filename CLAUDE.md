@@ -45,7 +45,7 @@ css/styles.css        All styles: "Steel" dark theme with the plate-blue accent,
 fonts/                Barlow + Barlow Condensed woff2 (SIL OFL, fonts/OFL.txt); --f-ui for text, --f-num for numbers/titles
 js/app.js             Startup, navigation (navigate(view); views call go(view) from utils), drawer, back-button guard (DECISIONS #37)
 js/data.js            EXERCISES (232, curated order, with sub + equip), PROGRAMS, GROUPS (9) + GROUP_COLORS, SUBGROUPS,
-                      LEVELS (set intensity), EQUIPMENT, TYPES
+                      LEVELS (set intensity), SET_TAGS (set variants, #51), EQUIPMENT, TYPES
 js/store.js           State, load/save + migrate(), CRUD, history(), records(), isPR(), daySummary(), daysSinceGroups(),
                       getProgression()/progressSet()/makeSets(): suggested sets via per-exercise rep ranges (DECISIONS #20, #21)
 js/utils.js           Dates, formatting, esc(), openModal(), confirmDialog(), promptDialog(), menuDialog(), topBar(), toast()
@@ -79,7 +79,7 @@ sw.js                 Network-first service worker with an offline cache
 {
   customExercises: [{ id: 'c-…', name, group, equip, type, desc }],
   customPrograms:  [{ id: 'cp-…', name, desc, level, days, workouts: [{ id, name, exercises: [{ ex, sets, reps }] }] }],
-  log:  { 'YYYY-MM-DD': { title, duration?, entries: [{ id, ex, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, at?, last?, pct?, amrap?, goal? }] }] } },
+  log:  { 'YYYY-MM-DD': { title, duration?, entries: [{ id, ex, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, tags?, at?, last?, pct?, amrap?, goal? }] }] } },
   body: [{ date: 'YYYY-MM-DD', weight?, chest?, waist?, armL?, armR?, thighL?, thighR? }],
   profile: { name, username, passHash?, salt?, iterations?, created },   // or profileSkipped: true (DECISIONS #45)
   favorites: ['exercise-id', …],

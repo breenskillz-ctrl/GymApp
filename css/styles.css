@@ -857,3 +857,12 @@ body.auth-open { overflow: hidden; }
 .rec-val { text-align: right; white-space: nowrap; }
 .rec-val b { display: block; font-family: var(--f-num); font-weight: 600; font-size: calc(20px * var(--fs)); color: var(--text); }
 .rec-val small { color: var(--muted); font-size: calc(11px * var(--fs)); }
+
+/* ---------- Set variants as tags (DECISIONS #51) ---------- */
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.tag-btn { padding: 4px 10px; border-radius: 99px; border: 1px solid var(--line2); color: var(--muted); font-size: calc(12px * var(--fs)); font-weight: 500; }
+.tag-btn.active { border-color: var(--accent-hi); color: var(--accent-hi); background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.set-tags { display: block; margin: 1px auto 0; font-size: calc(10px * var(--fs)); font-weight: 600; color: var(--accent-hi);
+  text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; max-width: 96px; overflow: hidden; text-overflow: ellipsis; }
+.rec-vars { margin-top: 2px; }
+.rec-vars b { color: var(--accent-hi); }

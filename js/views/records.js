@@ -1,6 +1,6 @@
 // Records page (DECISIONS #49): every exercise's personal records in one place, the latest PRs on top.
 import { state, getExercise, setHasData } from '../store.js';
-import { GROUPS, GROUP_COLORS } from '../data.js';
+import { GROUPS, GROUP_COLORS, SET_TAGS } from '../data.js';
 import { esc, icon, topBar, fmtDate, fmtNum, fmtTime, e1rm } from '../utils.js';
 import { openExerciseDetail } from './exercises.js';
 import { exLabel } from './seteditor.js';
@@ -25,7 +25,7 @@ function collect() {
   const events = [];
   for (const [id, days] of Object.entries(byEx)) {
     const ex = getExercise(id);
-    const rec = { id, ex, best: null, heaviest: null, rm: {}, sessions: days.length };
+    const rec = { id, ex, best: null, heaviest: null, rm: {}, variants: {}, sessions: days.length };
     let top = 0;
     days.forEach(({ date, sets }, i) => {
       const best = sets.reduce((a, b) => (score(ex, b) > score(ex, a) ? b : a));
@@ -36,6 +36,11 @@ function collect() {
         rec.best = { set: best, date };
       }
       for (const s of sets) {
+        // Best set per variant (paused, beltless …), shown on its own line (DECISIONS #51)
+        for (const t of s.tags || []) {
+          const cur = rec.variants[t];
+          if (!cur || score(ex, s) > score(ex, cur.set)) rec.variants[t] = { set: s, date };
+        }
         if (!s.w) continue;
         if (!rec.heaviest || s.w > rec.heaviest.set.w) rec.heaviest = { set: s, date };
         for (const n of REP_MAXES) if ((s.r || 0) >= n && s.w > (rec.rm[n]?.w || 0)) rec.rm[n] = { w: s.w, date };
@@ -69,10 +74,13 @@ function rowHtml(r) {
     ? REP_MAXES.map((n) => `<span>${n}RM <b>${r.rm[n] ? fmtNum(r.rm[n].w, 2) : '–'}</b></span>`).join('')
     : '';
   const sub = r.ex.type === 'wr' && r.best.set.w ? `Best set ${setText(r.ex, r.best.set)}` : `${r.sessions} session${r.sessions === 1 ? '' : 's'}`;
+  const vars = SET_TAGS.filter((t) => r.variants[t.id])
+    .map((t) => `<span>${t.label} <b>${esc(setText(r.ex, r.variants[t.id].set))}</b></span>`).join('');
   return `<button class="rec-row" data-ex="${esc(r.id)}">
     <span class="grow"><span class="title">${esc(exLabel(r.ex))}</span>
       <span class="sub">${esc(sub)} · ${fmtDate(r.best.date, false)}</span>
-      ${rms ? `<span class="rec-rms">${rms}</span>` : ''}</span>
+      ${rms ? `<span class="rec-rms">${rms}</span>` : ''}
+      ${vars ? `<span class="rec-rms rec-vars">${vars}</span>` : ''}</span>
     <span class="rec-val">${headline(r)}</span>
   </button>`;
 }

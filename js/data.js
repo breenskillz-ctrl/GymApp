@@ -28,6 +28,20 @@ export const LEVELS = [
   { id: 'drop', label: 'Drop', color: '#3D8BFF' },
 ];
 
+// Set variants (DECISIONS #51): optional tags on a set. `note` finds the variant in an old free-text set note.
+export const SET_TAGS = [
+  { id: 'paused', label: 'Paused', note: /\bpau[sz]e[ds]?\b|\bpausert\b/i },
+  { id: 'tempo', label: 'Tempo', note: /\btempo\b/i },
+  { id: 'speed', label: 'Speed', note: /\bspeed\b/i },
+  { id: 'backoff', label: 'Backoff', note: /\bback\s*-?\s*off\b/i },
+  { id: 'beltless', label: 'Beltless', note: /belteløs|beltless|no belt|uten belte/i },
+  { id: 'deficit', label: 'Deficit', note: /\bdeficit\b/i },
+  { id: 'close-grip', label: 'Close grip', note: /\bclose\s*-?\s*grip\b/i },
+  { id: 'wide-grip', label: 'Wide grip', note: /\bwide\s*-?\s*grip\b/i },
+  { id: 'touch-go', label: 'Touch & go', note: /\btouch\s*(?:and|&|n)?\s*go\b|\btng\b/i },
+  { id: 'sumo', label: 'Sumo', note: /\bsumo\b/i },
+];
+
 export const EQUIPMENT = [
   'Bodyweight', 'Barbell', 'Dumbbell', 'Cable', 'Machine', 'Smith Machine', 'Kettlebell', 'Band', 'Plate', 'Other',
 ];

@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-03 (v31: rack pulls split from deadlifts)_
+_Last updated: 2026-10-03 (v32: set variants as tags)_
 
 ## About the user
 
@@ -77,6 +77,7 @@ _Last updated: 2026-10-03 (v31: rack pulls split from deadlifts)_
 - [x] Explained how to import all GymKeeper workouts: Settings & backup → Import from GymKeeper (CSV), on the phone (2026-10-03).
 - [x] Records page with all PRs, always 1/3/5/10RM (v30, DECISIONS #49). Published 2026-10-03.
 - [x] Fix: rack pulls logged as deadlifts move to a new Rack Pull exercise (v31, DECISIONS #50). Published 2026-10-03.
+- [x] Set variants as tags, 10 tags incl. Close grip/Wide grip/Touch & go/Sumo (v32, DECISIONS #51). Published 2026-10-03.
 - The user's GymKeeper notes use "rackpull" for rack pulls; other variants may hide in set notes the same way.
 - [x] Figure redrawn and approved by the user; zoomed thumbnails, muscle close-up + equipment on the detail page (v25, DECISIONS #43).
 - [ ] Possible: if the user buys a Gym Visual licence, add a local image-pack import (files stay on the device, never in git).

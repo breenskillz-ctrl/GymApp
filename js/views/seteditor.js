@@ -1,5 +1,5 @@
 // Set editor dialog: add or edit one set (weight/reps/time/distance, comment, intensity level).
-import { LEVELS } from '../data.js';
+import { LEVELS, SET_TAGS } from '../data.js';
 import { state, save, getExercise, history, lastSets, isPR, getRest } from '../store.js';
 import { esc, icon, openModal, num, parseTime, fmtTime, fmtNum, e1rm, toast, dateKey, fmtDate } from '../utils.js';
 import { startRest } from '../timer.js';
@@ -84,6 +84,7 @@ export function openSetEditor(date, entry, index, onDone) {
     : entry.sets[entry.sets.length - 1] || prevSession[n - 1] || prevSession[prevSession.length - 1] || {};
   const values = { w: src.w ?? null, r: src.r ?? null, t: src.t ?? null, d: src.d ?? null };
   let lvl = existing?.lvl || src.lvl || 'normal';
+  const tags = new Set(existing?.tags || src.tags || []); // a new set keeps the variant of the set before it
   const fields = fieldsFor(ex.type);
   const tools = ex.type === 'wr' ? ['history', 'calc', 'plates'] : ['history'];
   let tool = null;
@@ -122,6 +123,8 @@ export function openSetEditor(date, entry, index, onDone) {
         ${LEVELS.map((l) => `<button type="button" class="lvl-btn ${l.id === lvl ? 'active' : ''}" style="--c:${l.color}" data-lvl="${l.id}">
           <span class="dot" style="background:${l.color}"></span>${l.label}</button>`).join('')}
       </div>
+      <div class="tag-row" aria-label="Variant">${SET_TAGS.map((t) => `<button type="button" class="tag-btn ${tags.has(t.id) ? 'active' : ''}"
+        data-tag="${t.id}" aria-pressed="${tags.has(t.id)}">${t.label}</button>`).join('')}</div>
       <button type="submit" class="btn primary block save-set">${icon('check')} ${editing ? 'Save set' : 'Add set'}</button>
     </form>`, {
     className: 'dialog set-dialog',
@@ -170,6 +173,13 @@ export function openSetEditor(date, entry, index, onDone) {
           m.querySelectorAll('[data-lvl]').forEach((b) => b.classList.toggle('active', b === lb));
           return;
         }
+        const tg = e.target.closest('[data-tag]');
+        if (tg) {
+          if (tags.has(tg.dataset.tag)) tags.delete(tg.dataset.tag); else tags.add(tg.dataset.tag);
+          tg.classList.toggle('active', tags.has(tg.dataset.tag));
+          tg.setAttribute('aria-pressed', tags.has(tg.dataset.tag));
+          return;
+        }
         const tb = e.target.closest('[data-tool]');
         if (tb) {
           tool = tool === tb.dataset.tool ? null : tb.dataset.tool;
@@ -190,6 +200,7 @@ export function openSetEditor(date, entry, index, onDone) {
         const set = { w: v.w ?? null, r: v.r ?? null, t: v.t ?? null, d: v.d ?? null, done: true, lvl, at: existing?.done && existing.at ? existing.at : Date.now() };
         const c = m.querySelector('[data-comment]').value.trim();
         if (c) set.c = c;
+        if (tags.size) set.tags = SET_TAGS.map((t) => t.id).filter((id) => tags.has(id));
         // Keep block prescriptions (percentage, AMRAP target) on the logged set
         for (const k of ['pct', 'amrap', 'goal']) if (existing?.[k] != null) set[k] = existing[k];
         if (editing) entry.sets[index] = set; else entry.sets.push(set);

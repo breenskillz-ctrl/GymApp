@@ -2,10 +2,15 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 31;
+export const APP_VERSION = 32;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 32, date: '2026-10-03', items: [
+    'Set variants: mark a set as Paused, Tempo, Speed, Backoff, Beltless, Deficit, Close grip, Wide grip, Touch & go or Sumo with one tap in the set editor.',
+    'Variants written in your old set notes (like "paused" or "belteløs") were turned into these tags automatically.',
+    'The Records page shows your best set for each variant, and next time\'s suggested sets keep the variant.',
+  ] },
   { v: 31, date: '2026-10-03', items: [
     'Fix: rack pulls that were logged as deadlifts (with "rack pull" in the set note) now have their own exercise, Rack Pull, so they no longer count as deadlift records.',
   ] },

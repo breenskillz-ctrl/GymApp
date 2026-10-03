@@ -1,5 +1,5 @@
 // Stores all user data in localStorage.
-import { EXERCISES, PROGRAMS, GROUPS } from './data.js';
+import { EXERCISES, PROGRAMS, GROUPS, SET_TAGS } from './data.js';
 import { uid, e1rm } from './utils.js';
 
 const KEY = 'gymapp.v1';
@@ -41,6 +41,21 @@ export function splitRackPulls(day) {
   day.entries = day.entries.filter((e) => e.sets.length);
 }
 
+// Variants written in a set note ("paused", "3 sec paused", "backoff", "belteløs" …) become set tags (DECISIONS #51).
+// The words are removed from the note; whatever else the note says stays.
+export function tagSetsFromNotes(day) {
+  for (const e of day.entries) {
+    for (const st of e.sets) {
+      const found = st.c ? SET_TAGS.filter((t) => t.note.test(st.c)) : [];
+      if (!found.length) continue;
+      st.tags = [...new Set([...(st.tags || []), ...found.map((t) => t.id)])];
+      for (const t of found) st.c = st.c.replace(t.note, ' ');
+      st.c = st.c.replace(/\s*[,;+&]\s*$|^\s*[,;+&]\s*/g, '').replace(/\s+/g, ' ').trim();
+      if (!st.c) delete st.c;
+    }
+  }
+}
+
 function migrate() {
   // Russian Squat and Smolov Jr. are written for % of the real 1RM; blocks started with the old 90 % default are corrected (DECISIONS #25)
   for (const b of state.blocks || []) {
@@ -60,6 +75,7 @@ function migrate() {
   }
   for (const day of Object.values(state.log)) {
     splitRackPulls(day);
+    tagSetsFromNotes(day);
     if (!day.title && day.note) day.title = day.note;
     delete day.note;
     const emptied = new Set();
@@ -222,6 +238,7 @@ export function setProgression(exId, p) {
 // Warm-up sets are repeated unchanged. Timed exercises get +5 s.
 export function progressSet(s, ex) {
   const next = { w: s.w ?? null, r: s.r ?? null, t: s.t ?? null, d: s.d ?? null, done: false, lvl: s.lvl };
+  if (s.tags?.length) next.tags = [...s.tags]; // a paused bench session suggests paused sets again
   next.last = { w: next.w, r: next.r, t: next.t, d: next.d }; // shown as "Last time" next to the suggestion
   const p = getProgression(ex.id);
   if (s.lvl === 'warmup' || !p.auto) return next;
