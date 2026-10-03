@@ -12,7 +12,10 @@ import { renderHistory } from './views/history.js';
 import { openProgressPhotos } from './views/photos.js';
 import { requestPersist } from './backup.js';
 import { initProfile, openProfile } from './profile.js';
+import { checkWhatsNew, openWhatsNew } from './changelog.js';
 
+let firstRun = true;
+try { firstRun = !localStorage.getItem('gymapp.v1'); } catch { /* storage blocked */ }
 load();
 applyTextScale(state.settings.textScale);
 requestPersist(); // ask the browser not to clear our storage (DECISIONS #41)
@@ -94,6 +97,7 @@ drawer.addEventListener('click', (e) => {
   if (a === 'body') openBodyWeight(refresh);
   if (a === 'photos') openProgressPhotos();
   if (a === 'profile') openProfile(refresh);
+  if (a === 'whatsnew') openWhatsNew();
 });
 
 // Bottom tab bar (DECISIONS #40). The Log tab always opens today.
@@ -116,7 +120,10 @@ window.addEventListener('resize', () => {
 
 // First start shows "Create profile"; with a password the lock screen comes first (DECISIONS #45)
 const start = location.hash.slice(1);
-initProfile().then(() => navigate(VIEWS[start] ? start : 'history'));
+initProfile().then(() => {
+  navigate(VIEWS[start] ? start : 'history');
+  checkWhatsNew(firstRun); // "What's new" after an update (DECISIONS #47)
+});
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   // Always fetch sw.js fresh, and reload once when a new version takes over so old and new files never mix

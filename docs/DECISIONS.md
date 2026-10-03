@@ -5,6 +5,24 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #47 · 2026-10-03 · "What's new" note after every update
+**Decision:** `js/changelog.js` holds `APP_VERSION` and a `CHANGELOG` list (version, date, short user-facing points). On start the
+app compares `APP_VERSION` with `localStorage['gymapp.seenVersion']` and, after an update, shows the entries the user has not
+seen yet in a "What's new" sheet, once. A fresh install only records the version. The side menu has "What's new" to read the
+whole list again. Every release that bumps the cache version must add an entry.
+**Reason:** The user asked for an update message listing the changes, pushed out with every update.
+**Status:** Active (approved and published 2026-10-03, v28).
+
+## #46 · 2026-10-03 · New app icon: five dark-blue plates on a bar, on graphite
+**Decision:** The orange dumbbell icon is replaced by our own drawing: a loaded barbell sleeve seen from the side: a grey bar that runs out of the left edge, with the
+stopper (collar) on the left, five equal dark-blue plates with black outlines, pressed together, that the bar runs through, and a clip on the short right end, on a
+graphite gradient. `icons/icon.svg` keeps rounded corners; the PNGs are full
+squares so Android and iOS can apply their own mask. The icon URLs carry `?v=2` so phones fetch the new files.
+**Reason:** The user wanted a black/white/grey icon without a dumbbell. They picked option A ("Stack") from four drafts and
+asked for it turned 90° to the right, with three equal plates in one colour, the bar going through them, a stopper and a clip. After seeing
+blue variants they chose dark blue (#2c5aa8) plates with a black outline, pressed together, and five plates (of 2–6 shown).
+**Status:** Active (approved and published 2026-10-03, v28).
+
 ## #45 · 2026-10-03 · Local profile with optional password, greeting and muscle-group mix on History
 **Decision:** The user can create a profile (name, username, optional password) on first start or skip it. The profile is stored
 in `state.profile` on the device; the password is saved only as a salted PBKDF2-SHA256 hash (150k iterations). With a password

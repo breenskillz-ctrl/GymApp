@@ -1,11 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#15181c"/>
-  <rect x="24" y="24" width="464" height="464" rx="92" fill="#ff7a1a"/>
-  <g fill="#15181c">
-    <rect x="96" y="176" width="48" height="160" rx="12"/>
-    <rect x="152" y="140" width="56" height="232" rx="14"/>
-    <rect x="304" y="140" width="56" height="232" rx="14"/>
-    <rect x="368" y="176" width="48" height="160" rx="12"/>
-    <rect x="200" y="236" width="112" height="40" rx="8"/>
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2e33"/><stop offset="1" stop-color="#121315"/></linearGradient></defs>
+  <clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath>
+  <rect width="512" height="512" rx="112" fill="url(#g)"/>
+  <g clip-path="url(#c)">
+  <!-- a loaded barbell sleeve: stopper, five equal plates, clip (DECISIONS #46) -->
+  <rect x="-20" y="241" width="492" height="30" rx="15" fill="#85878c"/>
+  <rect x="78" y="200" width="44" height="112" rx="9" fill="#85878c"/>
+  <g fill="#2c5aa8" stroke="#000" stroke-width="8"><rect x="128" y="112" width="52" height="288" rx="12"/><rect x="180" y="112" width="52" height="288" rx="12"/><rect x="232" y="112" width="52" height="288" rx="12"/><rect x="284" y="112" width="52" height="288" rx="12"/><rect x="336" y="112" width="52" height="288" rx="12"/></g>
+  <rect x="394" y="212" width="28" height="88" rx="8" fill="#b4b6ba"/>
+  <rect x="414" y="166" width="16" height="58" rx="8" fill="#b4b6ba" transform="rotate(28 422 220)"/>
   </g>
 </svg>

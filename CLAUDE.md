@@ -55,6 +55,7 @@ js/photos.js          PHOTOS: ids with photos in img/ex/<id>-0.jpg, -1.jpg, show
 js/blocks.js          Block training: templates (Russian, 5/3/1, Smolov Jr), setWeight(), addBlockWorkout(), moveBlock()
 js/import.js          GymKeeper CSV import: readGymKeeperCsv() (alias table, level mapping), applyImport() (DECISIONS #27)
 js/profile.js         Local profile: create/sign-in screens (PBKDF2 hash), Profile dialog, profileName(), workoutCount() (#45)
+js/changelog.js       APP_VERSION + CHANGELOG; "What's new" sheet after an update and from the side menu (DECISIONS #47)
 js/backup.js          Full backup (state + photos), share/download/restore, storage.persist() + status (DECISIONS #41)
 js/photodb.js         Progress photos in IndexedDB (addPhoto/allPhotos/deletePhoto); views/photos.js = timeline + compare
 js/wakelock.js        Screen wake lock while today has exercises (settings.keepAwake)
@@ -102,7 +103,8 @@ For `t` exercises in programs, `reps` means seconds.
 - Built-in exercise and program **ids must never change**, because saved logs reference them. Add new ones instead.
 - If the state shape changes, keep `load()` backward compatible (merge with defaults, migrate old data).
 - **On every release that changes cached files: bump `CACHE` in `sw.js` AND the `?v=` on `styles.css` and `app.js` in
-  `index.html` (keep them the same number).** When you add or rename a file, add it to `ASSETS` in `sw.js`.
+  `index.html` (keep them the same number), set `APP_VERSION` in `js/changelog.js` to that number and add a short,
+  user-facing `CHANGELOG` entry (English, plain words).** When you add or rename a file, add it to `ASSETS` in `sw.js`.
   Reason: GitHub Pages lets browsers cache files for 10 minutes. Without this, a phone once loaded a new index.html with
   an old stylesheet and app.js, and showed an unstyled, broken page (2026-09-28). The service worker fetches with
   `cache: 'no-cache'` and reloads once when a new version takes over.

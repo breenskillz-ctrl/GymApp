@@ -823,3 +823,11 @@ body.auth-open { overflow: hidden; }
 .profile-links .ico { width: 16px; height: 16px; }
 .text-btn.danger { color: #ff6b6b; }
 .small-note { font-size: calc(12px * var(--fs)); margin-top: 16px; line-height: 1.45; }
+
+/* ---------- What's new (DECISIONS #47) ---------- */
+.whatsnew section { padding: 4px 0 12px; }
+.whatsnew section + section { border-top: 1px solid var(--line); padding-top: 12px; }
+.whatsnew h3 { font-family: var(--f-num); font-weight: 600; font-size: calc(16px * var(--fs)); display: flex; justify-content: space-between; align-items: baseline; }
+.whatsnew h3 span { font-family: var(--f-ui); font-weight: 400; font-size: calc(12px * var(--fs)); color: var(--muted); }
+.whatsnew ul { margin: 6px 0 0; padding-left: 18px; color: var(--text2); font-size: calc(14px * var(--fs)); line-height: 1.45; }
+.whatsnew li + li { margin-top: 4px; }
