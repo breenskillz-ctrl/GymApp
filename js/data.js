@@ -40,6 +40,7 @@ export const SET_TAGS = [
   { id: 'wide-grip', label: 'Wide grip', note: /\bwide\s*-?\s*grip\b/i },
   { id: 'touch-go', label: 'Touch & go', note: /\btouch\s*(?:and|&|n)?\s*go\b|\btng\b/i },
   { id: 'sumo', label: 'Sumo', note: /\bsumo\b/i },
+  { id: 'unilateral', label: 'Unilateral', note: /\bunilateral\b|\bsingle[\s-]*(?:arm|leg)\b|\bone[\s-]*(?:arm|leg)(?:ed)?\b/i },
 ];
 
 export const EQUIPMENT = [
