@@ -9,6 +9,7 @@ import { renderExercises } from './views/exercises.js';
 import { renderProgress, openSettings, openBodyWeight } from './views/progress.js';
 import { renderTimers } from './views/timers.js';
 import { renderHistory } from './views/history.js';
+import { renderRecords } from './views/records.js';
 import { openProgressPhotos } from './views/photos.js';
 import { requestPersist } from './backup.js';
 import { initProfile, openProfile } from './profile.js';
@@ -31,6 +32,7 @@ const VIEWS = {
   exercises: renderExercises,
   progress: renderProgress,
   timers: renderTimers,
+  records: renderRecords,
   blocks: (el) => renderPrograms(el, { tab: 'blocks' }), // old links: Blocks now lives under Programs
 };
 

@@ -834,3 +834,26 @@ body.auth-open { overflow: hidden; }
 .whatsnew h3 span { font-family: var(--f-ui); font-weight: 400; font-size: calc(12px * var(--fs)); color: var(--muted); }
 .whatsnew ul { margin: 6px 0 0; padding-left: 18px; color: var(--text2); font-size: calc(14px * var(--fs)); line-height: 1.45; }
 .whatsnew li + li { margin-top: 4px; }
+
+/* ---------- Records page (DECISIONS #49) ---------- */
+.rec-top { padding: 6px 6px 2px; }
+.rec-head { color: var(--muted); font-size: calc(12px * var(--fs)); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin: 18px 0 6px; }
+.rec-latest { display: flex; flex-direction: column; }
+.rec-new { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.rec-new:last-child { border-bottom: 0; }
+.rec-new > .ico { width: 18px; height: 18px; color: var(--gold); flex: none; }
+.rec-new strong { font-family: var(--f-num); font-weight: 600; font-size: calc(16px * var(--fs)); white-space: nowrap; }
+.rec-search { margin: 16px 0 4px; }
+.rec-group { display: flex; align-items: center; gap: 8px; margin: 20px 4px 6px; color: var(--muted); font-size: calc(12px * var(--fs));
+  text-transform: uppercase; letter-spacing: .08em; font-weight: 500; }
+.rec-group .gdot { width: 7px; height: 7px; }
+.rec-group span { margin-left: auto; }
+.rec-list { background: var(--card); border: 1px solid var(--card-edge); border-radius: var(--radius); padding: 0 14px; }
+.rec-row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 12px 0; }
+.rec-row + .rec-row { border-top: 1px solid var(--line); }
+.rec-row .sub { font-size: calc(12.5px * var(--fs)); }
+.rec-rms { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 4px; color: var(--muted); font-size: calc(12px * var(--fs)); }
+.rec-rms b { color: var(--text2); font-weight: 500; }
+.rec-val { text-align: right; white-space: nowrap; }
+.rec-val b { display: block; font-family: var(--f-num); font-weight: 600; font-size: calc(20px * var(--fs)); color: var(--text); }
+.rec-val small { color: var(--muted); font-size: calc(11px * var(--fs)); }

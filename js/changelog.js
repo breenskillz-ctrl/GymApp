@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 29;
+export const APP_VERSION = 30;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 30, date: '2026-10-03', items: [
+    'New Records page (side menu): all your personal records by muscle group, your latest PRs, and your best 1, 3, 5 and 10 rep maxes.',
+  ] },
   { v: 29, date: '2026-10-03', items: [
     'The orange is gone: buttons, tabs and highlights now use the same blue as the plates in the app icon.',
     'The app icon now has four plates.',

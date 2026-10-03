@@ -5,7 +5,7 @@ import {
 } from '../store.js';
 import {
   esc, icon, topBar, applyTextScale, dateKey, addDays, weekStart, parseKey, fmtDate, fmtNum, num, toast, confirmDialog, openModal,
-  e1rm, MONTHS, pad, menuDialog,
+  e1rm, MONTHS, pad, menuDialog, go,
 } from '../utils.js';
 import { readGymKeeperCsv, applyImport } from '../import.js';
 import { openProgressPhotos, exportPhotos, importPhotosFile } from './photos.js';
@@ -220,12 +220,13 @@ export function renderProgress(root) {
 
     <section class="card">
       <h3>Personal records</h3>
-      ${recs.length ? `<div class="list">${recs.map((r) => `
+      ${recs.length ? `<div class="list">${recs.slice(0, 5).map((r) => `
         <button class="list-item" data-ex="${esc(r.id)}">
           <span class="avatar gold">${icon('trophy')}</span>
           <span class="grow"><span class="title">${esc(r.name)}</span><span class="sub">${fmtDate(r.date, false)}</span></span>
           <strong>${r.val}</strong>
-        </button>`).join('')}</div>` : '<p class="empty">Your records will appear here once you start logging.</p>'}
+        </button>`).join('')}</div>
+      <button class="btn ghost block" data-act="records">${icon('trophy')} All records</button>` : '<p class="empty">Your records will appear here once you start logging.</p>'}
     </section>`;
 
   requestAnimationFrame(() => {
@@ -256,6 +257,7 @@ export function renderProgress(root) {
     if (a === 'settings') openSettings(() => renderProgress(root));
     if (a === 'body-list') openBodyWeight(() => renderProgress(root));
     if (a === 'photos') openProgressPhotos();
+    if (a === 'records') go('records');
   };
 }
 

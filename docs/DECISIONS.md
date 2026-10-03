@@ -5,6 +5,15 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #49 · 2026-10-03 · Records page with all personal records
+**Decision:** A new view `records` (side menu "Records", also from "All records" on Progress and in the day's records dialog)
+lists every logged exercise's records, grouped by muscle group and searchable. Each row shows the best set and date, the
+estimated 1RM (weighted lifts) or the best reps/time/distance, and the 1, 3, 5 and 10 rep maxes (heaviest weight for at least
+that many reps; all four are always shown, "–" when missing, as the user asked). On top: number of exercises, PRs this year and the five latest PRs.
+A PR uses the same rule as `isPR()` (higher e1RM / reps / time / distance than every earlier day); warm-up sets do not count.
+**Reason:** The user asked for a separate page with all their PRs.
+**Status:** Active (approved and published 2026-10-03, v30).
+
 ## #48 · 2026-10-03 · Accent colour changed from orange to the icon's plate blue; icon with four plates
 **Decision:** `--accent` is now `#2c5aa8`, the dark blue of the plates in the app icon, with white `--accent-ink` on it. A lighter
 tint of the same blue, `--accent-hi` (`#6b97e0`), is used wherever the accent is text, an icon or a thin line on the dark

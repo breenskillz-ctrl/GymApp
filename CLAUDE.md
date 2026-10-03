@@ -49,7 +49,7 @@ js/data.js            EXERCISES (231, curated order, with sub + equip), PROGRAMS
 js/store.js           State, load/save + migrate(), CRUD, history(), records(), isPR(), daySummary(), daysSinceGroups(),
                       getProgression()/progressSet()/makeSets(): suggested sets via per-exercise rep ranges (DECISIONS #20, #21)
 js/utils.js           Dates, formatting, esc(), openModal(), confirmDialog(), promptDialog(), menuDialog(), topBar(), toast()
-js/icons.js           Our own SVG art: groupIcon(), exerciseThumb() (zoomed muscle map), programArt(), sleepArt
+js/icons.js           Our own SVG art: groupIcon(), exerciseThumb() (zoomed muscle map), programArt()
 js/musclemap.js       Muscle maps: muscleSvg(ex, crop) thumbnails, muscleDetail(ex) close-up, musclesFor(ex) (DECISIONS #42, #43)
 js/photos.js          PHOTOS: ids with photos in img/ex/<id>-0.jpg, -1.jpg, shown on the exercise detail page (public domain, #19)
 js/blocks.js          Block training: templates (Russian, 5/3/1, Smolov Jr), setWeight(), addBlockWorkout(), moveBlock()
@@ -68,6 +68,7 @@ js/views/addsheet.js  "+" sheet and exercise browser: shortcut links, plain musc
 js/views/programs.js  Program grid (page + sheet), detail, ⋮ menu (rename/edit/copy/export/delete), import, editor
 js/views/blocks.js    Blocks tab inside Programs (renderBlocks(el, {embedded})), activeBlocksHtml() cards, schedule, start/1RM dialogs;
                       blockeditor.js = custom block builder
+js/views/records.js   Records page: all PRs by muscle group, latest PRs, 1/3/5/10RM, search (DECISIONS #49)
 js/views/*.js         exercises (library + detail + editor), progress (+ settings, body weight), timers, picker
 sw.js                 Network-first service worker with an offline cache
 ```

@@ -347,13 +347,13 @@ function openDayRecords() {
     <div class="modal-head"><h2>Records</h2>
       <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
     <div class="list scroll">${rows}</div>
-    <button class="btn ghost block" data-all>${icon('chart')} All progress and records</button>`, {
+    <button class="btn ghost block" data-all>${icon('trophy')} All records</button>`, {
     className: 'tall',
     onMount(m, close) {
       m.addEventListener('click', (e) => {
         const b = e.target.closest('[data-ex]');
         if (b) openExerciseDetail(b.dataset.ex);
-        if (e.target.closest('[data-all]')) { close(); go('progress'); }
+        if (e.target.closest('[data-all]')) { close(); go('records'); }
       });
     },
   });
