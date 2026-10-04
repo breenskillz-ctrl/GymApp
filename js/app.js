@@ -11,7 +11,7 @@ import { renderTimers } from './views/timers.js';
 import { renderHistory } from './views/history.js';
 import { renderRecords } from './views/records.js';
 import { openProgressPhotos } from './views/photos.js';
-import { requestPersist } from './backup.js';
+import { requestPersist, autoBackup } from './backup.js';
 import { initProfile, openProfile } from './profile.js';
 import { checkWhatsNew, openWhatsNew } from './changelog.js';
 
@@ -125,7 +125,10 @@ const start = location.hash.slice(1);
 initProfile().then(() => {
   navigate(VIEWS[start] ? start : 'history');
   checkWhatsNew(firstRun); // "What's new" after an update (DECISIONS #47)
+  autoBackup(); // Android app: daily backup file in the chosen folder (DECISIONS #52)
 });
+// …and again when the app goes to the background, so a finished workout is saved off the phone soon after
+document.addEventListener('visibilitychange', () => { if (document.hidden) autoBackup(); });
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   // Always fetch sw.js fresh, and reload once when a new version takes over so old and new files never mix

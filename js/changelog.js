@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 35;
+export const APP_VERSION = 36;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 36, date: '2026-10-04', items: [
+    'Android app: automatic daily backup to a folder you choose once, for example in Google Drive (Settings → Data).',
+  ] },
   { v: 35, date: '2026-10-04', items: [
     'The app has a new name: Loadlog. Your workouts and settings are unchanged.',
     'Fix: a long "What\'s new" list now scrolls, so the button at the bottom can always be reached.',

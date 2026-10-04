@@ -866,3 +866,10 @@ body.auth-open { overflow: hidden; }
   text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; max-width: 96px; overflow: hidden; text-overflow: ellipsis; }
 .rec-vars { margin-top: 2px; }
 .rec-vars b { color: var(--accent-hi); }
+
+/* ---------- Automatic backup folder, Android app (DECISIONS #52) ---------- */
+.auto-backup { margin: 8px 0 4px; }
+.auto-backup-head { display: flex; gap: 10px; align-items: flex-start; font-size: calc(14px * var(--fs)); margin-bottom: 8px; }
+.auto-backup-head .ico { width: 18px; height: 18px; color: var(--accent-hi); flex: none; margin-top: 2px; }
+.auto-backup-head .small { display: block; margin-top: 2px; }
+.auto-backup .row { flex-wrap: wrap; align-items: center; }

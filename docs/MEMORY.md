@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-04 (Android app phase 1: test APK on branch wip-android)_
+_Last updated: 2026-10-04 (v36: Android app with automatic folder backup)_
 
 ## About the user
 
@@ -88,7 +88,8 @@ _Last updated: 2026-10-04 (Android app phase 1: test APK on branch wip-android)_
 - [ ] Android app + safe storage (DECISIONS #52). The user chose Google Play; storage: no preference → folder backup.
       Phase 1 done 2026-10-04: Capacitor project in android-app/, CI builds a test APK (pre-release `android-test`).
       Waiting for: the user to test the APK and to create a Google Play developer account (25 USD, ID check).
-      Next: (2) automatic backup to a picked folder (SAF plugin), (3) upload key in GitHub Secrets + signed .aab,
+      Phase 2 done 2026-10-04: app renamed Loadlog (appId app.loadlog), automatic backup to a picked folder (v36).
+      Next: (3) upload key in GitHub Secrets + signed .aab,
       (4) privacy policy page + store texts/screenshots, internal testing track.
       The user's phone is Android. The sandbox cannot download Actions artifacts or release files (gh refuses the redirect).
 - [ ] Ideas offered, not yet requested: supersets, goals ("bench 120 by Christmas"), Monday weekly summary, voice logging,

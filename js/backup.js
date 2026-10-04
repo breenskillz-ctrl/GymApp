@@ -29,6 +29,9 @@ export async function storageStatus() {
     const est = await navigator.storage?.estimate?.();
     if (est?.usage != null) used = est.usage;
   } catch { /* not supported */ }
+  if (window.Capacitor?.isNativePlatform?.()) {
+    return { level: 'ok', used, text: 'Stored inside the Loadlog app. Android keeps it until the app is uninstalled.' };
+  }
   if (isIOS() && !isStandalone()) {
     return { level: 'warn', used, text: 'Safari can delete this data after 7 days without a visit. Tap Share → Add to Home Screen and open the app from there.' };
   }
@@ -39,10 +42,14 @@ export async function storageStatus() {
 
 // ---------- Full backup ----------
 // File: the saved state as before, plus `photos` (progress photos as data URLs). Old backups without photos still import.
-async function backupFile() {
+async function backupText() {
   const photos = await exportPhotoList().catch(() => []);
-  const text = JSON.stringify({ ...state, backupVersion: 2, photos });
-  return { file: new File([text], `loadlog-backup-${dateKey()}.json`, { type: 'application/json' }), photos: photos.length };
+  return { text: JSON.stringify({ ...state, backupVersion: 2, photos }), photos: photos.length };
+}
+
+async function backupFile() {
+  const { text, photos } = await backupText();
+  return { file: new File([text], `loadlog-backup-${dateKey()}.json`, { type: 'application/json' }), photos };
 }
 
 function download(file) {
@@ -104,4 +111,48 @@ export function backupDue() {
   const last = Math.max(state.lastBackup || 0, state.backupSnooze || 0);
   if (Date.now() - last < week) return false;
   return Object.keys(state.log).filter(dayHasWork).length >= 3;
+}
+
+// ---------- Automatic backup to a folder (Android app only, DECISIONS #52) ----------
+// The native FolderBackup plugin writes one file per day (loadlog-auto-YYYY-MM-DD.json) to a folder the user picked once,
+// e.g. in Google Drive, and keeps the newest 14.
+const folderPlugin = () => (window.Capacitor?.isNativePlatform?.() ? window.Capacitor.Plugins?.FolderBackup : null);
+export const canAutoBackup = () => !!folderPlugin();
+const AUTO_EVERY = 3 * 3600000; // at most every 3 hours when nothing forces it
+
+export async function autoBackupFolder() {
+  try { return (await folderPlugin()?.getFolder()) || {}; } catch { return {}; }
+}
+
+export async function chooseBackupFolder() {
+  const r = await folderPlugin().pickFolder();
+  await autoBackup(true);
+  return r;
+}
+
+export async function stopAutoBackup() {
+  await folderPlugin()?.clearFolder();
+}
+
+let running = false;
+export async function autoBackup(force = false) {
+  const plugin = folderPlugin();
+  if (!plugin || running) return false;
+  if (!force && Date.now() - (state.lastAutoBackup || 0) < AUTO_EVERY) return false;
+  running = true;
+  try {
+    const folder = await plugin.getFolder();
+    if (!folder?.name) return false;
+    const { text } = await backupText();
+    await plugin.writeFile({ name: `loadlog-auto-${dateKey()}.json`, data: text, prefix: 'loadlog-auto-', keep: 14 });
+    state.lastAutoBackup = Date.now();
+    state.lastBackup = state.lastAutoBackup;
+    save();
+    return true;
+  } catch (e) {
+    if (force) toast(e?.message || 'Automatic backup failed');
+    return false;
+  } finally {
+    running = false;
+  }
 }

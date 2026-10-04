@@ -1,6 +1,6 @@
 {
-  "appId": "io.github.breenskillzctrl.gymapp",
-  "appName": "GymApp",
+  "appId": "app.loadlog",
+  "appName": "Loadlog",
   "webDir": "www",
   "server": {
     "url": "https://breenskillz-ctrl.github.io/GymApp/",

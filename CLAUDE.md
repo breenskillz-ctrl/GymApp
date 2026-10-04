@@ -70,7 +70,8 @@ js/views/blocks.js    Blocks tab inside Programs (renderBlocks(el, {embedded})),
 js/views/records.js   Records page: all PRs by muscle group, latest PRs, 1/3/5/10RM, search (DECISIONS #49)
 js/views/*.js         exercises (library + detail + editor), progress (+ settings, body weight), timers, picker
 sw.js                 Network-first service worker with an offline cache
-android-app/          Android app (Capacitor 8): loads the live site; android/ project, icons, launch theme (DECISIONS #52)
+android-app/          Android app (Capacitor 8, appId app.loadlog): loads the live site; android/ project, icons, launch theme,
+                      FolderBackupPlugin (auto backup to a picked folder; JS side in js/backup.js) (DECISIONS #52)
 .github/workflows/    pages.yml (deploy site), android.yml (test APK → pre-release `android-test`)
 ```
 
@@ -87,7 +88,7 @@ android-app/          Android app (Capacitor 8): loads the live site; android/ p
   progression: { 'exercise-id': { min, max, inc, auto, rest? } },
   blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],
   blockTemplates: [ /* the user's own templates, compact items */ ],
-  lastBackup, backupSnooze,          // backup files add backupVersion: 2 and photos: [...] (not stored in state)
+  lastBackup, backupSnooze, lastAutoBackup,   // backup files add backupVersion: 2 and photos: [...] (not stored in state)
   settings: { unit: 'kg'|'lb', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true }
 }
 ```

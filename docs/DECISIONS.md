@@ -31,7 +31,7 @@ branch name, which GitHub's Pages environment depends on. Git history still hold
 
 (#52, the Android app plan, is on the branch `wip-android` until that work is merged.)
 ## #52 · 2026-10-04 · Android app with Capacitor, loading the live web app; Google Play; backup to a folder the user picks
-**Decision:** A Capacitor 8 Android project lives in `android-app/` (appId `io.github.breenskillzctrl.gymapp`, name GymApp).
+**Decision:** A Capacitor 8 Android project lives in `android-app/` (appId `app.loadlog` since 2026-10-04, name Loadlog; the first test build used `io.github.breenskillzctrl.gymapp`).
 The app's WebView loads the live site (`server.url` = https://breenskillz-ctrl.github.io/GymApp/), so every web deploy updates
 the app without a new upload; a store upload is only needed for native changes. Dark launch theme, adaptive icon drawn as
 a vector (same shapes as icons/icon.svg), legacy icons rendered from icons/icon.svg. `.github/workflows/android.yml` builds a
@@ -43,7 +43,10 @@ written to a folder the user picks once with Android's folder picker (e.g. a Goo
 (`allowBackup`). No Google Cloud project or secrets needed.
 **Reason:** The user wants "a real app and safe storage of files" and chose Google Play. Live loading keeps the current
 publish flow; the folder picker reaches Google Drive without OAuth setup.
-**Status:** Active, phase 1 (test APK) built 2026-10-04 on branch `wip-android`. Next: folder backup, Play listing, signing.
+**Status:** Active. Phase 1 (test APK) and phase 2 (folder backup) done 2026-10-04: native `FolderBackupPlugin`
+(`android-app/.../app/loadlog/`) picks a folder with ACTION_OPEN_DOCUMENT_TREE, keeps the permission, writes
+`loadlog-auto-YYYY-MM-DD.json` and keeps the newest 14; `js/backup.js` `autoBackup()` runs at start and when the app goes to the
+background (at most every 3 h), and Settings → Data shows the folder (Android app only). Next: signing + .aab, Play listing.
 
 ## #51 · 2026-10-03 · Set variants as tags
 **Decision:** A set can carry tags from `SET_TAGS` in data.js: Paused, Tempo, Speed, Backoff, Beltless, Deficit, and (added at the user's yes the same day) Close grip, Wide grip,

@@ -10,7 +10,10 @@ import {
 import { readGymKeeperCsv, applyImport } from '../import.js';
 import { openProgressPhotos, exportPhotos, importPhotosFile } from './photos.js';
 import { clearPhotos } from '../photodb.js';
-import { downloadBackup, shareBackup, canShareFiles, restoreBackup, storageStatus, requestPersist } from '../backup.js';
+import {
+  downloadBackup, shareBackup, canShareFiles, restoreBackup, storageStatus, requestPersist,
+  canAutoBackup, autoBackupFolder, chooseBackupFolder, stopAutoBackup, autoBackup,
+} from '../backup.js';
 import { lineChart, barChart, multiLineChart, stackedBarChart } from '../charts.js';
 import { openExerciseDetail } from './exercises.js';
 import { updateWakeLock } from '../wakelock.js';
@@ -334,6 +337,7 @@ export function openSettings(onChange) {
       <h3 class="section-title">Data</h3>
       <p class="muted small">All data is stored only on this device. A backup file holds everything, progress photos included.</p>
       <div class="storage-status" data-storage><span class="muted small">Checking storage…</span></div>
+      ${canAutoBackup() ? '<div class="auto-backup" data-autob></div>' : ''}
       ${canShareFiles() ? `<button class="btn primary block" data-share>${icon('upload')} Back up to Drive, iCloud…</button>` : ''}
       <button class="btn ghost block" data-export>${icon('download')} Download backup</button>
       <label class="btn ghost block file-btn">${icon('import')} Restore backup<input type="file" accept="application/json,.json" data-import hidden></label>
@@ -367,6 +371,31 @@ export function openSettings(onChange) {
       m.querySelector('[data-awake]').addEventListener('change', (e) => { st.keepAwake = e.target.checked; save(); updateWakeLock(); });
       m.querySelector('[data-export]').addEventListener('click', () => downloadBackup());
       m.querySelector('[data-share]')?.addEventListener('click', () => shareBackup());
+      // Automatic backup folder, Android app only (DECISIONS #52)
+      const autoBox = m.querySelector('[data-autob]');
+      const drawAuto = async () => {
+        if (!autoBox) return;
+        const f = await autoBackupFolder();
+        const last = state.lastAutoBackup ? `Last automatic backup: ${fmtDate(dateKey(new Date(state.lastAutoBackup)), false)}` : 'No automatic backup yet';
+        autoBox.innerHTML = f.name
+          ? `<div class="auto-backup-head">${icon('check')}<span><b>Automatic backup</b> to “${esc(f.name)}”${f.ok ? '' : ' (folder not reachable)'}
+              <span class="muted small">${last}. A new file each day; the last 14 are kept.</span></span></div>
+            <div class="row gap"><button class="btn ghost sm" data-autob-now>Back up now</button>
+              <button class="btn ghost sm" data-autob-pick>Change folder</button><button class="text-btn" data-autob-off>Turn off</button></div>`
+          : `<p class="muted small">Pick a folder once (for example in Google Drive) and Loadlog saves a backup there every day.</p>
+            <button class="btn primary block" data-autob-pick>${icon('upload')} Choose backup folder</button>`;
+      };
+      drawAuto();
+      autoBox?.addEventListener('click', async (e) => {
+        try {
+          if (e.target.closest('[data-autob-pick]')) { await chooseBackupFolder(); toast('Backup folder saved'); }
+          if (e.target.closest('[data-autob-now]')) { if (await autoBackup(true)) toast('Backup saved'); }
+          if (e.target.closest('[data-autob-off]')) { await stopAutoBackup(); toast('Automatic backup turned off'); }
+        } catch (err) {
+          if (err?.code !== 'CANCELLED') toast(err?.message || 'Something went wrong');
+        }
+        drawAuto();
+      });
       // Storage protection status (DECISIONS #41)
       (async () => {
         await requestPersist();
