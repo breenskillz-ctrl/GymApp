@@ -56,8 +56,11 @@ function download(file) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(file);
   a.download = file.name;
+  document.body.appendChild(a);
   a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  a.remove();
+  // Chrome on Android reads the file after a delay; freeing it too early (it was 1 s) cancelled big backups
+  setTimeout(() => URL.revokeObjectURL(a.href), 120000);
 }
 
 const markDone = () => { state.lastBackup = Date.now(); save(); };

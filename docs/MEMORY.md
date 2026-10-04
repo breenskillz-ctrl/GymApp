@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-04 (v36: Android app with automatic folder backup)_
+_Last updated: 2026-10-04 (v37: more reliable backup download on phones)_
 
 ## About the user
 

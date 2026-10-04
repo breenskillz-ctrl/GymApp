@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 36;
+export const APP_VERSION = 37;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 37, date: '2026-10-04', items: [
+    'Fix: "Download backup" works more reliably on phones, also for big backups with photos.',
+  ] },
   { v: 36, date: '2026-10-04', items: [
     'Android app: automatic daily backup to a folder you choose once, for example in Google Drive (Settings → Data).',
   ] },
