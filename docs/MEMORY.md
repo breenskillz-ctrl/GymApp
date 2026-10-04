@@ -82,8 +82,7 @@ _Last updated: 2026-10-03 (v34: set variants trimmed to 8)_
 - [x] Removed every "inspired by / built like" reference to other apps from code comments and docs (DECISIONS #53).
       Still open (asked the user 2026-10-04): keep the GymKeeper CSV import label? Fresh private repo (drops the git
       history and the branch name)?
-- [ ] Selling (DECISIONS #54): 7 days free + 199 NOK one-time, decided. Name not decided: GrindLog/OmniGym are taken;
-      proposed Platewise / Loadlog (no app hits). Needs: private repo, bundled files, Play Billing, merchant account.
+- [ ] Selling (DECISIONS #54): 7 days free + 199 NOK one-time, decided. Name: Loadlog (2026-10-04, DECISIONS #55). Needs: private repo, bundled files, Play Billing, merchant account.
 - The user's imported set notes use "rackpull" for rack pulls; other variants may hide in set notes the same way.
 - [x] Figure redrawn and approved by the user; zoomed thumbnails, muscle close-up + equipment on the detail page (v25, DECISIONS #43).
 - [ ] OPEN (asked 2026-09-29): what it takes to make a downloadable app for phone and PC. Explained PWA install, store apps

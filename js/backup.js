@@ -42,7 +42,7 @@ export async function storageStatus() {
 async function backupFile() {
   const photos = await exportPhotoList().catch(() => []);
   const text = JSON.stringify({ ...state, backupVersion: 2, photos });
-  return { file: new File([text], `gymapp-backup-${dateKey()}.json`, { type: 'application/json' }), photos: photos.length };
+  return { file: new File([text], `loadlog-backup-${dateKey()}.json`, { type: 'application/json' }), photos: photos.length };
 }
 
 function download(file) {
@@ -69,7 +69,7 @@ export async function shareBackup() {
   const { file } = await backupFile();
   if (navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], title: 'GymApp backup' });
+      await navigator.share({ files: [file], title: 'Loadlog backup' });
       markDone();
       toast('Backup shared');
       return;

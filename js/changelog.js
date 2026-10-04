@@ -2,10 +2,14 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 34;
+export const APP_VERSION = 35;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 35, date: '2026-10-04', items: [
+    'The app has a new name: Loadlog. Your workouts and settings are unchanged.',
+    'Fix: a long "What\'s new" list now scrolls, so the button at the bottom can always be reached.',
+  ] },
   { v: 34, date: '2026-10-03', items: [
     'Fewer set variants: Speed is now Tempo, and Backoff and Touch & go are gone. Sets that had them keep the word in their note.',
   ] },

@@ -1,6 +1,6 @@
 {
-  "name": "GymApp – Workout Log",
-  "short_name": "GymApp",
+  "name": "Loadlog – Workout Log",
+  "short_name": "Loadlog",
   "description": "Log workouts, follow programs, track progress and use timers.",
   "lang": "en",
   "start_url": "./index.html",

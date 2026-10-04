@@ -1,6 +1,6 @@
-# GymApp – Workout Log
+# Loadlog – Workout Log
 
-A fast, calm workout tracker. It is an installable web app (PWA) that works on phones and desktops, including offline,
+Loadlog is a fast, calm workout tracker (the repository is still called GymApp). It is an installable web app (PWA) that works on phones and desktops, including offline,
 and an Android app (`android-app/`). All data is stored locally on the device.
 
 ## Features

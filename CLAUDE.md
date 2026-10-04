@@ -34,7 +34,7 @@ if you made or were given a decision. Keep entries short and dated (YYYY-MM-DD).
 
 ## Project
 
-GymApp is a workout tracker: an installable PWA written in
+**Loadlog** (repo and internal names still say GymApp/`gymapp`, DECISIONS #55) is a workout tracker: an installable PWA written in
 plain HTML/CSS/JavaScript (ES modules). There is no build step, there are no dependencies and there is no backend.
 All data is stored in `localStorage` on the device.
 

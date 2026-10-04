@@ -38,7 +38,7 @@ export async function exportPhotos() {
   if (!count) { toast('No photos to export'); return; }
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `gymapp-photos-${dateKey()}.json`;
+  a.download = `loadlog-photos-${dateKey()}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   toast(`${count} photo${count === 1 ? '' : 's'} exported`);
@@ -52,7 +52,7 @@ export async function importPhotosFile(file) {
     toast(n ? `${n} photo${n === 1 ? '' : 's'} imported` : 'No new photos in the file');
     return n > 0;
   } catch {
-    toast('This is not a GymApp photo export');
+    toast('This is not a Loadlog photo export');
     return false;
   }
 }
