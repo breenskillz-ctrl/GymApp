@@ -9,7 +9,7 @@ import { hasPhoto, photoUrl } from '../icons.js';
 import { muscleDetail, muscleLists } from '../musclemap.js';
 import { openAddSheet, groupRowsHtml } from './addsheet.js';
 
-// Exercises page: muscle groups like the + sheet. Opening a group shows the GymKeeper-style list in browse mode.
+// Exercises page: muscle groups like the + sheet. Opening a group shows the same exercise list in browse mode.
 export function renderExercises(root) {
   const draw = () => {
     root.innerHTML = `

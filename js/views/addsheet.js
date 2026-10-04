@@ -1,4 +1,4 @@
-// The "Exercises" sheet: quick actions, muscle groups, and GymKeeper-style exercise lists with filter chips.
+// The "Exercises" sheet: quick actions, muscle groups, and exercise lists with filter chips.
 // mode 'add'    (+ button): tapping an exercise adds it to `date`.
 // mode 'browse' (Exercises page): tapping an exercise opens its details.
 import { GROUPS, GROUP_COLORS, SUBGROUPS } from '../data.js';
