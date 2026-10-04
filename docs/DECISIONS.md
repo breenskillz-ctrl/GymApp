@@ -36,7 +36,7 @@ The app's WebView loads the live site (`server.url` = https://breenskillz-ctrl.g
 the app without a new upload; a store upload is only needed for native changes. Dark launch theme, adaptive icon drawn as
 a vector (same shapes as icons/icon.svg), legacy icons rendered from icons/icon.svg. `.github/workflows/android.yml` builds a
 debug APK on pushes that touch `android-app/` and publishes it as the pre-release `android-test`
-(…/releases/download/android-test/GymApp-test.apk). The signed .aab for Play will use an upload key kept only in GitHub
+(…/releases/download/android-test/Loadlog-test.apk). The signed .aab for Play will use an upload key kept only in GitHub
 Secrets. Distribution: Google Play (the user's choice), starting on the internal testing track, which avoids the
 12-testers/14-days rule for new personal accounts. Safe storage (user had no preference): planned as automatic backup files
 written to a folder the user picks once with Android's folder picker (e.g. a Google Drive folder), plus Android Auto Backup

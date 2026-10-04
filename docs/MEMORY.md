@@ -86,7 +86,7 @@ _Last updated: 2026-10-04 (v36: Android app with automatic folder backup)_
 - The user's imported set notes use "rackpull" for rack pulls; other variants may hide in set notes the same way.
 - [x] Figure redrawn and approved by the user; zoomed thumbnails, muscle close-up + equipment on the detail page (v25, DECISIONS #43).
 - [ ] Android app + safe storage (DECISIONS #52). The user chose Google Play; storage: no preference → folder backup.
-      Phase 1 done 2026-10-04: Capacitor project in android-app/, CI builds a test APK (pre-release `android-test`).
+      Phase 1 done 2026-10-04: Capacitor project in android-app/, CI builds a test APK (pre-release `android-test`, file Loadlog-test.apk; the file is replaced, the release is kept).
       Waiting for: the user to test the APK and to create a Google Play developer account (25 USD, ID check).
       Phase 2 done 2026-10-04: app renamed Loadlog (appId app.loadlog), automatic backup to a picked folder (v36).
       Next: (3) upload key in GitHub Secrets + signed .aab,
