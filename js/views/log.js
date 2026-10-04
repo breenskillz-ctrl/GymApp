@@ -420,11 +420,14 @@ export function startWorkout(program, workout, key = logState.date) {
 }
 
 // Swipe left/right to change day
+// Swipe left/right anywhere on the day view (also the empty space under the cards) to change day.
+// Not inside dialogs, menus, the bottom bars or horizontally scrolling chip rows.
+const NO_SWIPE = 'input, textarea, .chips, .modal-backdrop, #drawer, #tabbar, #restbar, .auth, .lvl-row';
 export function enableSwipe(el, isActive) {
   let x0 = null;
   let y0 = null;
   el.addEventListener('touchstart', (e) => {
-    if (!isActive() || e.target.closest('input, textarea, .chips')) { x0 = null; return; }
+    if (!isActive() || e.touches.length > 1 || e.target.closest(NO_SWIPE)) { x0 = null; return; }
     x0 = e.touches[0].clientX;
     y0 = e.touches[0].clientY;
   }, { passive: true });

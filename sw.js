@@ -1,5 +1,5 @@
 // Service worker: makes the app available offline.
-const CACHE = 'gymapp-v37';
+const CACHE = 'gymapp-v38';
 const ASSETS = [
   './',
   './index.html',

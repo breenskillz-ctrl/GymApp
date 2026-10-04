@@ -109,7 +109,7 @@ tabbar.addEventListener('click', (e) => {
   else if (v) navigate(v);
 });
 
-enableSwipe(main, () => current === 'log');
+enableSwipe(document, () => current === 'log');
 initRestBar();
 initWakeLock();
 

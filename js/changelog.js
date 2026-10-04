@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 37;
+export const APP_VERSION = 38;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 38, date: '2026-10-04', items: [
+    'Fix: swiping left or right to change day now works anywhere on the log, also in the empty space under the exercises.',
+  ] },
   { v: 37, date: '2026-10-04', items: [
     'Fix: "Download backup" works more reliably on phones, also for big backups with photos.',
   ] },
