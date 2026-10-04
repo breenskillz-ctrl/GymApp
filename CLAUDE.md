@@ -9,7 +9,6 @@ Guidance for Claude when working in this repository. Read this first in every se
 | `CLAUDE.md` | Stable rules, conventions and how the project works (this file). |
 | `docs/DECISIONS.md` | Decision log: what was decided, when and why. Add a new entry for every non-trivial decision. Never delete old entries; mark them superseded instead. |
 | `docs/MEMORY.md` | Working memory: current status, open issues, the user's preferences and the next steps. Update it at the end of each task. |
-| `docs/DESIGN-REFERENCE.md` | What GymKeeper looks like, from the user's screenshots, and the planned UI changes. Read it before any UI work. |
 
 Before you finish a task: update `docs/MEMORY.md` (status and next steps) and add to `docs/DECISIONS.md`
 if you made or were given a decision. Keep entries short and dated (YYYY-MM-DD).
@@ -28,14 +27,14 @@ if you made or were given a decision. Keep entries short and dated (YYYY-MM-DD).
 - The sandbox cannot reach `*.github.io`. Verify a deploy through the GitHub API instead (workflow run steps and
   `repos/.../deployments?environment=github-pages`). Deploy errors are in the check-run annotations
   (`repos/.../check-runs/<job id>/annotations`).
-- **Only use images we have the rights to.** Never use GymKeeper's or Gym visual's media without a licence (DECISIONS #4, #19).
+- **Only use images we have the rights to.** Never use other apps' or Gym visual's media without a licence (DECISIONS #4, #19).
   Check the licence of any image source, including exceptions for media, before adding it.
-- **Never commit the user's own exports (e.g. GymKeeper `diary_*.csv`).** They are personal data and the repo is public.
+- **Never commit the user's own exports (e.g. `diary_*.csv`).** They are personal data and the repo is public.
 - Don't ask the user to change GitHub settings unless there is no other way. Solve it in the repo when possible.
 
 ## Project
 
-GymApp is a workout tracker inspired by [GymKeeper](https://gymkeeper.app/): an installable PWA written in
+GymApp is a workout tracker: an installable PWA written in
 plain HTML/CSS/JavaScript (ES modules). There is no build step, there are no dependencies and there is no backend.
 All data is stored in `localStorage` on the device.
 
@@ -53,7 +52,7 @@ js/icons.js           Our own SVG art: groupIcon(), exerciseThumb() (zoomed musc
 js/musclemap.js       Muscle maps: muscleSvg(ex, crop) thumbnails, muscleDetail(ex) close-up, musclesFor(ex) (DECISIONS #42, #43)
 js/photos.js          PHOTOS: ids with photos in img/ex/<id>-0.jpg, -1.jpg, shown on the exercise detail page (public domain, #19)
 js/blocks.js          Block training: templates (Russian, 5/3/1, Smolov Jr), setWeight(), addBlockWorkout(), moveBlock()
-js/import.js          GymKeeper CSV import: readGymKeeperCsv() (alias table, level mapping), applyImport() (DECISIONS #27)
+js/import.js          CSV diary import (GymKeeper export format): readGymKeeperCsv() (alias table, level mapping), applyImport() (DECISIONS #27)
 js/profile.js         Local profile: create/sign-in screens (PBKDF2 hash), Profile dialog, profileName(), workoutCount() (#45)
 js/changelog.js       APP_VERSION + CHANGELOG; "What's new" sheet after an update and from the side menu (DECISIONS #47)
 js/backup.js          Full backup (state + photos), share/download/restore, storage.persist() + status (DECISIONS #41)

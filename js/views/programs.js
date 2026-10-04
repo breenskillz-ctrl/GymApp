@@ -1,4 +1,4 @@
-// Programs: a two-column card grid (GymKeeper style), with your own nicknamed programs first.
+// Programs: a two-column card grid, with your own nicknamed programs first.
 import {
   state, save, allPrograms, getProgram, saveProgram, deleteProgram, getExercise,
 } from '../store.js';

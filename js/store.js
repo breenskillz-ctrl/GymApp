@@ -21,7 +21,7 @@ const defaults = () => ({
 
 export let state = defaults();
 
-// Old group names -> the 9 GymKeeper-style groups
+// Old group names -> the 9 muscle groups
 const GROUP_MIGRATION = {
   Biceps: 'Arms', Triceps: 'Arms', Forearms: 'Arms', Glutes: 'Legs', Calves: 'Legs', 'Full body': 'Full-Body',
 };
@@ -93,7 +93,7 @@ function migrate() {
     delete day.note;
     const emptied = new Set();
     for (const e of day.entries) {
-      // Logged sets without any numbers (e.g. empty 0 × 0 sets from the first GymKeeper import) are dropped
+      // Logged sets without any numbers (e.g. empty 0 × 0 sets from an early CSV import) are dropped
       const n = e.sets.length;
       e.sets = e.sets.filter((st) => !st.done || [st.w, st.r, st.t, st.d].some(Boolean));
       if (n && !e.sets.length) emptied.add(e);

@@ -1,4 +1,4 @@
-// Day view: the workout log for one day, styled after GymKeeper (see docs/DESIGN-REFERENCE.md).
+// Day view: the workout log for one day.
 import {
   state, save, getDay, cleanupDay, addEntry, getExercise, dayHasWork, isPR, daySummary, records, makeSets,
   warmupSets, getRest, dayDuration, isStalled, deloadEntry, setHasData,

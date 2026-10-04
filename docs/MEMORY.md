@@ -11,7 +11,7 @@ _Last updated: 2026-10-03 (v34: set variants trimmed to 8)_
 - Writes in Norwegian → reply in Norwegian. App and code are in English.
 - Security-conscious: no secrets in GitHub, ever (see DECISIONS #6).
 - Wants Claude to keep notes and decisions in these Markdown files.
-- Loves being able to create programs with their own nicknames in GymKeeper. Keep that front and centre.
+- Loves being able to create programs with their own nicknames. Keep that front and centre.
 - Chose the "Steel & orange" look (slate greys, Barlow / Barlow Condensed); since 2026-10-03 the accent is the icon's plate blue
   #2c5aa8 (lighter #6b97e0 for text/lines), not orange (DECISIONS #48). Keep new UI in that style.
 - Wants a **minimal, calm** UI: small controls, few colours, no figures except in exercise lists/search and the detail page.
@@ -19,7 +19,7 @@ _Last updated: 2026-10-03 (v34: set variants trimmed to 8)_
 - Progression rule: after a failure set, fill all sets up to the same reps at the same weight before adding reps or weight.
 - Trains with wide, exercise-specific rep ranges (deadlift 1–5, sometimes 10 at lighter weight; bench 1–12; triceps 10–30).
 - Blocks: Russian Squat (and Smolov) must use 100 % of the real 1RM, not a 90 % training max (the user corrected this 2026-09-28).
-- Likes a compact History list (Strong-style cards) as the start screen; the Android back button must never close the app by surprise.
+- Likes a compact History list (workout cards) as the start screen; the Android back button must never close the app by surprise.
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
@@ -43,9 +43,9 @@ _Last updated: 2026-10-03 (v34: set variants trimmed to 8)_
 - [x] Get the Pages deploy working without the user changing settings (2026-09-28).
 - [x] Deploy succeeded (verified via the Actions run and the deployments API; the sandbox can't open github.io).
 - [ ] User: test the app on the phone and give feedback.
-- [x] Redesigned to match the user's GymKeeper screenshots (2026-09-28): black/green theme, drawer, + sheet, card day view,
+- [x] First redesign (2026-09-28): black/green theme, drawer, + sheet, card day view,
       set editor dialog, 6 intensity levels, program grid with rename/import/export, 9 muscle groups.
-- [x] Exercise library expanded to 231 exercises, with GymKeeper-style group lists (2026-09-28).
+- [x] Exercise library expanded to 231 exercises, with group lists and filters (2026-09-28).
 - [x] Exercise photos added: 198/231 from free-exercise-db (public domain), 2026-09-28 (DECISIONS #19).
 - [x] Progressive overload suggestions: +1 rep per working set, warm-ups unchanged (2026-09-28, DECISIONS #20).
 - [x] Per-exercise rep ranges with double progression (2026-09-28, DECISIONS #21). User's ranges: DL 1–5, bench 1–12, triceps 10–30.
@@ -79,23 +79,22 @@ _Last updated: 2026-10-03 (v34: set variants trimmed to 8)_
 - [x] Fix: rack pulls logged as deadlifts move to a new Rack Pull exercise (v31, DECISIONS #50). Published 2026-10-03.
 - [x] Set variants as tags (DECISIONS #51): now Paused, Tempo (= speed), Beltless, Deficit, Close grip, Wide grip, Sumo,
       Unilateral (v34). Backoff and Touch & go were dropped by the user; never re-add them without asking.
-- The user's GymKeeper notes use "rackpull" for rack pulls; other variants may hide in set notes the same way.
+- [x] Removed every "inspired by / built like" reference to other apps from code comments and docs (DECISIONS #53).
+      Still open (asked the user 2026-10-04): keep the GymKeeper CSV import label? Fresh repo to drop the git history and
+      the branch name? Selling: paid app needs a merchant account, a distinct name and no free copy of the content.
+- The user's imported set notes use "rackpull" for rack pulls; other variants may hide in set notes the same way.
 - [x] Figure redrawn and approved by the user; zoomed thumbnails, muscle close-up + equipment on the detail page (v25, DECISIONS #43).
-- [ ] Possible: if the user buys a Gym Visual licence, add a local image-pack import (files stay on the device, never in git).
 - [ ] OPEN (asked 2026-09-29): what it takes to make a downloadable app for phone and PC. Explained PWA install, store apps
       (Capacitor/Tauri) and sync between devices; waiting for the user's choice.
 - [ ] Ideas offered, not yet requested: supersets, goals ("bench 120 by Christmas"), Monday weekly summary, voice logging,
       shareable workout card, long-press plate calculator.
 - [ ] Ideas offered again 2026-10-03 (after v31), waiting for the user's pick: goals on the Records page, weekly summary on
-      History, set variants as tags (paused/speed/backoff, seen in the user's GymKeeper notes), supersets, Google Drive
+      History, set variants as tags (paused/speed/backoff, seen in the user's set notes), supersets, Google Drive
       backup/sync, Android app (APK/Play Store), an automated test suite in the repo.
 - [x] RIR/RPE: declined by the user (2026-09-29, DECISIONS #39). Don't suggest it again.
 - [x] History page as the start screen + "Start workout", and the phone back button no longer closes the app (v19, DECISIONS #36, #37).
 - [ ] Ideas for blocks (not requested): RPE-based prescriptions, exporting/sharing block templates, a warm-up set generator.
-- [ ] Possible later: the user buys Gym visual illustrations (the GymKeeper look). Swap files in img/ex/, and check the licence re: public repo.
 - [ ] 33 exercises still have no photo (list in docs/photo-sources.json → ids not in map).
-- [ ] Not yet seen: GymKeeper lists for Back, Legs, Core and Other. Ask for screenshots if the user wants those matched too.
-- [ ] User: try the redesign on the phone and give feedback (more GymKeeper screenshots are welcome).
 - [ ] Optional: commit an automated Playwright smoke test under `tests/`.
 - [ ] Optional ideas: exercise illustrations, supersets, plate calculator, workout duration, cloud sync
       (cloud sync would need a backend and secrets → GitHub Secrets / server-side only).

@@ -15,14 +15,14 @@ suggested sets for next time keep them (`progressSet`). Set chips in the log sho
 notes are converted once (`tagSetsFromNotes()` in `migrate()` and on GymKeeper import): "paused", "3 sec paused", "backoff",
 "belteløs" … become tags and the words leave the note; the rest of the note stays. The Records page adds a line with the
 best set per variant. Variant sets still count for the exercise's normal records: they are harder or lighter, never easier.
-**Reason:** The user picked idea #3 ("varianter som merker"); their GymKeeper notes use paused/speed/backoff/belteløs a lot.
+**Reason:** The user picked idea #3 ("varianter som merker"); their imported set notes use paused/speed/backoff/belteløs a lot.
 **Status:** Active (approved and published 2026-10-03, v32).
 
 ## #50 · 2026-10-03 · Rack pulls get their own exercise
 **Decision:** New built-in exercise `rack-pull` (Back, Barbell). Deadlift sets whose note mentions "rack pull" ("rackpull",
 "høy rackpull", "lav rack pull" …) are moved to a Rack Pull card right after the deadlift card: on import, and once for data
 already on the phone (`splitRackPulls()` in `migrate()`).
-**Reason:** The user's Records page showed a deadlift 3RM of 200 kg, but they have only pulled 200 kg once. In GymKeeper the
+**Reason:** The user's Records page showed a deadlift 3RM of 200 kg, but they have only pulled 200 kg once. In the imported diary the
 rack pulls on 2025-12-03 were logged as "Deadlift" with a note, so they counted as deadlifts.
 **Status:** Active (approved and published 2026-10-03, v31).
 
@@ -76,7 +76,7 @@ top of History. They had no preference between local and cloud login; local need
 The lock keeps casual eyes out but does not encrypt the data, and the app says so in the profile dialog.
 **Status:** Active (approved and published 2026-10-03, v27).
 
-## #44 · 2026-10-02 · Own, minimal controls instead of GymKeeper's
+## #44 · 2026-10-02 · Own, minimal controls
 **Decision:** After two preview rounds with the user (first version felt "big and noisy"):
 - Sets are hairline chips; the set level is a thin coloured line at the bottom; suggested sets have a dashed edge. A small
   dashed "+" chip ends the row (no "+" icon in the card header). Log cards have no muscle figure and no group tags.
@@ -88,7 +88,7 @@ The lock keeps casual eyes out but does not encrypt the data, and the app says s
   closed with ✕ in the header and a grip (no floating "CLOSE").
 - Rest timer: a small ring that empties, text buttons.
 - Muscle-figure thumbnails stay only in exercise lists/search and on the exercise detail page.
-**Reason:** The user did not want the app to be a copy of GymKeeper and asked for a calmer, minimalist look.
+**Reason:** The user wanted the app to have its own identity and asked for a calmer, minimalist look.
 **Status:** Active
 
 ## #43 · 2026-09-29 · Muscle-map figure redrawn with the user, plus a detail close-up
@@ -122,12 +122,12 @@ reminder uses sharing when available. Restore replaces workout data and adds the
 **Status:** Active (the separate photo export from #35 stays as an extra)
 
 ## #40 · 2026-09-29 · "Steel & orange" look, bottom tab bar
-**Decision:** Replace the GymKeeper-like black/green look with the user's pick from a preview of three options:
+**Decision:** Replace the black/green look with the user's pick from a preview of three options:
 slate greys (#15181c background, #1e2329 cards with a thin edge) and one orange accent (#ff7a1a, dark text on it). Type is Barlow
 for the UI and Barlow Condensed for numbers and page titles (uppercase), self-hosted in `fonts/` (SIL OFL, `fonts/OFL.txt`) so
 they work offline. A bottom tab bar (History, Log, Programs, Progress) sits on every page; the drawer keeps the rest. Round FAB,
 pill "Start workout", orange app icon. Set level colours and muscle-group colours are unchanged. All colours are tokens in `:root`.
-**Reason:** The user wanted the app to look less like GymKeeper and chose option 1 of 3 from a preview (2026-09-29).
+**Reason:** The user wanted a look of its own and chose option 1 of 3 from a preview (2026-09-29).
 **Status:** Active (supersedes the colour part of #14)
 
 ## #39 · 2026-09-29 · No RIR/RPE
@@ -156,7 +156,7 @@ at a time. Each card: title (day comment, else Morning/Afternoon/Evening Workout
 "n × exercise | best set". Tap opens the day; ⋮ = open, repeat today, delete. The app starts on History; "Start workout" (bottom
 right, "Continue workout" when today has exercises) opens today's log. Also: empty 0 kg × 0 rep sets from GymKeeper are skipped on
 import and removed from already imported data (they were planned sets that were never done).
-**Reason:** The user asked for it with a screenshot from another app (Strong-style history).
+**Reason:** The user asked for a history list as the start page.
 **Status:** Active. 2026-09-28 update (user): the card title is only Morning/Afternoon/Evening Workout ("Workout" when there
 are no set times, e.g. imported days); the day comment or block name goes on its own smaller line right under it.
 
@@ -299,49 +299,48 @@ per exercise id (replace `img/ex/<id>-*.jpg`). If Gym visual media is bought, ch
 repo is public.
 **Status:** Active
 
-## #18 · 2026-09-28 · GymKeeper-style exercise library and lists
+## #18 · 2026-09-28 · Exercise library and lists
 **Decision:** 231 built-in exercises, named "Movement" + equipment variant ("Curl · Cable") in a curated order, each with a muscle
 region (`sub`). Group lists have ★/region/equipment filter chips, "N days" since last done, favourites (★, first) and a ⋮ menu.
 The Exercises page uses the same lists. Chin Up moved from Back to Arms; Pullover to Chest; Swing/Farmer's Walk to Full-Body;
-Burpee/Mountain Climber/Jumping Jack to Cardio (as in GymKeeper). Brand names are replaced ("Hammer Strength Press" →
+Burpee/Mountain Climber/Jumping Jack to Cardio. Brand names are replaced ("Hammer Strength Press" →
 "Plate-Loaded Chest Press"). The equipment "Dumbbells" was renamed "Dumbbell", and saved custom exercises are migrated.
-**Reason:** It matches the user's GymKeeper screenshots. Exercise names are generic, but images are not copied (#4).
+**Reason:** The user's wishes for how exercises are organised. Exercise names are generic; no images are copied (#4).
 **Status:** Active
 
 ## #17 · 2026-09-28 · Filled muscle-group icons
 **Decision:** Muscle-group icons are body outlines with the trained muscle filled in the group colour (chest = pecs, back = lats,
-core = six-pack, and so on). They are drawn larger (40px) with bolder strokes, and each group row has a ⋮ menu, like GymKeeper.
-**Reason:** The user said the first thin line icons looked very poor next to GymKeeper's. The drawings are our own (#4).
+core = six-pack, and so on). They are drawn larger (40px) with bolder strokes, and each group row has a ⋮ menu.
+**Reason:** The user found the first thin line icons poor. The drawings are our own (#4).
 **Status:** Active
 
-## #16 · 2026-09-28 · Adding exercises and sets works like GymKeeper
+## #16 · 2026-09-28 · Adding exercises and sets
 **Decision:** The + button opens an "Exercises" sheet (four quick tiles, then muscle groups showing days since last trained).
 Picking an exercise adds an empty card and opens the set editor. Sets are entered in a dialog, not typed inline.
 Sets from a program or another day are added as *planned* sets (`done: false`, no dot) and become done when saved in the editor.
-**Reason:** The user wants the app to work like GymKeeper (screenshots in DESIGN-REFERENCE.md).
+**Reason:** The flow the user asked for.
 **Status:** Active
 
 ## #15 · 2026-09-28 · Nine muscle groups
 **Decision:** Chest, Arms, Back, Legs, Shoulders, Core, Full-Body, Cardio, Other, each with its own colour (`GROUP_COLORS`).
 Biceps/Triceps/Forearms became Arms, and Glutes/Calves became Legs. Exercise ids are unchanged, and `migrate()` in `store.js`
 converts old saved data.
-**Reason:** It matches GymKeeper's group list.
+**Reason:** The grouping the user asked for.
 **Status:** Active
 
-## #14 · 2026-09-28 · GymKeeper-style look: black and green, drawer navigation
+## #14 · 2026-09-28 · Black and green look, drawer navigation
 **Decision:** Pure black background, dark grey cards and a green accent (`#3bb54a`), dark theme only. Navigation uses a ☰ side
 drawer and a top bar; there is no bottom tab bar. Programs are shown as a two-column card grid with our own SVG artwork.
 The app icon is green.
-**Reason:** The user said the first version looked like a different app. The design now follows their GymKeeper screenshots.
-We use our own artwork and never GymKeeper's images or icons (#4).
+**Reason:** The user's feedback on the first version. We use our own artwork only (#4).
 **Status:** Active. Replaces the first version's orange theme with a bottom nav.
 
 ## #13 · 2026-09-28 · Set intensity levels, with failure in purple
 **Decision:** Each set gets an intensity level shown as a coloured dot: **grey = warm-up, green = easy, yellow = normal,
-red = hard, purple = failure, blue = drop**. Failure is a full level of its own and is shown in purple. The user approved keeping
-GymKeeper's DROP level too, shown in blue.
-**Reason:** It matches GymKeeper's dots (grey/green/yellow/red), as confirmed by the user. The user misses failure as a level
-there and suggested purple. Purple is also clearly different from red, so the two are easy to tell apart.
+red = hard, purple = failure, blue = drop**. Failure is a full level of its own and is shown in purple. The user also wanted a
+DROP level, shown in blue.
+**Reason:** The levels and colours the user asked for. The user wanted failure as a level of its own
+and suggested purple. Purple is also clearly different from red, so the two are easy to tell apart.
 **Status:** Active
 
 ## #12 · 2026-09-28 · Deploy from `claude/gymkeeper-app-pq7o0u`
@@ -400,8 +399,8 @@ Exercise ids were changed to English slugs at the same time (this was safe becau
 **Status:** Active. Supersedes the original Norwegian UI from #1.
 
 ## #4 · 2026-09-27 · Exercise animations not included
-**Decision:** Exercises have text descriptions only. GymKeeper's animated exercise illustrations are not copied.
-**Reason:** No assets are available and we must not copy GymKeeper's content. We could add our own illustrations later.
+**Decision:** Exercises have text descriptions only. No other app's illustrations or animations are copied.
+**Reason:** We have no licensed assets and must never copy another app's content. We could add our own illustrations later.
 **Status:** Active
 
 ## #3 · 2026-09-27 · Local-only storage with JSON export/import
@@ -415,10 +414,8 @@ done through JSON export/import in Settings.
 **Reason:** Easy to host anywhere (e.g. GitHub Pages), fast, nothing to install or keep up to date.
 **Status:** Active
 
-## #1 · 2026-09-27 · Build a GymKeeper-inspired workout tracker
-**Decision:** Build a workout log based on GymKeeper's feature set: daily log with swipe/calendar, smart
-autofill from the last session, exercise library, ready-made and custom programs, PRs, progress charts,
-rest/countdown/Tabata timers.
-**Reason:** The user's original request. gymkeeper.app was blocked from the sandbox, so we worked out the features from
-app-store listings (Google Play etc.) rather than the website itself.
+## #1 · 2026-09-27 · Build a workout tracker
+**Decision:** Build a workout log with a daily log with calendar, smart autofill from the last session, an exercise
+library, ready-made and custom programs, PRs, progress charts and rest/countdown/Tabata timers.
+**Reason:** The user's original request.
 **Status:** Active (the language part was superseded by #5)
