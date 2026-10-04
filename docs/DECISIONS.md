@@ -5,6 +5,32 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #55 · 2026-10-04 · The app is called Loadlog
+**Decision:** The visible name is **Loadlog** (page title, manifest, side menu, backup and photo export file names, Android
+app name). Internal names stay as they are so nothing breaks: the storage keys (`gymapp.v1`, `gymapp.session`,
+`gymapp.seenVersion`), the IndexedDB name, the cache name prefix, the repo name and the web address.
+**Reason:** The user chose "Loadlog" from the name ideas (GrindLog and OmniGym were taken). Not a trademark search; the user
+should still check Play and Patentstyret before the store launch.
+**Status:** Active (supersedes the open name question in #54)
+
+## #54 · 2026-10-04 · Paid app: 7 days free, then 199 NOK once
+**Decision:** If the app is sold on Google Play: free download with everything open for 7 days, then a one-time in-app
+purchase of 199 NOK unlocks it for good (Google Play Billing; the trial is counted in the app, since Play only has built-in
+trials for subscriptions). After the trial, the user's own data stays readable and exportable; only logging new workouts
+needs the purchase. A subscription (e.g. 25 NOK/month) can be added later as an alternative.
+**Reason:** The user's choice. No server costs, so a one-time price is fair and easy to sell.
+**Status:** Active. Requires: private repo, bundled web files instead of live loading, Play Billing, merchant account.
+
+## #53 · 2026-10-04 · No references to other apps as inspiration
+**Decision:** Code comments, README, CLAUDE.md, MEMORY.md and this log no longer describe the app as built after or inspired by
+another app, and `docs/DESIGN-REFERENCE.md` (notes about another app's screens) is deleted. Older entries here were reworded
+to match. What stays: the CSV import of the user's own diary export (it names the file format it reads) and the deploy
+branch name, which GitHub's Pages environment depends on. Git history still holds the old texts.
+**Reason:** The user wants the app to stand on its own, possibly as a paid app.
+**Status:** Active
+
+(#52, the Android app plan, is on the branch `wip-android` until that work is merged.)
+
 ## #51 · 2026-10-03 · Set variants as tags
 **Decision:** A set can carry tags from `SET_TAGS` in data.js: Paused, Tempo, Speed, Backoff, Beltless, Deficit, and (added at the user's yes the same day) Close grip, Wide grip,
 Touch & go, Sumo, and Unilateral (asked for later the same day, v33) (`set.tags`, ids in that order).
