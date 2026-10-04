@@ -71,6 +71,8 @@ js/views/blocks.js    Blocks tab inside Programs (renderBlocks(el, {embedded})),
 js/views/records.js   Records page: all PRs by muscle group, latest PRs, 1/3/5/10RM, search (DECISIONS #49)
 js/views/*.js         exercises (library + detail + editor), progress (+ settings, body weight), timers, picker
 sw.js                 Network-first service worker with an offline cache
+android-app/          Android app (Capacitor 8): loads the live site; android/ project, icons, launch theme (DECISIONS #52)
+.github/workflows/    pages.yml (deploy site), android.yml (test APK → pre-release `android-test`)
 ```
 
 ### Data model (localStorage key `gymapp.v1`)

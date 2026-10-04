@@ -5,6 +5,21 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #52 · 2026-10-04 · Android app with Capacitor, loading the live web app; Google Play; backup to a folder the user picks
+**Decision:** A Capacitor 8 Android project lives in `android-app/` (appId `io.github.breenskillzctrl.gymapp`, name GymApp).
+The app's WebView loads the live site (`server.url` = https://breenskillz-ctrl.github.io/GymApp/), so every web deploy updates
+the app without a new upload; a store upload is only needed for native changes. Dark launch theme, adaptive icon drawn as
+a vector (same shapes as icons/icon.svg), legacy icons rendered from icons/icon.svg. `.github/workflows/android.yml` builds a
+debug APK on pushes that touch `android-app/` and publishes it as the pre-release `android-test`
+(…/releases/download/android-test/GymApp-test.apk). The signed .aab for Play will use an upload key kept only in GitHub
+Secrets. Distribution: Google Play (the user's choice), starting on the internal testing track, which avoids the
+12-testers/14-days rule for new personal accounts. Safe storage (user had no preference): planned as automatic backup files
+written to a folder the user picks once with Android's folder picker (e.g. a Google Drive folder), plus Android Auto Backup
+(`allowBackup`). No Google Cloud project or secrets needed.
+**Reason:** The user wants "a real app and safe storage of files" and chose Google Play. Live loading keeps the current
+publish flow; the folder picker reaches Google Drive without OAuth setup.
+**Status:** Active, phase 1 (test APK) built 2026-10-04 on branch `wip-android`. Next: folder backup, Play listing, signing.
+
 ## #51 · 2026-10-03 · Set variants as tags
 **Decision:** A set can carry tags from `SET_TAGS` in data.js: Paused, Tempo, Speed, Backoff, Beltless, Deficit, and (added at the user's yes the same day) Close grip, Wide grip,
 Touch & go, Sumo, and Unilateral (asked for later the same day, v33) (`set.tags`, ids in that order).
