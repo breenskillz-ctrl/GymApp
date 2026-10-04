@@ -84,7 +84,8 @@ _Last updated: 2026-10-04 (v37: more reliable backup download on phones)_
       history and the branch name)?
 - [ ] iPhone (asked 2026-10-04): explained (1) the web app already installs on iPhone via Safari → Add to Home Screen,
       (2) an App Store app = Capacitor iOS + Apple Developer Program (99 USD/year) + macOS build (GitHub Actions) + bundled
-      files (Apple rejects thin website wrappers) + StoreKit for the 199 NOK unlock. Waiting for the user's choice.
+      files (Apple rejects thin website wrappers) + StoreKit for the 199 NOK unlock. 2026-10-04: the web app works well on
+      iPhone (user tested). Plan: Android in Play first, iOS app when the app is bundled for selling.
 - [ ] Selling (DECISIONS #54): 7 days free + 199 NOK one-time, decided. Name: Loadlog (2026-10-04, DECISIONS #55). Needs: private repo, bundled files, Play Billing, merchant account.
 - The user's imported set notes use "rackpull" for rack pulls; other variants may hide in set notes the same way.
 - [x] Figure redrawn and approved by the user; zoomed thumbnails, muscle close-up + equipment on the detail page (v25, DECISIONS #43).
