@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- App icon: a loaded barbell sleeve, four blue plates (DECISIONS #46, #52). Same shapes as icons/icon.svg. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="512" android:viewportHeight="512">
+  <group android:scaleX="0.72" android:scaleY="0.72" android:pivotX="256" android:pivotY="256" android:translateX="-6" android:translateY="0">
+    <path android:fillColor="#85878C" android:pathData="M-185,241h616a15,15 0 0 1 15,15v0a15,15 0 0 1 -15,15h-616a15,15 0 0 1 -15,-15v-0a15,15 0 0 1 15,-15z"/>
+    <path android:fillColor="#85878C" android:pathData="M113,200h26a9,9 0 0 1 9,9v94a9,9 0 0 1 -9,9h-26a9,9 0 0 1 -9,-9v-94a9,9 0 0 1 9,-9z"/>
+    <path android:fillColor="#2C5AA8" android:strokeColor="#000000" android:strokeWidth="8" android:pathData="M166,112h28a12,12 0 0 1 12,12v264a12,12 0 0 1 -12,12h-28a12,12 0 0 1 -12,-12v-264a12,12 0 0 1 12,-12zM218,112h28a12,12 0 0 1 12,12v264a12,12 0 0 1 -12,12h-28a12,12 0 0 1 -12,-12v-264a12,12 0 0 1 12,-12zM270,112h28a12,12 0 0 1 12,12v264a12,12 0 0 1 -12,12h-28a12,12 0 0 1 -12,-12v-264a12,12 0 0 1 12,-12zM322,112h28a12,12 0 0 1 12,12v264a12,12 0 0 1 -12,12h-28a12,12 0 0 1 -12,-12v-264a12,12 0 0 1 12,-12z"/>
+    <path android:fillColor="#B4B6BA" android:pathData="M376,212h12a8,8 0 0 1 8,8v72a8,8 0 0 1 -8,8h-12a8,8 0 0 1 -8,-8v-72a8,8 0 0 1 8,-8z"/>
+    <group android:rotation="28" android:pivotX="396" android:pivotY="220">
+      <path android:fillColor="#B4B6BA" android:pathData="M396,166h0a8,8 0 0 1 8,8v42a8,8 0 0 1 -8,8h-0a8,8 0 0 1 -8,-8v-42a8,8 0 0 1 8,-8z"/>
+    </group>
+  </group>
+</vector>

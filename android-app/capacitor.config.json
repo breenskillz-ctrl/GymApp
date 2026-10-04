@@ -1,0 +1,19 @@
+{
+  "appId": "io.github.breenskillzctrl.gymapp",
+  "appName": "GymApp",
+  "webDir": "www",
+  "server": {
+    "url": "https://breenskillz-ctrl.github.io/GymApp/",
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#15181c",
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "SystemBars": {
+      "style": "DARK",
+      "initialViewportFitValueHint": "cover"
+    }
+  }
+}
