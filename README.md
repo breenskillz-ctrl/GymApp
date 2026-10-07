@@ -43,6 +43,8 @@ The Android app is built by `.github/workflows/android.yml`.
 
 Exercise photos come from [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (public domain / Unlicense).
 Fonts: Barlow and Barlow Condensed (SIL Open Font License, `fonts/OFL.txt`).
+Barcode reading: [ZXing](https://github.com/zxing-js/library) (`js/vendor/`) and
+[zxing-android-embedded](https://github.com/journeyapps/zxing-android-embedded) in the Android app (Apache License 2.0).
 
 ## Secrets and API keys
 

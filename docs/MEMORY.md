@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-07 (v39 published: Food tab + Home page)_
+_Last updated: 2026-10-07 (v40 on branch wip-scan: live barcode scanner, awaiting approval)_
 
 ## About the user
 
@@ -88,6 +88,8 @@ _Last updated: 2026-10-07 (v39 published: Food tab + Home page)_
       iPhone (user tested). Plan: Android in Play first, iOS app when the app is bundled for selling.
 - [x] Food tab ported from Makrologg (v39, DECISIONS #56). Published 2026-10-07.
 - [x] Home page with Food / Exercise / History buttons (v39, DECISIONS #57). Published 2026-10-07.
+- [ ] Live barcode scanner like Makrologg (v40, DECISIONS #58) on local branch `wip-scan`. Needs the user's OK; then publish
+  and check that the Android workflow builds the new APK (the native plugin was not compiled locally: no Android SDK here).
       Makrologg repo (breenskillz-ctrl/makrologg, private) was read-only input; its keystore + password are committed there
       (told the user). Open Food Facts is not reachable from the sandbox: tests mock it with page.route.
 - [ ] Selling (DECISIONS #54): 7 days free + 199 NOK one-time, decided. Name: Loadlog (2026-10-04, DECISIONS #55). Needs: private repo, bundled files, Play Billing, merchant account.

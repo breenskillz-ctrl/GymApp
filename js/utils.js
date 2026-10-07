@@ -117,7 +117,7 @@ export function toast(msg) {
 // ---------- Modal ----------
 const modalStack = [];
 
-export function openModal(html, { onMount, className = '' } = {}) {
+export function openModal(html, { onMount, onClose, className = '' } = {}) {
   const wrap = document.createElement('div');
   wrap.className = 'modal-backdrop';
   wrap.innerHTML = `<div class="modal ${className}" role="dialog" aria-modal="true">${html}</div>`;
@@ -125,7 +125,9 @@ export function openModal(html, { onMount, className = '' } = {}) {
   const modal = wrap.firstElementChild;
   const close = () => {
     const i = modalStack.indexOf(close);
-    if (i >= 0) modalStack.splice(i, 1);
+    if (i < 0) return; // already closed
+    modalStack.splice(i, 1);
+    onClose?.();
     wrap.classList.remove('open');
     setTimeout(() => wrap.remove(), 200);
   };

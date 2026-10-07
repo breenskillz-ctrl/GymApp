@@ -182,15 +182,68 @@ export async function offSearch(q) {
 }
 
 // ---------- Barcodes ----------
-export const canDecodeBarcodes = () => 'BarcodeDetector' in window;
+// The Android app has a native camera scanner (BarcodeScanPlugin, the same zxing library as Makrologg). In a browser we read the
+// live camera with BarcodeDetector where it works, otherwise with ZXing (js/vendor/zxing.min.js, Apache-2.0, loaded on demand).
+const FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
+export const nativeScanner = () => (window.Capacitor?.isNativePlatform?.() ? window.Capacitor.Plugins?.BarcodeScan : null);
+export const canUseCamera = () => !!navigator.mediaDevices?.getUserMedia;
 
-// Reads an EAN/UPC barcode from a photo; null when none is found or the browser can't decode barcodes
-export async function decodeBarcode(file) {
-  if (!canDecodeBarcodes()) return null;
+let zxing = null;
+function loadZxing() {
+  zxing ||= new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = new URL('./vendor/zxing.min.js', import.meta.url).href;
+    s.onload = () => resolve(window.ZXing);
+    s.onerror = () => { zxing = null; reject(new Error('Could not load the barcode reader')); };
+    document.head.appendChild(s);
+  });
+  return zxing;
+}
+
+async function nativeDetector() {
+  if (!('BarcodeDetector' in window)) return null;
   try {
-    const det = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'] });
-    const r = await det.detect(await createImageBitmap(file));
-    return r?.[0]?.rawValue || null;
+    const ok = await window.BarcodeDetector.getSupportedFormats();
+    return ok.includes('ean_13') ? new window.BarcodeDetector({ formats: FORMATS.filter((f) => ok.includes(f)) }) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Returns read(source, maxSize) for a <video>, image or ImageBitmap: the barcode digits, or null when none is found
+export async function barcodeReader() {
+  const det = await nativeDetector();
+  if (det) return async (src) => (await det.detect(src).catch(() => []))[0]?.rawValue || null;
+  const Z = await loadZxing();
+  const F = Z.BarcodeFormat;
+  const reader = new Z.MultiFormatReader();
+  reader.setHints(new Map([[Z.DecodeHintType.POSSIBLE_FORMATS, [F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E, F.CODE_128]],
+    [Z.DecodeHintType.TRY_HARDER, true]]));
+  const cv = document.createElement('canvas');
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  return async (src, maxSize = 1280) => {
+    const w = src.videoWidth || src.width;
+    const h = src.videoHeight || src.height;
+    if (!w || !h) return null;
+    const sc = Math.min(1, maxSize / Math.max(w, h));
+    cv.width = Math.round(w * sc);
+    cv.height = Math.round(h * sc);
+    ctx.drawImage(src, 0, 0, cv.width, cv.height);
+    try {
+      return reader.decode(new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.HTMLCanvasElementLuminanceSource(cv)))).getText();
+    } catch {
+      return null; // no barcode in this frame
+    } finally {
+      reader.reset();
+    }
+  };
+}
+
+// Reads a barcode from a photo; null when none is found. Big phone photos are tried again smaller.
+export async function decodeBarcode(file) {
+  try {
+    const [read, img] = await Promise.all([barcodeReader(), createImageBitmap(file)]);
+    return (await read(img, 1600)) || (await read(img, 800));
   } catch {
     return null;
   }

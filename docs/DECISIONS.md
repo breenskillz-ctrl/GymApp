@@ -5,6 +5,17 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #58 · 2026-10-07 · Barcode scanning like Makrologg: live camera
+**Decision:** "Scan barcode" opens the camera straight away and reads the code by itself. In the Android app a native plugin
+(`BarcodeScanPlugin`, zxing-android-embedded 4.3.0, the scanner Makrologg used) opens a full-screen scanner; it needs a new
+APK. In a browser the sheet shows a live camera view and checks a frame every 200 ms with `BarcodeDetector` when it supports
+EAN, otherwise with ZXing (`js/vendor/zxing.min.js`, @zxing/library 0.21.3, Apache-2.0, loaded only when scanning). A photo
+(same decoders, tried at two sizes) and typing the numbers stay as fallbacks. `openModal` got an `onClose` hook so the camera
+always stops. Makrologg's last fallback (AI reading the digits) is not ported (no server, #56).
+**Reason:** The user reported that scanning products did not work like in Makrologg (2026-10-07): v39 only read a photo,
+and only where `BarcodeDetector` exists, which the Android WebView and iPhone lack.
+**Status:** Active. Awaiting the user's approval before publishing.
+
 ## #57 · 2026-10-07 · Home page with three buttons
 **Decision:** The app starts on a simple Home page: the greeting ("Are you ready to grind, NAME?") and three big buttons,
 Food, Exercise and History, each with a one-line status (today's kcal and protein / today's exercises and sets / number of

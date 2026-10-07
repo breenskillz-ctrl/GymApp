@@ -69,12 +69,14 @@ js/views/programs.js  Program grid (page + sheet), detail, ⋮ menu (rename/edit
 js/views/blocks.js    Blocks tab inside Programs (renderBlocks(el, {embedded})), activeBlocksHtml() cards, schedule, start/1RM dialogs;
                       blockeditor.js = custom block builder
 js/food.js            Food data: BASE_FOODS (59, English + Norwegian names), MEALS, goals/calcGoals, Open Food Facts, barcode, Makrologg import
+js/vendor/            Third-party code we ship: zxing.min.js (@zxing/library 0.21.3 UMD, Apache-2.0, zxing-LICENSE.txt), loaded on demand
 js/views/food.js      Food tab: kcal ring + macros, meals, water, add/amount/own-food/scan sheets, goals, last 14 days (DECISIONS #56)
 js/views/records.js   Records page: all PRs by muscle group, latest PRs, 1/3/5/10RM, search (DECISIONS #49)
 js/views/*.js         exercises (library + detail + editor), progress (+ settings, body weight), timers, picker
 sw.js                 Network-first service worker with an offline cache
 android-app/          Android app (Capacitor 8, appId app.loadlog): loads the live site; android/ project, icons, launch theme,
-                      FolderBackupPlugin (auto backup to a picked folder; JS side in js/backup.js) (DECISIONS #52)
+                      FolderBackupPlugin (auto backup to a picked folder; JS side in js/backup.js) (DECISIONS #52),
+                      BarcodeScanPlugin (native camera scanner, zxing-android-embedded; JS side in js/food.js) (#58)
 .github/workflows/    pages.yml (deploy site), android.yml (test APK → pre-release `android-test`)
 ```
 
@@ -106,7 +108,7 @@ For `t` exercises in programs, `reps` means seconds.
 - Views render with template strings and `innerHTML`. **Always wrap user-supplied text in `esc()`.**
 - Events use delegation via `data-act` / `data-*` attributes. `navigate()` clears `main.onclick` etc.,
   so views assign `root.onclick = …` (not `addEventListener` on `root`).
-- Modals: `openModal(html, { className: 'tall'|'small', onMount(modal, close) })`.
+- Modals: `openModal(html, { className: 'tall'|'small', onMount(modal, close), onClose() })`.
 - Icons: add a `<symbol id="i-name">` to `index.html` and use `icon('name')`.
 - Built-in exercise and program **ids must never change**, because saved logs reference them. Add new ones instead.
 - If the state shape changes, keep `load()` backward compatible (merge with defaults, migrate old data).

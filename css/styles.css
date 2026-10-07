@@ -235,6 +235,11 @@ textarea.input { resize: vertical; }
 .scale-preview .v { font-size: calc(16px * var(--fs)); font-weight: 700; }
 .scale-preview .u { font-size: calc(10px * var(--fs)); font-weight: 700; color: var(--muted2); margin-left: 2px; }
 .credit { font-size: calc(11px * var(--fs)); color: var(--muted); }
+.scan-view { position: relative; aspect-ratio: 4 / 3; margin: 4px 0 10px; border-radius: 12px; overflow: hidden; background: var(--bg); }
+.scan-view video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.scan-view i { position: absolute; inset: 30% 10%; border: 2px solid var(--accent-hi); border-radius: 10px; box-shadow: 0 0 0 999px rgba(0, 0, 0, .35); }
+.scan-btns { display: grid; gap: 8px; margin: 8px 0 12px; }
+.scan-btns [hidden] { display: none; }
 .ex-card > button:first-child { align-self: flex-start; }
 .ex-body { flex: 1; min-width: 0; }
 .ex-head { display: flex; align-items: flex-start; gap: 0; }

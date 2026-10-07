@@ -3,7 +3,7 @@ import { state, save } from '../store.js';
 import { esc, icon, openModal, toast, dateKey, addDays, parseKey, MONTHS, num, confirmDialog, fmtNum } from '../utils.js';
 import {
   F, MEALS, BASE_FOODS, goals, foodDay, saveFoodDay, scale, totals, guessMeal, searchFoods, saveFood, deleteFood,
-  findByBarcode, recentFoods, calcGoals, latestWeight, offLookup, offSearch, decodeBarcode, canDecodeBarcodes,
+  findByBarcode, recentFoods, calcGoals, latestWeight, offLookup, offSearch, decodeBarcode, barcodeReader, nativeScanner, canUseCamera,
 } from '../food.js';
 
 export const foodState = { date: dateKey() };
@@ -298,44 +298,123 @@ function openFoodForm(p = {}, meal = null, note = '') {
 }
 
 // ---------- Barcode ----------
+// Opens straight into the camera, like Makrologg: the native scanner in the Android app, a live camera view in a browser.
+// A photo and typing the numbers are the fallbacks.
 function openScanSheet(meal) {
+  const native = nativeScanner();
+  const live = !native && canUseCamera();
+  let stream = null;
+  let timer = 0;
+  let closed = false;
+  const stop = () => {
+    clearTimeout(timer);
+    stream?.getTracks().forEach((t) => t.stop());
+    stream = null;
+  };
   openModal(`<div class="modal-head"><h2>Scan barcode</h2><button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
-    ${canDecodeBarcodes() ? `<label class="btn primary block file-btn">${icon('camera')} Take a photo of the barcode
-      <input type="file" accept="image/*" capture="environment" hidden data-photo></label>`
-      : '<p class="muted small">This browser cannot read barcodes from the camera. Type the numbers under the barcode instead.</p>'}
-    <form class="form scan-form"><label>Numbers under the barcode<div class="row gap">
-      <input class="input" name="code" inputmode="numeric" placeholder="7038010…" style="flex:1;min-width:0"><button class="btn ghost" type="submit">Look up</button></div></label></form>
+    ${live ? '<div class="scan-view" hidden><video playsinline muted></video><i></i></div>' : ''}
     <p class="scan-msg muted small"></p>
+    <div class="scan-btns">
+      ${native || live ? `<button class="btn primary block" data-scan>${icon('scan')} Scan again</button>` : ''}
+      <label class="btn ghost block file-btn">${icon('camera')} Use a photo
+        <input type="file" accept="image/*" capture="environment" hidden data-photo></label>
+    </div>
+    <form class="form scan-form"><label>Or type the numbers under the barcode<div class="row gap">
+      <input class="input" name="code" inputmode="numeric" placeholder="7038010…" style="flex:1;min-width:0"><button class="btn ghost" type="submit">Look up</button></div></label></form>
     <p class="credit">Product data: Open Food Facts (openfoodfacts.org). Products you have scanned before also work offline.</p>`, {
     className: 'dialog',
+    onClose() { closed = true; stop(); },
     onMount(m, close) {
       const msg = (t) => { m.querySelector('.scan-msg').textContent = t; };
+      const again = m.querySelector('[data-scan]');
+      if (again) again.hidden = true;
       const lookup = async (raw) => {
         const code = String(raw || '').replace(/\D/g, '');
         if (!code) { msg('Type the numbers under the barcode.'); return; }
+        m.querySelector('[name=code]').value = code;
         const known = findByBarcode(code);
         if (known) { close(); openAmountSheet(known, meal); toast(`Found ${known.name}`); return; }
         msg(`Looking up ${code} in Open Food Facts…`);
         try {
           const r = await offLookup(code);
+          if (closed) return;
           if (r.food) { const f = saveFood(r.food); close(); openAmountSheet(f, meal); toast(`Found ${f.name}`); return; }
           close();
           openFoodForm({ name: r.name || '', barcode: code }, meal,
             `${r.noNutrition ? 'The product is in Open Food Facts but has no nutrition values.' : 'The product was not found in Open Food Facts.'} Type the values from the label (per 100 g); Loadlog remembers it next time.`);
         } catch {
           msg('Could not reach Open Food Facts. Check the connection, or add the food yourself.');
+          if (again) again.hidden = false;
         }
       };
-      m.querySelector('[data-photo]')?.addEventListener('change', async (e) => {
+      const found = (code) => {
+        stop();
+        m.querySelector('.scan-view')?.setAttribute('hidden', '');
+        navigator.vibrate?.(60);
+        lookup(code);
+      };
+
+      // Android app: the native scanner opens on top and returns the digits
+      const scanNative = async () => {
+        again.hidden = true;
+        msg('');
+        try {
+          const { code } = await native.scan();
+          if (code) found(code);
+          else { msg('No barcode scanned.'); again.hidden = false; }
+        } catch {
+          msg('The scanner could not start. Allow the camera for Loadlog, or use a photo.');
+          again.hidden = false;
+        }
+      };
+
+      // Browser: live camera in the sheet, checked a few times a second
+      const scanLive = async () => {
+        again.hidden = true;
+        const view = m.querySelector('.scan-view');
+        const video = view.querySelector('video');
+        msg('Starting the camera…');
+        try {
+          const [read, s] = await Promise.all([barcodeReader(), navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false })]);
+          if (closed) { s.getTracks().forEach((t) => t.stop()); return; }
+          stream = s;
+          video.srcObject = s;
+          await video.play();
+          view.hidden = false;
+          msg('Hold the barcode inside the frame.');
+          const tick = async () => {
+            if (!stream) return;
+            const code = await read(video);
+            if (code) found(code);
+            else if (stream) timer = setTimeout(tick, 200);
+          };
+          tick();
+        } catch {
+          stop();
+          view.hidden = true;
+          msg('The camera could not start. Allow camera access, or use a photo or the numbers instead.');
+          again.hidden = false;
+        }
+      };
+
+      if (again) again.onclick = native ? scanNative : scanLive;
+      if (native) scanNative();
+      else if (live) scanLive();
+      else msg('Take a photo of the barcode, or type the numbers under it.');
+
+      m.querySelector('[data-photo]').addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
+        stop();
+        m.querySelector('.scan-view')?.setAttribute('hidden', '');
         msg('Reading the barcode…');
         const code = await decodeBarcode(file);
-        if (!code) { msg('No barcode found in the photo. Try closer and sharper, or type the numbers.'); return; }
-        m.querySelector('[name=code]').value = code;
-        lookup(code);
+        e.target.value = '';
+        if (code) found(code);
+        else { msg('No barcode found in the photo. Try closer and sharper, or type the numbers.'); if (again) again.hidden = false; }
       });
-      m.querySelector('.scan-form').onsubmit = (e) => { e.preventDefault(); lookup(e.target.code.value); };
+      m.querySelector('.scan-form').onsubmit = (e) => { e.preventDefault(); stop(); lookup(e.target.code.value); };
     },
   });
 }

@@ -2,10 +2,14 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 39;
+export const APP_VERSION = 40;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 40, date: '2026-10-07', items: [
+    'Scanning barcodes works like in Makrologg: the camera opens right away and finds the barcode by itself, also on iPhone.',
+    'In the Android app the scanner is built in (update the app to get it). A photo or typing the numbers still works too.',
+  ] },
   { v: 39, date: '2026-10-07', items: [
     'New Food tab: log calories, protein, carbs and fat per meal, with daily goals, a goal calculator, water and the last 14 days.',
     'Add food from common foods, your own foods or Open Food Facts, by search or barcode.',
