@@ -2,10 +2,16 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 38;
+export const APP_VERSION = 39;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 39, date: '2026-10-07', items: [
+    'New Food tab: log calories, protein, carbs and fat per meal, with daily goals, a goal calculator, water and the last 14 days.',
+    'Add food from common foods, your own foods or Open Food Facts, by search or barcode.',
+    'Import your food log from Makrologg under Settings & backup. Food days also show on the History cards.',
+    'New, simple home page with three buttons: Food, Exercise and History. The bottom bar is now Home, Food, Exercise, History and Progress; Programs is in the side menu.',
+  ] },
   { v: 38, date: '2026-10-04', items: [
     'Fix: swiping left or right to change day now works anywhere on the log, also in the empty space under the exercises.',
   ] },

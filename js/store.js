@@ -16,6 +16,8 @@ const defaults = () => ({
   blocks: [], // running and finished training blocks (js/blocks.js)
   blockTemplates: [], // the user's own block templates
   lastBackup: 0, // time of the last exported backup (weekly reminder)
+  // Food log (DECISIONS #56): goals, the calorie calculator inputs, own foods and one entry list per day
+  food: { goals: null, calc: {}, items: {}, days: {} },
   settings: { unit: 'kg', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true },
 });
 

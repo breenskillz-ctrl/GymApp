@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-04 (v38: swipe to change day works on the whole log screen)_
+_Last updated: 2026-10-07 (v39 published: Food tab + Home page)_
 
 ## About the user
 
@@ -19,7 +19,7 @@ _Last updated: 2026-10-04 (v38: swipe to change day works on the whole log scree
 - Progression rule: after a failure set, fill all sets up to the same reps at the same weight before adding reps or weight.
 - Trains with wide, exercise-specific rep ranges (deadlift 1–5, sometimes 10 at lighter weight; bench 1–12; triceps 10–30).
 - Blocks: Russian Squat (and Smolov) must use 100 % of the real 1RM, not a 90 % training max (the user corrected this 2026-09-28).
-- Likes a compact History list (workout cards) as the start screen; the Android back button must never close the app by surprise.
+- Since 2026-10-07 the start screen is Home (Food / Exercise / History buttons, DECISIONS #57); History keeps the compact cards; the Android back button must never close the app by surprise.
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
@@ -86,6 +86,10 @@ _Last updated: 2026-10-04 (v38: swipe to change day works on the whole log scree
       (2) an App Store app = Capacitor iOS + Apple Developer Program (99 USD/year) + macOS build (GitHub Actions) + bundled
       files (Apple rejects thin website wrappers) + StoreKit for the 199 NOK unlock. 2026-10-04: the web app works well on
       iPhone (user tested). Plan: Android in Play first, iOS app when the app is bundled for selling.
+- [x] Food tab ported from Makrologg (v39, DECISIONS #56). Published 2026-10-07.
+- [x] Home page with Food / Exercise / History buttons (v39, DECISIONS #57). Published 2026-10-07.
+      Makrologg repo (breenskillz-ctrl/makrologg, private) was read-only input; its keystore + password are committed there
+      (told the user). Open Food Facts is not reachable from the sandbox: tests mock it with page.route.
 - [ ] Selling (DECISIONS #54): 7 days free + 199 NOK one-time, decided. Name: Loadlog (2026-10-04, DECISIONS #55). Needs: private repo, bundled files, Play Billing, merchant account.
 - The user's imported set notes use "rackpull" for rack pulls; other variants may hide in set notes the same way.
 - [x] Figure redrawn and approved by the user; zoomed thumbnails, muscle close-up + equipment on the detail page (v25, DECISIONS #43).

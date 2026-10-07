@@ -60,13 +60,16 @@ js/photodb.js         Progress photos in IndexedDB (addPhoto/allPhotos/deletePho
 js/wakelock.js        Screen wake lock while today has exercises (settings.keepAwake)
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart(), barChart(), multiLineChart(), stackedBarChart() on canvas
-js/views/history.js   History (start page): greeting + muscle-group mix, compact workout cards, "Start workout" → today's log
+js/views/home.js      Home (start page, back-button root): greeting + Food / Exercise / History buttons with today's status (#57)
+js/views/history.js   History: workout count + muscle-group mix, compact workout cards, "Start workout" → today's log
 js/views/log.js       Day view (cards with set chips + "+" chip, ‹ day › nav, "Add exercise" pill, day menu, calendar, records)
 js/views/seteditor.js Set editor dialog (fields, −/+, comment, levels, history/1RM/plate tools)
 js/views/addsheet.js  "+" sheet and exercise browser: shortcut links, plain muscle-group list, filtered exercise lists (★/region/equipment), ⋮ menu
 js/views/programs.js  Program grid (page + sheet), detail, ⋮ menu (rename/edit/copy/export/delete), import, editor
 js/views/blocks.js    Blocks tab inside Programs (renderBlocks(el, {embedded})), activeBlocksHtml() cards, schedule, start/1RM dialogs;
                       blockeditor.js = custom block builder
+js/food.js            Food data: BASE_FOODS (59, English + Norwegian names), MEALS, goals/calcGoals, Open Food Facts, barcode, Makrologg import
+js/views/food.js      Food tab: kcal ring + macros, meals, water, add/amount/own-food/scan sheets, goals, last 14 days (DECISIONS #56)
 js/views/records.js   Records page: all PRs by muscle group, latest PRs, 1/3/5/10RM, search (DECISIONS #49)
 js/views/*.js         exercises (library + detail + editor), progress (+ settings, body weight), timers, picker
 sw.js                 Network-first service worker with an offline cache
@@ -83,6 +86,8 @@ android-app/          Android app (Capacitor 8, appId app.loadlog): loads the li
   customPrograms:  [{ id: 'cp-…', name, desc, level, days, workouts: [{ id, name, exercises: [{ ex, sets, reps }] }] }],
   log:  { 'YYYY-MM-DD': { title, duration?, entries: [{ id, ex, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, tags?, at?, last?, pct?, amrap?, goal? }] }] } },
   body: [{ date: 'YYYY-MM-DD', weight?, chest?, waist?, armL?, armR?, thighL?, thighR? }],
+  food: { goals?: { kcal, p, c, f, water }, calc: { sex, age, height, act, goal }, items: { id: { id, name, per: { kcal, p, c, f }, portion?, barcode? } },
+          days: { 'YYYY-MM-DD': { entries: [{ id, meal, name, g, per, kcal, p, c, f, foodId?, portion?, est? }], water } } },
   profile: { name, username, passHash?, salt?, iterations?, created },   // or profileSkipped: true (DECISIONS #45)
   favorites: ['exercise-id', …],
   progression: { 'exercise-id': { min, max, inc, auto, rest? } },

@@ -5,6 +5,29 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #57 · 2026-10-07 · Home page with three buttons
+**Decision:** The app starts on a simple Home page: the greeting ("Are you ready to grind, NAME?") and three big buttons,
+Food, Exercise and History, each with a one-line status (today's kcal and protein / today's exercises and sets / number of
+workouts and the last one). Food and Exercise open today. Home is the root for the back-button guard (#37): back goes to the screen a view was opened
+from (e.g. History → a day → back = History), and from a tab or side-menu screen to Home; the greeting moved
+there from History. Bottom bar: Home, Food, Exercise (the day log), History, Progress. Programs is only in the side menu.
+Code: `js/views/home.js`.
+**Reason:** The user asked for a simple home page with three buttons before the Food tab is published (2026-10-07).
+**Status:** Active. Approved and published in v39 (2026-10-07). Supersedes "History as the start page" in #36.
+
+## #56 · 2026-10-07 · Food tab, ported from the user's Makrologg app
+**Decision:** Loadlog gets a Food tab (a tab and one of the three Home buttons, #57) with what Makrologg had: a calorie ring with kcal
+left, protein/carbs/fat bars against goals, five meals (Breakfast, Lunch, Dinner, Evening meal, Snacks) with "Copy yesterday",
+a water counter, goals with a Mifflin–St Jeor calculator, and the last 14 days (chart + averages). Foods: 59 common Norwegian
+foods (English names, searchable in Norwegian), own foods, Open Food Facts search and barcode lookup (barcode from a photo via
+`BarcodeDetector` where the browser has it, otherwise typed). Data in `state.food` = `{ goals, calc, items, days }`, so it is in
+every backup. Body weight stays in `state.body` (one weight log). Settings imports a Makrologg backup (text or file): days,
+own foods, goals and weights. History cards show the day's kcal and protein. Code: `js/food.js`, `js/views/food.js`.
+Not ported: Makrologg's AI features (read a label / estimate a meal from text or a photo); they only worked inside Claude
+and would need a server with an API key. Not ported: Makrologg's own APK self-update.
+**Reason:** The user asked to put "almost the whole" Makrologg app into Loadlog (2026-10-07).
+**Status:** Active. Approved and published in v39 (2026-10-07).
+
 ## #55 · 2026-10-04 · The app is called Loadlog
 **Decision:** The visible name is **Loadlog** (page title, manifest, side menu, backup and photo export file names, Android
 app name). Internal names stay as they are so nothing breaks: the storage keys (`gymapp.v1`, `gymapp.session`,

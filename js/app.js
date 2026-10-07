@@ -10,6 +10,8 @@ import { renderProgress, openSettings, openBodyWeight } from './views/progress.j
 import { renderTimers } from './views/timers.js';
 import { renderHistory } from './views/history.js';
 import { renderRecords } from './views/records.js';
+import { renderFood, shiftFoodDay } from './views/food.js';
+import { renderHome } from './views/home.js';
 import { openProgressPhotos } from './views/photos.js';
 import { requestPersist, autoBackup } from './backup.js';
 import { initProfile, openProfile } from './profile.js';
@@ -23,9 +25,11 @@ requestPersist(); // ask the browser not to clear our storage (DECISIONS #41)
 
 const main = document.getElementById('main');
 const drawer = document.getElementById('drawer');
-let current = 'history';
+let current = 'home';
+let parent = null; // the screen the back button returns to (DECISIONS #57)
 
 const VIEWS = {
+  home: renderHome,
   history: renderHistory,
   log: renderLog,
   programs: renderPrograms,
@@ -33,13 +37,16 @@ const VIEWS = {
   progress: renderProgress,
   timers: renderTimers,
   records: renderRecords,
+  food: renderFood,
   blocks: (el) => renderPrograms(el, { tab: 'blocks' }), // old links: Blocks now lives under Programs
 };
 
 const tabbar = document.getElementById('tabbar');
 document.body.classList.add('has-tabbar');
 
-export function navigate(view) {
+// `top`: opened from the tab bar or side menu. Otherwise the back button returns to the screen it was opened from.
+export function navigate(view, top = false) {
+  if (view !== current) parent = top || current === 'home' ? null : current;
   current = view;
   document.body.dataset.screen = view;
   closeDrawer();
@@ -48,12 +55,13 @@ export function navigate(view) {
   VIEWS[view](main);
   window.scrollTo(0, 0);
   if (location.hash !== `#${view}`) history.replaceState(history.state, '', `#${view}`);
-  if (view !== 'history') ensureGuard();
+  if (view !== 'home') ensureGuard();
 }
 
 // ---------- Phone back button (DECISIONS #37) ----------
 // The app keeps one extra "guard" entry on top of its own history entry. Back pops the guard; we then close the drawer or the
-// top dialog, or go to History, and put the guard back. On History with nothing open, the next back press leaves the app.
+// top dialog, or go to the screen this one was opened from (else Home), and put the guard back.
+// On Home with nothing open, the next back press leaves the app.
 function ensureGuard() {
   if (history.state?.gym !== 'guard') history.pushState({ gym: 'guard' }, '', `#${current}`);
 }
@@ -61,7 +69,7 @@ history.replaceState({ gym: 'root' }, '', location.hash);
 window.addEventListener('popstate', () => {
   if (history.state?.gym === 'guard') return;
   if (drawer.classList.contains('open')) closeDrawer();
-  else if (closeTopModal()) { /* closed a dialog */ } else if (current !== 'history') navigate('history');
+  else if (closeTopModal()) { /* closed a dialog */ } else if (current !== 'home') navigate(parent || 'home', true);
   else { toast('Press back again to exit'); return; }
   ensureGuard();
 });
@@ -90,7 +98,7 @@ document.addEventListener('click', (e) => {
 drawer.addEventListener('click', (e) => {
   if (e.target === drawer) return closeDrawer();
   const v = e.target.closest('[data-view]');
-  if (v) return navigate(v.dataset.view);
+  if (v) return navigate(v.dataset.view, true);
   const a = e.target.closest('[data-drawer-act]')?.dataset.drawerAct;
   if (!a) return;
   closeDrawer();
@@ -105,11 +113,11 @@ drawer.addEventListener('click', (e) => {
 // Bottom tab bar (DECISIONS #40). The Log tab always opens today.
 tabbar.addEventListener('click', (e) => {
   const v = e.target.closest('[data-view]')?.dataset.view;
-  if (v === 'log') goToDate(dateKey());
-  else if (v) navigate(v);
+  if (v === 'log') { goToDate(dateKey()); parent = null; } else if (v) navigate(v, true);
 });
 
 enableSwipe(document, () => current === 'log');
+enableSwipe(document, () => current === 'food', shiftFoodDay);
 initRestBar();
 initWakeLock();
 
@@ -123,7 +131,7 @@ window.addEventListener('resize', () => {
 // First start shows "Create profile"; with a password the lock screen comes first (DECISIONS #45)
 const start = location.hash.slice(1);
 initProfile().then(() => {
-  navigate(VIEWS[start] ? start : 'history');
+  navigate(VIEWS[start] ? start : 'home');
   checkWhatsNew(firstRun); // "What's new" after an update (DECISIONS #47)
   autoBackup(); // Android app: daily backup file in the chosen folder (DECISIONS #52)
 });

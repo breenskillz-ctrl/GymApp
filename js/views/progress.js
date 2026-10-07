@@ -8,6 +8,7 @@ import {
   e1rm, MONTHS, pad, menuDialog, go,
 } from '../utils.js';
 import { readGymKeeperCsv, applyImport } from '../import.js';
+import { importMakrologg } from '../food.js';
 import { openProgressPhotos, exportPhotos, importPhotosFile } from './photos.js';
 import { clearPhotos } from '../photodb.js';
 import {
@@ -344,6 +345,7 @@ export function openSettings(onChange) {
       <button class="btn ghost block" data-exportp>${icon('camera')} Export progress photos</button>
       <label class="btn ghost block file-btn">${icon('camera')} Import progress photos<input type="file" accept="application/json,.json" data-importp hidden></label>
       <label class="btn ghost block file-btn">${icon('import')} Import from GymKeeper (CSV)<input type="file" accept=".csv,text/csv" data-gk hidden></label>
+      <button class="btn ghost block" data-mk>${icon('food')} Import from Makrologg</button>
       <button class="btn danger block" data-reset>${icon('trash')} Delete all data</button>
       <h3 class="section-title">About</h3>
       <p class="credit">Exercise photos: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener" style="color:inherit">free-exercise-db</a> (public domain).</p>
@@ -451,6 +453,31 @@ export function openSettings(onChange) {
         const n = applyImport(res, mode);
         toast(`Imported ${n} workout day${n === 1 ? '' : 's'}`);
         onChange();
+      });
+      // Makrologg backup: shared as text (or saved as a file); food days, own foods, goals and weights (DECISIONS #56)
+      m.querySelector('[data-mk]').addEventListener('click', () => {
+        openModal(`<h2 class="dialog-title">Import from Makrologg</h2>
+          <p class="muted small">In Makrologg, tap “Del backup” and save or copy the text. Then pick the file or paste the text here.
+            Food days you already have here are kept; new entries are added.</p>
+          <label class="btn ghost block file-btn">${icon('import')} Choose file<input type="file" accept=".json,.txt,application/json,text/plain" hidden data-mkfile></label>
+          <textarea class="input" rows="4" placeholder="…or paste the backup text" data-mktext></textarea>
+          <div class="dialog-actions"><button class="text-btn" data-close>Cancel</button><button class="text-btn accent" data-mkgo>Import</button></div>`, {
+          className: 'dialog',
+          onMount(md, closeMk) {
+            const run = (text) => {
+              try {
+                const r = importMakrologg(text);
+                closeMk();
+                toast(`Imported ${r.days} food day${r.days === 1 ? '' : 's'}, ${r.foods} own food${r.foods === 1 ? '' : 's'}, ${r.weights} weight${r.weights === 1 ? '' : 's'}`);
+                onChange();
+              } catch {
+                toast('This is not a Makrologg backup');
+              }
+            };
+            md.querySelector('[data-mkfile]').addEventListener('change', async (e) => { const f = e.target.files[0]; if (f) run(await f.text()); });
+            md.querySelector('[data-mkgo]').addEventListener('click', () => run(md.querySelector('[data-mktext]').value));
+          },
+        });
       });
       m.querySelector('[data-reset]').addEventListener('click', async () => {
         if (await confirmDialog('Delete all workout data, custom exercises, programs and progress photos? This cannot be undone.', 'Delete all')) {

@@ -9,7 +9,8 @@ import { logState, copyToToday, openCalendar } from './log.js';
 import { setText } from './exercises.js';
 import { exLabel } from './seteditor.js';
 import { GROUPS, GROUP_COLORS } from '../data.js';
-import { profileName, workoutCount } from '../profile.js';
+import { workoutCount } from '../profile.js';
+import { foodSummaryLine } from './food.js';
 
 const PAGE = 25;
 
@@ -30,11 +31,6 @@ function title(day) {
 }
 
 // ---------- Greeting and muscle-group mix (DECISIONS #45) ----------
-function greeting() {
-  const h = new Date().getHours();
-  return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 22 ? 'Good evening' : 'Good night';
-}
-
 let mixRange = 'all'; // 'all' | '30'
 
 // Working sets (no warmups) per muscle group, as [group, sets] sorted largest first
@@ -83,12 +79,9 @@ function mixHtml() {
 }
 
 function helloHtml() {
-  const name = profileName();
   const n = workoutCount();
   const week = weekCount();
   return `<section class="hello">
-    <div class="hello-greet">${greeting()}</div>
-    <h2 class="hello-title">Are you ready to grind${name ? `, <span>${esc(name)}</span>` : ''}?</h2>
     <div class="hello-stats"><span><b>${n}</b> workout${n === 1 ? '' : 's'}</span><span><b>${week}</b> this week</span></div>
     ${mixHtml()}
   </section>`;
@@ -128,6 +121,7 @@ function cardHtml(key) {
       ${mins ? `<span>${icon('timer')}${fmtDuration(mins)}</span>` : ''}
       ${sum.vol ? `<span>${icon('dumbbell')}${fmtNum(sum.vol, 0)} ${u}</span>` : `<span>${icon('check')}${sum.sets} sets</span>`}
       <span class="${prs ? 'gold' : ''}">${icon('trophy')}${prs} PR${prs === 1 ? '' : 's'}</span>
+      ${foodSummaryLine(key) ? `<span>${icon('food')}${foodSummaryLine(key)}</span>` : ''}
     </div>
     <div class="h-table"><div class="h-row h-th"><span>Exercise</span><span>Best set</span></div>${rows}</div>
   </article>`;
