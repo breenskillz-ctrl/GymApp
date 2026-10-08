@@ -14,7 +14,7 @@ EAN, otherwise with ZXing (`js/vendor/zxing.min.js`, @zxing/library 0.21.3, Apac
 always stops. Makrologg's last fallback (AI reading the digits) is not ported (no server, #56).
 **Reason:** The user reported that scanning products did not work like in Makrologg (2026-10-07): v39 only read a photo,
 and only where `BarcodeDetector` exists, which the Android WebView and iPhone lack.
-**Status:** Active. Awaiting the user's approval before publishing.
+**Status:** Active. Approved and published in v40 (2026-10-08).
 
 ## #57 · 2026-10-07 · Home page with three buttons
 **Decision:** The app starts on a simple Home page: the greeting ("Are you ready to grind, NAME?") and three big buttons,
