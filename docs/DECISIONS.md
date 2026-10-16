@@ -13,7 +13,7 @@ Exercise, Programs, History, Progress (Programs is back where Food was). Food da
 `state.food` (and in backups); nothing reads it, so it can come back if the user changes their mind.
 `openModal`'s `onClose` hook stays (generic).
 **Reason:** The user tried it and does not like it: "Gjerne fjern matdelen fra appen. Jeg liker det ikke." (2026-10-16).
-**Status:** Active. Awaiting the user's approval before publishing. Supersedes #56 and #58; changes #57 (Programs replaces Food).
+**Status:** Active. Approved and published in v41 (2026-10-16). Supersedes #56 and #58; changes #57 (Programs replaces Food).
 
 ## #58 · 2026-10-07 · Barcode scanning like Makrologg: live camera
 **Decision:** "Scan barcode" opens the camera straight away and reads the code by itself. In the Android app a native plugin

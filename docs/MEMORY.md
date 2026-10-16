@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-16 (v41 on branch wip-nofood: Food removed, awaiting approval)_
+_Last updated: 2026-10-16 (v41 published: Food removed)_
 
 ## About the user
 
@@ -91,8 +91,8 @@ _Last updated: 2026-10-16 (v41 on branch wip-nofood: Food removed, awaiting appr
 - [x] Home page with Food / Exercise / History buttons (v39, DECISIONS #57). Published 2026-10-07.
 - [x] Live barcode scanner like Makrologg (v40, DECISIONS #58). Published 2026-10-08; the APK with the native scanner is built by
   android.yml (check the run if the user reports problems).
-- [ ] Food tab and scanner removed again (v41, DECISIONS #59) on local branch `wip-nofood`. The user did not like the food
-  part. Needs the user's OK, then publish; android.yml rebuilds the APK without the camera permission.
+- [x] Food tab and scanner removed again (v41, DECISIONS #59). Published 2026-10-16; android.yml rebuilds the APK without
+  the camera permission.
 - iPhone (2026-10-08): recommended the Safari home-screen app; a native iOS app needs Apple's 99 USD/year even when free.
   The user asked "what if the app is not sold?" – no decision yet on dropping the paid plan (#54).
       Makrologg repo (breenskillz-ctrl/makrologg, private) was read-only input; its keystore + password are committed there
