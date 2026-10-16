@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-16 (v42 built, waiting for the user's OK: coach sync to Google Sheets, DECISIONS #60)_
+_Last updated: 2026-10-16 (v42 published: coach sync to Google Sheets, DECISIONS #60)_
 
 ## About the user
 
@@ -25,8 +25,8 @@ _Last updated: 2026-10-16 (v42 built, waiting for the user's OK: coach sync to G
 
 ## Current status
 
-- **v42 (2026-10-16), not pushed yet:** coach sync to Google Sheets in Settings (`js/sync.js`, DECISIONS #60). Tested in
-  headless Chromium with a mocked Apps Script. Waiting for the user's OK before pushing to the deploy branch.
+- **v42 (2026-10-16), published after the user's OK:** coach sync to Google Sheets in Settings (`js/sync.js`, DECISIONS #60).
+  Tested in headless Chromium with a mocked Apps Script. Next: the user sets up the sheet and sends Claude the link.
   The user sets up the sheet + Apps Script from the Makrologg repo (`data/coach/Kode.gs`) and pastes the /exec address.
 
 - The first full version of the app is built and tested in headless Chromium (no console errors):
