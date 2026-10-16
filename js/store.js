@@ -122,6 +122,7 @@ export function load() {
 export function save() {
   try {
     localStorage.setItem(KEY, JSON.stringify(state));
+    window.dispatchEvent(new Event('gymapp:saved')); // coach sync listens (js/sync.js)
   } catch (e) {
     console.error('Could not save', e);
   }

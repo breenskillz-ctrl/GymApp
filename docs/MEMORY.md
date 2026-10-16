@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-16 (v41 published: Food removed)_
+_Last updated: 2026-10-16 (v42 built, waiting for the user's OK: coach sync to Google Sheets, DECISIONS #60)_
 
 ## About the user
 
@@ -24,6 +24,10 @@ _Last updated: 2026-10-16 (v41 published: Food removed)_
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
+
+- **v42 (2026-10-16), not pushed yet:** coach sync to Google Sheets in Settings (`js/sync.js`, DECISIONS #60). Tested in
+  headless Chromium with a mocked Apps Script. Waiting for the user's OK before pushing to the deploy branch.
+  The user sets up the sheet + Apps Script from the Makrologg repo (`data/coach/Kode.gs`) and pastes the /exec address.
 
 - The first full version of the app is built and tested in headless Chromium (no console errors):
   log, programs, exercises, progress/settings, timers.

@@ -15,12 +15,14 @@ import { openProgressPhotos } from './views/photos.js';
 import { requestPersist, autoBackup } from './backup.js';
 import { initProfile, openProfile } from './profile.js';
 import { checkWhatsNew, openWhatsNew } from './changelog.js';
+import { initSync } from './sync.js';
 
 let firstRun = true;
 try { firstRun = !localStorage.getItem('gymapp.v1'); } catch { /* storage blocked */ }
 load();
 applyTextScale(state.settings.textScale);
 requestPersist(); // ask the browser not to clear our storage (DECISIONS #41)
+initSync(); // coach sync to Google Sheets (DECISIONS #60)
 
 const main = document.getElementById('main');
 const drawer = document.getElementById('drawer');

@@ -5,6 +5,17 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #60 · 2026-10-16 · Coach sync to Google Sheets
+**Decision:** Settings get a "Coach (Google Sheets)" section. With a web app address (`settings.sheetUrl`), `js/sync.js`
+POSTs one record per logged day (done sets: exercise, group, weight, reps, time, distance, level, tags, comment, e1RM)
+and one per body measurement to an Apps Script web app. The script is shared with Makrologg and lives in that repo
+(`data/coach/Kode.gs`); it fills the tabs Økter, Sett and Kroppsmål. Only changed records are sent; fingerprints are kept
+per device in `gymapp.sync` (not in backups). `store.save()` fires `gymapp:saved`, which schedules a sync.
+Person id is `p0`, the same as "Meg" in Makrologg.
+**Reason:** The user wants Claude (as coach) to read the training log daily and weekly. The data was only on the phone.
+A text/plain POST avoids a CORS preflight, so no native code or new APK is needed.
+**Status:** Active
+
 ## #59 · 2026-10-16 · Food removed again
 **Decision:** The Food tab (#56) and the barcode scanner (#58) are removed: Food tab, Home's Food button, the kcal line on
 History cards, the Makrologg import in Settings, `js/food.js`, `js/views/food.js`, `js/vendor/` (ZXing), and the Android

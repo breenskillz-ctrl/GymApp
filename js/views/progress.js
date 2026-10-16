@@ -17,6 +17,7 @@ import {
 import { lineChart, barChart, multiLineChart, stackedBarChart } from '../charts.js';
 import { openExerciseDetail } from './exercises.js';
 import { updateWakeLock } from '../wakelock.js';
+import { sheetUrl, syncStatus, syncSoon, resendAll, onSyncChange } from '../sync.js';
 
 function stats() {
   const days = Object.keys(state.log).filter(dayHasWork).sort();
@@ -345,6 +346,13 @@ export function openSettings(onChange) {
       <label class="btn ghost block file-btn">${icon('camera')} Import progress photos<input type="file" accept="application/json,.json" data-importp hidden></label>
       <label class="btn ghost block file-btn">${icon('import')} Import from GymKeeper (CSV)<input type="file" accept=".csv,text/csv" data-gk hidden></label>
       <button class="btn danger block" data-reset>${icon('trash')} Delete all data</button>
+      <h3 class="section-title">Coach (Google Sheets)</h3>
+      <p class="muted small">Sends your workouts and body measurements to your Google Sheet, so Claude can follow your training. Paste the web app address from Apps Script (it ends in /exec).</p>
+      <label>Web app address<input class="input" type="url" data-sheet value="${esc(sheetUrl())}" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <button class="btn primary block" data-sheet-save>Save and send</button>
+      <p class="muted small" data-sync-status>${esc(syncStatus())}</p>
+      <div class="row gap" data-sync-btns ${sheetUrl() ? '' : 'hidden'}><button class="btn ghost sm" data-sync-now>Send now</button>
+        <button class="btn ghost sm" data-sync-all>Send everything again</button></div>
       <h3 class="section-title">About</h3>
       <p class="credit">Exercise photos: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener" style="color:inherit">free-exercise-db</a> (public domain).</p>
     </div>`, {
@@ -369,6 +377,21 @@ export function openSettings(onChange) {
       m.querySelector('[data-auto]').addEventListener('change', (e) => { st.autoRest = e.target.checked; save(); });
       m.querySelector('[data-sound]').addEventListener('change', (e) => { st.sound = e.target.checked; save(); });
       m.querySelector('[data-awake]').addEventListener('change', (e) => { st.keepAwake = e.target.checked; save(); updateWakeLock(); });
+      // Coach sync (DECISIONS #60)
+      const syncEl = m.querySelector('[data-sync-status]');
+      const offSync = onSyncChange(() => { if (syncEl.isConnected) syncEl.textContent = syncStatus(); else offSync(); });
+      m.querySelector('[data-sheet-save]').addEventListener('click', () => {
+        const u = m.querySelector('[data-sheet]').value.trim();
+        if (u && !/^https:\/\/script\.google(usercontent)?\.com\//.test(u)) { toast('The address should start with https://script.google.com/'); return; }
+        st.sheetUrl = u;
+        save();
+        m.querySelector('[data-sync-btns]').hidden = !u;
+        syncEl.textContent = syncStatus();
+        toast(u ? 'Saved. Sending your data…' : 'Coach sync turned off');
+        if (u) syncSoon(300);
+      });
+      m.querySelector('[data-sync-now]').addEventListener('click', () => syncSoon(0));
+      m.querySelector('[data-sync-all]').addEventListener('click', () => { resendAll(); toast('Sending everything again…'); });
       m.querySelector('[data-export]').addEventListener('click', () => downloadBackup());
       m.querySelector('[data-share]')?.addEventListener('click', () => shareBackup());
       // Automatic backup folder, Android app only (DECISIONS #52)

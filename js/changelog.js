@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 41;
+export const APP_VERSION = 42;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 42, date: '2026-10-16', items: [
+    'New in Settings: Coach (Google Sheets). Loadlog can send your workouts and body measurements to your own Google Sheet, so Claude can follow your training.',
+  ] },
   { v: 41, date: '2026-10-16', items: [
     'The Food tab is gone again: Loadlog is about training only.',
     'Home now has Exercise, Programs and History. The bottom bar is Home, Exercise, Programs, History and Progress.',
