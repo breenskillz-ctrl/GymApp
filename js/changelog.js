@@ -2,10 +2,14 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 40;
+export const APP_VERSION = 41;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 41, date: '2026-10-16', items: [
+    'The Food tab is gone again: Loadlog is about training only.',
+    'Home now has Exercise, Programs and History. The bottom bar is Home, Exercise, Programs, History and Progress.',
+  ] },
   { v: 40, date: '2026-10-07', items: [
     'Scanning barcodes works like in Makrologg: the camera opens right away and finds the barcode by itself, also on iPhone.',
     'In the Android app the scanner is built in (update the app to get it). A photo or typing the numbers still works too.',

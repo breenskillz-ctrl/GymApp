@@ -5,8 +5,7 @@ and an Android app (`android-app/`). All data is stored locally on the device.
 
 ## Features
 
-- **Home** as the start page: a greeting and three buttons, Food, Exercise and History, with today's status.
-- **Food log**: calories, protein, carbs and fat per meal, goals, water, Open Food Facts search and barcodes.
+- **Home** as the start page: a greeting and three buttons, Exercise, Programs and History, with their status.
 - **History**: your number of workouts, a pie chart of the muscle groups you train most, and compact workout cards.
 - **Daily workout log.** Change day with the arrows or the calendar. Each exercise card shows its sets as small chips;
   suggested sets have a dashed edge.
@@ -43,8 +42,6 @@ The Android app is built by `.github/workflows/android.yml`.
 
 Exercise photos come from [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (public domain / Unlicense).
 Fonts: Barlow and Barlow Condensed (SIL Open Font License, `fonts/OFL.txt`).
-Barcode reading: [ZXing](https://github.com/zxing-js/library) (`js/vendor/`) and
-[zxing-android-embedded](https://github.com/journeyapps/zxing-android-embedded) in the Android app (Apache License 2.0).
 
 ## Secrets and API keys
 

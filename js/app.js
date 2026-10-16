@@ -10,7 +10,6 @@ import { renderProgress, openSettings, openBodyWeight } from './views/progress.j
 import { renderTimers } from './views/timers.js';
 import { renderHistory } from './views/history.js';
 import { renderRecords } from './views/records.js';
-import { renderFood, shiftFoodDay } from './views/food.js';
 import { renderHome } from './views/home.js';
 import { openProgressPhotos } from './views/photos.js';
 import { requestPersist, autoBackup } from './backup.js';
@@ -37,7 +36,6 @@ const VIEWS = {
   progress: renderProgress,
   timers: renderTimers,
   records: renderRecords,
-  food: renderFood,
   blocks: (el) => renderPrograms(el, { tab: 'blocks' }), // old links: Blocks now lives under Programs
 };
 
@@ -117,7 +115,6 @@ tabbar.addEventListener('click', (e) => {
 });
 
 enableSwipe(document, () => current === 'log');
-enableSwipe(document, () => current === 'food', shiftFoodDay);
 initRestBar();
 initWakeLock();
 

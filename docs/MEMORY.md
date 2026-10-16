@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-08 (v40 published: live barcode scanner)_
+_Last updated: 2026-10-16 (v41 on branch wip-nofood: Food removed, awaiting approval)_
 
 ## About the user
 
@@ -20,6 +20,7 @@ _Last updated: 2026-10-08 (v40 published: live barcode scanner)_
 - Trains with wide, exercise-specific rep ranges (deadlift 1–5, sometimes 10 at lighter weight; bench 1–12; triceps 10–30).
 - Blocks: Russian Squat (and Smolov) must use 100 % of the real 1RM, not a 90 % training max (the user corrected this 2026-09-28).
 - Since 2026-10-07 the start screen is Home (Food / Exercise / History buttons, DECISIONS #57); History keeps the compact cards; the Android back button must never close the app by surprise.
+- Does not want food/calorie tracking in Loadlog (tried it in v39–v40, removed 2026-10-16, DECISIONS #59).
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
@@ -90,6 +91,8 @@ _Last updated: 2026-10-08 (v40 published: live barcode scanner)_
 - [x] Home page with Food / Exercise / History buttons (v39, DECISIONS #57). Published 2026-10-07.
 - [x] Live barcode scanner like Makrologg (v40, DECISIONS #58). Published 2026-10-08; the APK with the native scanner is built by
   android.yml (check the run if the user reports problems).
+- [ ] Food tab and scanner removed again (v41, DECISIONS #59) on local branch `wip-nofood`. The user did not like the food
+  part. Needs the user's OK, then publish; android.yml rebuilds the APK without the camera permission.
 - iPhone (2026-10-08): recommended the Safari home-screen app; a native iOS app needs Apple's 99 USD/year even when free.
   The user asked "what if the app is not sold?" – no decision yet on dropping the paid plan (#54).
       Makrologg repo (breenskillz-ctrl/makrologg, private) was read-only input; its keystore + password are committed there

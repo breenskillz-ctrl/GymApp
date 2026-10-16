@@ -5,6 +5,16 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #59 · 2026-10-16 · Food removed again
+**Decision:** The Food tab (#56) and the barcode scanner (#58) are removed: Food tab, Home's Food button, the kcal line on
+History cards, the Makrologg import in Settings, `js/food.js`, `js/views/food.js`, `js/vendor/` (ZXing), and the Android
+`BarcodeScanPlugin` with its camera permission. Home keeps three buttons: Exercise, Programs, History. The bottom bar is Home,
+Exercise, Programs, History, Progress (Programs is back where Food was). Food data already saved stays untouched in
+`state.food` (and in backups); nothing reads it, so it can come back if the user changes their mind.
+`openModal`'s `onClose` hook stays (generic).
+**Reason:** The user tried it and does not like it: "Gjerne fjern matdelen fra appen. Jeg liker det ikke." (2026-10-16).
+**Status:** Active. Awaiting the user's approval before publishing. Supersedes #56 and #58; changes #57 (Programs replaces Food).
+
 ## #58 · 2026-10-07 · Barcode scanning like Makrologg: live camera
 **Decision:** "Scan barcode" opens the camera straight away and reads the code by itself. In the Android app a native plugin
 (`BarcodeScanPlugin`, zxing-android-embedded 4.3.0, the scanner Makrologg used) opens a full-screen scanner; it needs a new
@@ -14,7 +24,7 @@ EAN, otherwise with ZXing (`js/vendor/zxing.min.js`, @zxing/library 0.21.3, Apac
 always stops. Makrologg's last fallback (AI reading the digits) is not ported (no server, #56).
 **Reason:** The user reported that scanning products did not work like in Makrologg (2026-10-07): v39 only read a photo,
 and only where `BarcodeDetector` exists, which the Android WebView and iPhone lack.
-**Status:** Active. Approved and published in v40 (2026-10-08).
+**Status:** Superseded by #59 (removed 2026-10-16).
 
 ## #57 · 2026-10-07 · Home page with three buttons
 **Decision:** The app starts on a simple Home page: the greeting ("Are you ready to grind, NAME?") and three big buttons,
@@ -37,7 +47,7 @@ own foods, goals and weights. History cards show the day's kcal and protein. Cod
 Not ported: Makrologg's AI features (read a label / estimate a meal from text or a photo); they only worked inside Claude
 and would need a server with an API key. Not ported: Makrologg's own APK self-update.
 **Reason:** The user asked to put "almost the whole" Makrologg app into Loadlog (2026-10-07).
-**Status:** Active. Approved and published in v39 (2026-10-07).
+**Status:** Superseded by #59 (removed 2026-10-16).
 
 ## #55 · 2026-10-04 · The app is called Loadlog
 **Decision:** The visible name is **Loadlog** (page title, manifest, side menu, backup and photo export file names, Android

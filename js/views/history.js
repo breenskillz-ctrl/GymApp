@@ -10,7 +10,6 @@ import { setText } from './exercises.js';
 import { exLabel } from './seteditor.js';
 import { GROUPS, GROUP_COLORS } from '../data.js';
 import { workoutCount } from '../profile.js';
-import { foodSummaryLine } from './food.js';
 
 const PAGE = 25;
 
@@ -121,7 +120,6 @@ function cardHtml(key) {
       ${mins ? `<span>${icon('timer')}${fmtDuration(mins)}</span>` : ''}
       ${sum.vol ? `<span>${icon('dumbbell')}${fmtNum(sum.vol, 0)} ${u}</span>` : `<span>${icon('check')}${sum.sets} sets</span>`}
       <span class="${prs ? 'gold' : ''}">${icon('trophy')}${prs} PR${prs === 1 ? '' : 's'}</span>
-      ${foodSummaryLine(key) ? `<span>${icon('food')}${foodSummaryLine(key)}</span>` : ''}
     </div>
     <div class="h-table"><div class="h-row h-th"><span>Exercise</span><span>Best set</span></div>${rows}</div>
   </article>`;
