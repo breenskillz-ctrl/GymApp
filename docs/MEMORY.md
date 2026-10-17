@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-17 (v43 published: equipment in synced exercise names, DECISIONS #61)_
+_Last updated: 2026-10-17 (v44 built: 12-Week Strength Period block, DECISIONS #62)_
 
 ## About the user
 
@@ -24,6 +24,9 @@ _Last updated: 2026-10-17 (v43 published: equipment in synced exercise names, DE
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
+
+- **v44 (2026-10-17):** built-in block "12-Week Strength Period" (DECISIONS #62). The user's training maxes: bench 130,
+  squat 145 (adjust after the Russian Squat test), deadlift 185, OHP 85. Waiting for the user's OK before publishing.
 
 - **v43 (2026-10-17), published at the user's request:** synced exercise names include the equipment when names are shared (DECISIONS #61).
 

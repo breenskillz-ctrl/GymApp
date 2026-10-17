@@ -34,6 +34,52 @@ const sets531 = (week) => week.map(([pct, reps, amrap]) => ({ pct, reps, ...(amr
 // Smolov Jr: the same four days for three weeks; weeks 2 and 3 add one and two weight steps (5 kg lower body, 2.5 kg upper body)
 const SMOLOV_DAYS = [[6, 70, 6], [7, 75, 5], [8, 80, 4], [10, 85, 3]];
 
+// 12-week strength period (DECISIONS #62): three phases (accumulation 1–4, transmutation 5–8, realization 9–12) for
+// squat, bench, deadlift and overhead press, 4 days A–D with accessories. Week 12 is a test week with three attempts.
+// [sets, % of training max, reps] per week; the percentages give clean 2.5 kg steps from typical training maxes.
+const P12 = {
+  squat: [[[4, 72.5, 6]], [[4, 76, 6]], [[4, 79.5, 5]], [[3, 72.5, 5]], [[5, 83, 4]], [[5, 86, 3]], [[4, 89.5, 3]], [[3, 79.5, 3]],
+    [[3, 93, 2], [1, 98.5, 1]], [[2, 96.5, 2], [1, 101.5, 1]], [[1, 89.5, 1], [3, 79.5, 3]], [[1, 89.5, 1], [1, 100, 1], [1, 107, 1], [1, 114, 1]]],
+  bench: [[[4, 71, 6]], [[4, 75, 6]], [[4, 79, 5]], [[3, 71, 5]], [[5, 82.5, 4]], [[5, 86.5, 3]], [[4, 90.5, 3]], [[3, 79, 3]],
+    [[3, 94, 2], [1, 98, 1]], [[2, 98, 2], [1, 102, 1]], [[1, 92.5, 1], [3, 79, 3]], [[1, 92.5, 1], [1, 100, 1], [1, 106, 1], [1, 109.5, 1]]],
+  pause: [[[3, 67.5, 5]], [[3, 69, 5]], [[3, 71, 5]], [[3, 67.5, 5]], [[4, 73, 4]], [[4, 75, 4]], [[4, 77, 3]], [[3, 71, 3]],
+    [[3, 79, 3]], [[3, 79, 2]], [[3, 67.5, 3]], null],
+  dl: [[[3, 78.5, 5]], [[3, 81, 5]], [[3, 84, 5]], [[3, 75.5, 3]], [[4, 86.5, 3]], [[4, 89, 3]], [[3, 92, 3]], [[2, 81, 3]],
+    [[3, 92, 2], [1, 97.5, 1]], [[2, 100, 1]], [[3, 81, 2]], [[1, 92, 1], [1, 100, 1], [1, 105.5, 1], [1, 111, 1]]],
+  ohp: [[[3, 70.5, 8]], [[3, 73.5, 8]], [[3, 76.5, 6]], [[3, 70.5, 6]], [[4, 79.5, 5]], [[4, 82.5, 5]], [[4, 88, 4]], [[3, 73.5, 5]],
+    [[3, 91, 3]], [[3, 94, 3]], [[3, 76.5, 3]], [[1, 94, 1], [1, 103, 1], [1, 112, 1]]],
+};
+const LIGHT12 = [3, 7, 10]; // weeks 4, 8 and 11: lighter, accessories drop to 2 sets
+const pctItem = (slot, groups, extra = {}) => ({
+  slot, kind: 'pct', ...extra, sets: groups.flatMap(([n, pct, reps]) => S(n, pct, reps)),
+});
+const acc = (ex, sets, reps) => ({ ex, kind: 'normal', sets, reps });
+const A12 = [['romanian-deadlift', 3, 8], ['leg-press', 3, 12], ['leg-curl', 3, 12], ['standing-calf-raise', 3, 12]];
+const B12 = [['smith-incline-press', 3, 8], ['barbell-row', 3, 8]];
+const B12b = [['lat-pulldown', 3, 10], ['lateral-raise', 3, 15], ['triceps-pushdown', 3, 12]];
+const C12 = [['bulgarian-split-squat', 3, 8], ['hip-thrust', 3, 10], ['leg-extension', 3, 12], ['back-extension', 3, 12], ['hanging-leg-raise', 3, 12]];
+const D12 = [['seated-cable-row', 3, 10], ['pull-ups', 3, 8], ['db-curl', 3, 10], ['overhead-triceps-extension', 3, 12], ['reverse-flyes', 3, 15]];
+const accs = (list, w) => list.map(([ex, n, r]) => acc(ex, LIGHT12.includes(w) ? 2 : n, r));
+const TEST = { note: 'Test: first attempt easy, second heavy but safe, third is the record attempt' };
+const STRENGTH12 = P12.squat.map((_, w) => {
+  const test = w === 11;
+  if (test) {
+    return { days: [
+      day('A · Squat test', [pctItem('squat', P12.squat[w], TEST)]),
+      day('B · Bench + press test', [pctItem('bench', P12.bench[w], TEST),
+        pctItem('ohp', P12.ohp[w], { note: 'Only if the shoulder feels 0–2 out of 10' })]),
+      day('C · Deadlift test', [pctItem('dl', P12.dl[w], TEST)]),
+    ] };
+  }
+  return { days: [
+    day('A · Squat', [pctItem('squat', P12.squat[w]), ...accs(A12, w)]),
+    day('B · Bench + press', [pctItem('bench', P12.bench[w]), ...accs(B12, w), pctItem('ohp', P12.ohp[w]), ...accs(B12b, w)]),
+    day('C · Deadlift', [pctItem('dl', P12.dl[w]), ...accs(C12, w)]),
+    day('D · Upper volume', [acc('db-incline-press', LIGHT12.includes(w) ? 2 : 3, 10),
+      pctItem('bench', P12.pause[w], { tags: ['paused'], note: 'Paused: 1–2 s still on the chest' }), ...accs(D12, w)]),
+  ] };
+});
+
 export const BLOCK_TEMPLATES = [
   {
     id: 'bt-russian',
@@ -68,6 +114,19 @@ export const BLOCK_TEMPLATES = [
       days: SMOLOV_DAYS.map(([n, pct, reps], i) => day(`Day ${i + 1}`, main(S(n, pct, reps, { addSteps: w })))),
     })),
   },
+  {
+    id: 'bt-strength-12',
+    base: 100, // percentages of a training max (about 95 % of the best 1RM)
+    name: '12-Week Strength Period',
+    desc: 'Squat, bench, deadlift and overhead press over 12 weeks: volume (weeks 1–4), heavier (5–8), heavy singles and a test in week 12. 4 days A–D with accessories; weeks 4, 8 and 11 are lighter. Enter a training max (about 95 % of your best 1RM) for each lift.',
+    slots: [
+      { key: 'squat', label: 'Squat (day A)', ex: 'squat' },
+      { key: 'bench', label: 'Bench (days B and D)', ex: 'bench-press' },
+      { key: 'dl', label: 'Deadlift (day C)', ex: 'deadlift' },
+      { key: 'ohp', label: 'Overhead press (day B)', ex: 'overhead-press' },
+    ],
+    weeks: STRENGTH12,
+  },
 ];
 
 export const allBlockTemplates = () => [...(state.blockTemplates || []), ...BLOCK_TEMPLATES];
@@ -87,11 +146,12 @@ export function templateLifts(t) {
 function expandItem(item, lifts) {
   const ex = item.slot ? lifts[item.slot] : item.ex;
   if (item.kind !== 'pct') return { ex, kind: 'normal', sets: item.sets || 3, reps: item.reps || 10 };
+  const extra = { ...(item.tags ? { tags: item.tags } : {}), ...(item.note ? { note: item.note } : {}) };
   const sets = Array.isArray(item.sets) ? item.sets
     : Array.from({ length: item.count || 1 }, (_, i) => ({
       pct: item.pct, reps: item.reps, ...(item.amrapLast && i === (item.count || 1) - 1 ? { amrap: true } : {}),
     }));
-  return { ex, kind: 'pct', sets };
+  return { ex, kind: 'pct', sets, ...extra };
 }
 
 // ---------- Running blocks ----------
@@ -171,7 +231,7 @@ export function addBlockWorkout(b, date, w = b.pos.w, d = b.pos.d) {
     }
     const entry = addEntry(date, it.ex, null, false);
     entry.block = { id: b.id, w, d };
-    entry.sets = it.sets.map((s) => ({
+    entry.sets = it.sets.map((s, i) => ({
       w: setWeight(b, it.ex, s),
       r: s.reps,
       t: null,
@@ -179,6 +239,8 @@ export function addBlockWorkout(b, date, w = b.pos.w, d = b.pos.d) {
       done: false,
       lvl: s.pct >= 90 || s.amrap ? 'hard' : 'normal',
       pct: s.pct,
+      ...(it.tags ? { tags: [...it.tags] } : {}),
+      ...(it.note && i === 0 && !s.amrap ? { c: it.note } : {}), // note on the first set only
       ...(s.amrap ? { amrap: true, goal: s.reps, c: 'AMRAP – as many reps as possible' } : {}),
     }));
   }
