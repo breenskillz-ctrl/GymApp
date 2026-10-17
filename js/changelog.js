@@ -7,7 +7,7 @@ const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
   { v: 44, date: '2026-10-17', items: [
-    'New block: 12-Week Strength Period. Squat, bench, deadlift and overhead press with four days A–D, lighter weeks and a test in week 12. Find it under Programs → Blocks.',
+    'New block: 12-Week Strength Period. Squat, bench, deadlift and overhead press with five days A–E, lighter weeks and a test in week 12. Find it under Programs → Blocks.',
   ] },
   { v: 43, date: '2026-10-17', items: [
     'Coach sync: exercises that share a name now include the equipment, for example "Incline Bench Press (Dumbbell)", so barbell and dumbbell work no longer mix in your sheet.',

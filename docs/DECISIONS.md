@@ -6,7 +6,7 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 ---
 
 ## #62 · 2026-10-17 · Built-in "12-Week Strength Period" block
-**Decision:** A built-in block template (`bt-strength-12`) with four slots (squat, bench, deadlift, OHP), 4 days A–D, accessories
+**Decision:** A built-in block template (`bt-strength-12`) with four slots (squat, bench, deadlift, OHP), 5 days A–E (E = accessories only, skippable), accessories
 as normal items, weeks 4/8/11 lighter (accessories 2 sets) and a 3-day test week 12. Percentages are of a training max
 (about 95 % of 1RM, base 100) and chosen so the coach plan's kg values come out exactly. Pct items may carry `tags`
 (pause bench = bench-press tagged `paused`) and a `note` written as the comment on the first set. Each new period is the

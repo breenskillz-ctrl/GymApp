@@ -25,7 +25,7 @@ _Last updated: 2026-10-17 (v44 built: 12-Week Strength Period block, DECISIONS #
 
 ## Current status
 
-- **v44 (2026-10-17):** built-in block "12-Week Strength Period" (DECISIONS #62). The user's training maxes: bench 130,
+- **v44 (2026-10-17):** built-in block "12-Week Strength Period" with 5 days A–E (DECISIONS #62). The user's training maxes: bench 130,
   squat 145 (adjust after the Russian Squat test), deadlift 185, OHP 85. Waiting for the user's OK before publishing.
 
 - **v43 (2026-10-17), published at the user's request:** synced exercise names include the equipment when names are shared (DECISIONS #61).

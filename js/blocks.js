@@ -35,7 +35,7 @@ const sets531 = (week) => week.map(([pct, reps, amrap]) => ({ pct, reps, ...(amr
 const SMOLOV_DAYS = [[6, 70, 6], [7, 75, 5], [8, 80, 4], [10, 85, 3]];
 
 // 12-week strength period (DECISIONS #62): three phases (accumulation 1–4, transmutation 5–8, realization 9–12) for
-// squat, bench, deadlift and overhead press, 4 days A–D with accessories. Week 12 is a test week with three attempts.
+// squat, bench, deadlift and overhead press, 5 days A–E with accessories. Week 12 is a test week with three attempts.
 // [sets, % of training max, reps] per week; the percentages give clean 2.5 kg steps from typical training maxes.
 const P12 = {
   squat: [[[4, 72.5, 6]], [[4, 76, 6]], [[4, 79.5, 5]], [[3, 72.5, 5]], [[5, 83, 4]], [[5, 86, 3]], [[4, 89.5, 3]], [[3, 79.5, 3]],
@@ -59,6 +59,10 @@ const B12 = [['smith-incline-press', 3, 8], ['barbell-row', 3, 8]];
 const B12b = [['lat-pulldown', 3, 10], ['lateral-raise', 3, 15], ['triceps-pushdown', 3, 12]];
 const C12 = [['bulgarian-split-squat', 3, 8], ['hip-thrust', 3, 10], ['leg-extension', 3, 12], ['back-extension', 3, 12], ['hanging-leg-raise', 3, 12]];
 const D12 = [['seated-cable-row', 3, 10], ['pull-ups', 3, 8], ['db-curl', 3, 10], ['overhead-triceps-extension', 3, 12], ['reverse-flyes', 3, 15]];
+// Day E: no main lift, so the heavy lifts are unchanged. Second hit for biceps, calves, side delts and core, a third
+// quad session without spinal load, and shoulder care (face pulls). Skip it with › in a busy week.
+const E12 = [['hack-squat', 3, 10], ['t-bar-row', 3, 10], ['cable-lateral-raise', 3, 15], ['face-pull', 3, 15],
+  ['hammer-curl', 3, 12], ['seated-calf-raise', 3, 15], ['ab-wheel', 3, 10]];
 const accs = (list, w) => list.map(([ex, n, r]) => acc(ex, LIGHT12.includes(w) ? 2 : n, r));
 const TEST = { note: 'Test: first attempt easy, second heavy but safe, third is the record attempt' };
 const STRENGTH12 = P12.squat.map((_, w) => {
@@ -77,6 +81,7 @@ const STRENGTH12 = P12.squat.map((_, w) => {
     day('C · Deadlift', [pctItem('dl', P12.dl[w]), ...accs(C12, w)]),
     day('D · Upper volume', [acc('db-incline-press', LIGHT12.includes(w) ? 2 : 3, 10),
       pctItem('bench', P12.pause[w], { tags: ['paused'], note: 'Paused: 1–2 s still on the chest' }), ...accs(D12, w)]),
+    day('E · Pump + weak points', accs(E12, w)),
   ] };
 });
 
@@ -118,7 +123,7 @@ export const BLOCK_TEMPLATES = [
     id: 'bt-strength-12',
     base: 100, // percentages of a training max (about 95 % of the best 1RM)
     name: '12-Week Strength Period',
-    desc: 'Squat, bench, deadlift and overhead press over 12 weeks: volume (weeks 1–4), heavier (5–8), heavy singles and a test in week 12. 4 days A–D with accessories; weeks 4, 8 and 11 are lighter. Enter a training max (about 95 % of your best 1RM) for each lift.',
+    desc: 'Squat, bench, deadlift and overhead press over 12 weeks: volume (weeks 1–4), heavier (5–8), heavy singles and a test in week 12. 5 days A–E with accessories (E is light and can be skipped in a busy week); weeks 4, 8 and 11 are lighter. Enter a training max (about 95 % of your best 1RM) for each lift.',
     slots: [
       { key: 'squat', label: 'Squat (day A)', ex: 'squat' },
       { key: 'bench', label: 'Bench (days B and D)', ex: 'bench-press' },
