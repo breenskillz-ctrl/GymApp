@@ -5,6 +5,13 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #61 · 2026-10-17 · Coach sync sends the equipment for shared exercise names
+**Decision:** When several exercises share a name (Bench Press, Incline Bench Press, Squat …), `js/sync.js` sends
+"Name (Equipment)", e.g. "Incline Bench Press (Dumbbell)". Unique names are sent as before. The change alters the
+fingerprints, so the affected days are re-sent automatically and the sheet rows are replaced.
+**Reason:** Claude could not tell barbell and dumbbell incline press apart in the sheet (user request).
+**Status:** Active
+
 ## #60 · 2026-10-16 · Coach sync to Google Sheets
 **Decision:** Settings get a "Coach (Google Sheets)" section. With a web app address (`settings.sheetUrl`), `js/sync.js`
 POSTs one record per logged day (done sets: exercise, group, weight, reps, time, distance, level, tags, comment, e1RM)

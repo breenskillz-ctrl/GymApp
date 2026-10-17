@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-16 (v42 published: coach sync to Google Sheets, DECISIONS #60)_
+_Last updated: 2026-10-17 (v43 published: equipment in synced exercise names, DECISIONS #61)_
 
 ## About the user
 
@@ -24,6 +24,8 @@ _Last updated: 2026-10-16 (v42 published: coach sync to Google Sheets, DECISIONS
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
+
+- **v43 (2026-10-17), published at the user's request:** synced exercise names include the equipment when names are shared (DECISIONS #61).
 
 - **v42 (2026-10-16), published after the user's OK:** coach sync to Google Sheets in Settings (`js/sync.js`, DECISIONS #60).
   Tested in headless Chromium with a mocked Apps Script. Next: the user sets up the sheet and sends Claude the link.

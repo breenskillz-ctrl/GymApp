@@ -1,7 +1,7 @@
 // Coach sync (DECISIONS #60): sends workouts and body measurements to the user's Google Sheet through an
 // Apps Script web app (the script lives in the Makrologg repo: data/coach/Kode.gs), so Claude can follow the training.
 // Only records that changed since the last send go out; their fingerprints are kept per device in SYNC_KEY.
-import { state, getExercise } from './store.js';
+import { state, getExercise, allExercises } from './store.js';
 import { e1rm } from './utils.js';
 import { profileName } from './profile.js';
 
@@ -33,6 +33,13 @@ function hash(str) {
 
 const r1 = (n) => Math.round(n * 10) / 10;
 
+// Several exercises share a name (Bench Press with a barbell, dumbbells, Smith …). Add the equipment to those names
+// so the sheet can tell them apart: "Incline Bench Press (Dumbbell)".
+function nameOf(ex) {
+  const shared = allExercises().filter((x) => x.name === ex.name).length > 1;
+  return shared && ex.equip ? `${ex.name} (${ex.equip})` : ex.name;
+}
+
 // One record per logged day and one per body measurement, newest first
 function records() {
   const person = profileName() || 'Me';
@@ -44,7 +51,7 @@ function records() {
       const ex = getExercise(e.ex);
       e.sets.forEach((s) => {
         if (!s.done) { planned++; return; }
-        sets.push([ex.name, ex.group || '', s.w ?? '', s.r ?? '', s.t ?? '', s.d ?? '', s.lvl || '',
+        sets.push([nameOf(ex), ex.group || '', s.w ?? '', s.r ?? '', s.t ?? '', s.d ?? '', s.lvl || '',
           (s.tags || []).join(' '), s.c || '', ex.type === 'wr' && s.w && s.r ? r1(e1rm(s.w, s.r)) : '']);
       });
     }

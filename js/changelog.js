@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 42;
+export const APP_VERSION = 43;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 43, date: '2026-10-17', items: [
+    'Coach sync: exercises that share a name now include the equipment, for example "Incline Bench Press (Dumbbell)", so barbell and dumbbell work no longer mix in your sheet.',
+  ] },
   { v: 42, date: '2026-10-16', items: [
     'New in Settings: Coach (Google Sheets). Loadlog can send your workouts and body measurements to your own Google Sheet, so Claude can follow your training.',
   ] },
