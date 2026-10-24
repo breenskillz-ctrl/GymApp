@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-24 (v45 built: exercise and workout notes, DECISIONS #63)_
+_Last updated: 2026-10-24 (v45 published: exercise and workout notes, DECISIONS #63)_
 
 ## About the user
 
@@ -26,7 +26,7 @@ _Last updated: 2026-10-24 (v45 built: exercise and workout notes, DECISIONS #63)
 ## Current status
 
 - **v45 (2026-10-24):** exercise notes and workout notes (DECISIONS #63). Kode.gs in Makrologg updated to match;
-  the user must paste it and deploy a new version for notes to reach the sheet.
+  the user deployed it (new /exec address, pasted into both apps 2026-10-24). Published at the user's OK.
 
 - **v44 (2026-10-17):** built-in block "12-Week Strength Period" with 5 days A–E (DECISIONS #62). The user's training maxes: bench 130,
   squat 145 (adjust after the Russian Squat test), deadlift 185, OHP 85. Published 2026-10-17 at the user's OK.
