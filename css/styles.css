@@ -208,6 +208,10 @@ textarea.input { resize: vertical; }
 .day-summary { text-align: center; color: var(--muted2); font-size: calc(12px * var(--fs)); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin: 6px 0 8px; }
 .group-tags { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 12px; font-size: calc(15px * var(--fs)); margin-bottom: 14px; }
 .day-comment { display: block; width: 100%; text-align: center; color: var(--text2); padding: 6px 12px 14px; }
+.day-note { display: block; width: 100%; text-align: center; color: var(--muted); font-size: calc(13px * var(--fs)); font-style: italic;
+  margin-top: -8px; padding: 0 16px 14px; white-space: pre-line; }
+.ex-note { display: block; text-align: left; color: var(--muted); font-size: calc(13px * var(--fs)); font-style: italic;
+  margin: -2px 40px 8px 0; white-space: pre-line; }
 
 .ex-card { display: flex; gap: 14px; background: var(--card); border-radius: var(--radius); padding: 12px 4px 14px 12px; margin-bottom: 10px; }
 .thumb {

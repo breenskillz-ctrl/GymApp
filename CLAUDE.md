@@ -82,7 +82,7 @@ android-app/          Android app (Capacitor 8, appId app.loadlog): loads the li
 {
   customExercises: [{ id: 'c-…', name, group, equip, type, desc }],
   customPrograms:  [{ id: 'cp-…', name, desc, level, days, workouts: [{ id, name, exercises: [{ ex, sets, reps }] }] }],
-  log:  { 'YYYY-MM-DD': { title, duration?, entries: [{ id, ex, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, tags?, at?, last?, pct?, amrap?, goal? }] }] } },
+  log:  { 'YYYY-MM-DD': { title, note?, duration?, entries: [{ id, ex, note?, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, tags?, at?, last?, pct?, amrap?, goal? }] }] } },
   body: [{ date: 'YYYY-MM-DD', weight?, chest?, waist?, armL?, armR?, thighL?, thighR? }],
   food?: { … },   // left over from the removed Food tab (v39–v40, DECISIONS #59); nothing reads it, keep it untouched
   profile: { name, username, passHash?, salt?, iterations?, created },   // or profileSkipped: true (DECISIONS #45)

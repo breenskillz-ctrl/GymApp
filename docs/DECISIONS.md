@@ -5,6 +5,15 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #63 · 2026-10-24 · Exercise notes and workout notes
+**Decision:** `entry.note` (one note per exercise in a workout, ⋮ → Add note) and `day.note` (a note for the whole workout,
+day menu → Add workout note). The old day "comment" is `day.title` and is now labelled "Workout name". Notes show in
+italics under the exercise title / workout name. Coach sync sends `note` and `notes: [[exercise, note]]` only when set,
+so days without notes keep their fingerprint and are not re-sent. Kode.gs shows them (plus set tags and comments) in «Økter».
+The old load() migration that moved a legacy `day.note` into `title` and deleted it was removed, since it erased the new notes.
+**Reason:** The user wanted to comment on a whole exercise or workout instead of on every set.
+**Status:** Active
+
 ## #62 · 2026-10-17 · Built-in "12-Week Strength Period" block
 **Decision:** A built-in block template (`bt-strength-12`) with four slots (squat, bench, deadlift, OHP), 5 days A–E (E = accessories only, skippable), accessories
 as normal items, weeks 4/8/11 lighter (accessories 2 sets) and a 3-day test week 12. Percentages are of a training max

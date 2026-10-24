@@ -87,6 +87,7 @@ function entryHtml(entry) {
           <button class="ex-title" data-act="info">${esc(exLabel(ex))}</button>
           <button class="icon-btn" data-act="entry-menu" aria-label="Menu">${icon('more')}</button>
         </div>
+        ${entry.note ? `<button class="ex-note" data-act="entry-note">${esc(entry.note)}</button>` : ''}
         <div class="sets">${entry.sets.map((s, i) => setColHtml(ex, s, i)).join('')}
           <button class="set-col add-chip" data-act="add-set" aria-label="Add set">${icon('plus')}<span>Set</span></button></div>
         ${stalled ? `<div class="stall">No progress in 3 sessions.
@@ -158,8 +159,10 @@ export function renderLog(root) {
     ${entries.length ? `
       <p class="day-summary">${sum.exs} exs · ${sum.sets} sets${sum.vol ? ` · ${fmtNum(sum.vol, 0)} ${state.settings.unit}` : ''}${mins ? ` · ${mins} min` : ''}</p>
       ${day.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
+      ${day.note ? `<button class="day-note" data-act="day-note">${esc(day.note)}</button>` : ''}
       <div class="entries">${entries.map(entryHtml).join('')}</div>` : `
       ${day?.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
+      ${day?.note ? `<button class="day-note" data-act="day-note">${esc(day.note)}</button>` : ''}
       ${emptyDayHtml(logState.date)}`}
     <div class="fab-wrap wide"><button class="add-bar" data-act="add">${icon('plus')}Add exercise</button></div>`;
 
@@ -185,6 +188,8 @@ function onClick(e) {
     case 'day-menu': return openDayMenu();
     case 'records': return openDayRecords();
     case 'comment': return editComment();
+    case 'day-note': return editDayNote();
+    case 'entry-note': return editEntryNote(entry);
     case 'add':
       return openAddSheet(date, (added) => {
         rerender();
@@ -214,10 +219,31 @@ function onClick(e) {
 
 async function editComment() {
   const day = getDay(logState.date);
-  const text = await promptDialog('Comment', day?.title || '', { placeholder: 'E.g. Friday Lower + Hypers' });
+  const text = await promptDialog('Workout name', day?.title || '', { placeholder: 'E.g. Friday Lower + Hypers' });
   if (text == null) return;
   getDay(logState.date, true).title = text;
   cleanupDay(logState.date);
+  save();
+  rerender();
+}
+
+// A note for the whole workout (how it went, sleep, food …), separate from the workout name
+async function editDayNote() {
+  const day = getDay(logState.date);
+  const text = await promptDialog('Workout note', day?.note || '', { placeholder: 'E.g. Tired after a long shift, little food', multiline: true });
+  if (text == null) return;
+  const d = getDay(logState.date, true);
+  if (text) d.note = text; else delete d.note;
+  cleanupDay(logState.date);
+  save();
+  rerender();
+}
+
+// A note for one exercise in this workout, instead of the same comment on every set
+async function editEntryNote(entry) {
+  const text = await promptDialog(`Note · ${exLabel(getExercise(entry.ex))}`, entry.note || '', { placeholder: 'E.g. Beltless, shoulder 0/10', multiline: true });
+  if (text == null) return;
+  if (text) entry.note = text; else delete entry.note;
   save();
   rerender();
 }
@@ -265,19 +291,23 @@ function removeEntry(entry) {
 async function openDayMenu() {
   const key = logState.date;
   const day = getDay(key);
-  const items = [{ value: 'comment', label: day?.title ? 'Edit comment' : 'Add comment', icon: 'comment' }];
+  const items = [
+    { value: 'comment', label: day?.title ? 'Rename workout' : 'Name workout', icon: 'edit' },
+    { value: 'note', label: day?.note ? 'Edit workout note' : 'Add workout note', icon: 'comment' },
+  ];
   if (key !== dateKey()) items.push({ value: 'today', label: 'Go to today', icon: 'calendar' });
   if (day?.entries.length && key !== dateKey()) items.push({ value: 'copy', label: 'Copy workout to today', icon: 'copy' });
   if (day?.entries.length) items.push({ value: 'clear', label: 'Clear this day', icon: 'trash', danger: true });
   const v = await menuDialog(null, items);
   if (v === 'comment') editComment();
+  if (v === 'note') editDayNote();
   if (v === 'today') goToDate(dateKey());
   if (v === 'copy') {
     copyToToday(key);
     goToDate(dateKey());
     toast('Copied to today – tap a set to log it');
   }
-  if (v === 'clear' && await confirmDialog('Remove all exercises and the comment from this day?', 'Clear')) {
+  if (v === 'clear' && await confirmDialog('Remove all exercises, the name and the note from this day?', 'Clear')) {
     delete state.log[key];
     save();
     rerender();
@@ -289,6 +319,7 @@ async function openEntryMenu(entry) {
   const day = getDay(logState.date);
   const idx = day.entries.indexOf(entry);
   const items = [{ value: 'info', label: 'History and records', icon: 'chart' }];
+  items.push({ value: 'note', label: entry.note ? 'Edit note' : 'Add note', icon: 'comment' });
   if (plannedSets(entry).length) items.push({ value: 'logall', label: 'Log all as suggested', icon: 'check' });
   if (ex.type === 'wr') items.push({ value: 'warmup', label: 'Add warm-up sets', icon: 'up' });
   items.push({ value: 'range', label: progressionText(ex.id), icon: 'settings' });
@@ -298,6 +329,7 @@ async function openEntryMenu(entry) {
   items.push({ value: 'del', label: 'Remove from day', icon: 'trash', danger: true });
   const a = await menuDialog(exLabel(ex), items);
   if (a === 'info') openExerciseDetail(entry.ex);
+  if (a === 'note') editEntryNote(entry);
   if (a === 'logall') logAll(entry);
   if (a === 'warmup') addWarmups(entry);
   if (a === 'range') {

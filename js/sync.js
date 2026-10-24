@@ -55,10 +55,15 @@ function records() {
           (s.tags || []).join(' '), s.c || '', ex.type === 'wr' && s.w && s.r ? r1(e1rm(s.w, s.r)) : '']);
       });
     }
-    if (!sets.length && !planned) continue;
+    if (!sets.length && !planned && !day.note) continue;
     const times = (day.entries || []).flatMap((e) => e.sets.filter((s) => s.done && s.at).map((s) => s.at));
     const min = day.duration || (times.length > 1 ? Math.round((Math.max(...times) - Math.min(...times)) / 60000) : '');
-    out.push({ t: 'workout', pid: PID, person, date, title: day.title || '', min, unit: state.settings.unit, planned, sets });
+    // Notes are only added when there are any, so days without notes keep their fingerprint and are not re-sent
+    const notes = (day.entries || []).filter((e) => e.note).map((e) => [nameOf(getExercise(e.ex)), e.note]);
+    out.push({
+      t: 'workout', pid: PID, person, date, title: day.title || '', min, unit: state.settings.unit, planned, sets,
+      ...(day.note ? { note: day.note } : {}), ...(notes.length ? { notes } : {}),
+    });
   }
   for (const b of state.body || []) {
     if (!b?.date) continue;

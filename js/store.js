@@ -7,8 +7,8 @@ const KEY = 'gymapp.v1';
 const defaults = () => ({
   customExercises: [],
   customPrograms: [],
-  // { 'YYYY-MM-DD': { title, entries: [{ id, ex, sets: [{ w, r, t, d, done, lvl, c }] }] } }
-  // title = the day comment. done = performed (planned sets have done: false). lvl = intensity level id.
+  // { 'YYYY-MM-DD': { title, note?, entries: [{ id, ex, note?, sets: [{ w, r, t, d, done, lvl, c }] }] } }
+  // title = the workout name, note = a note for the whole workout. done = performed (planned sets have done: false). lvl = intensity level id.
   log: {},
   body: [], // [{ date, weight?, chest?, waist?, armL?, armR?, thighL?, thighR? }]
   favorites: [], // exercise ids marked with ★
@@ -89,8 +89,8 @@ function migrate() {
   for (const day of Object.values(state.log)) {
     splitRackPulls(day);
     tagSetsFromNotes(day);
-    if (!day.title && day.note) day.title = day.note;
-    delete day.note;
+    // day.note was the old name of the day comment (now title) and was migrated long ago; since v45 it is the
+    // workout note (DECISIONS #63), so it is kept as it is
     const emptied = new Set();
     for (const e of day.entries) {
       // Logged sets without any numbers (e.g. empty 0 × 0 sets from an early CSV import) are dropped
@@ -196,7 +196,7 @@ export function getDay(key, create = false) {
 
 export function cleanupDay(key) {
   const d = state.log[key];
-  if (d && !d.entries.length && !d.title) delete state.log[key];
+  if (d && !d.entries.length && !d.title && !d.note) delete state.log[key];
 }
 
 export function dayHasWork(key) {
