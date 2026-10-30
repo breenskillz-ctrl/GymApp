@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-24 (v45 published: exercise and workout notes, DECISIONS #63)_
+_Last updated: 2026-10-30 (v46 built: 12-week block takes the real 1RM, DECISIONS #64)_
 
 ## About the user
 
@@ -24,6 +24,8 @@ _Last updated: 2026-10-24 (v45 published: exercise and workout notes, DECISIONS 
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
+
+- **v46 (2026-10-30):** 12-week block takes the real 1RM, base 95 % (DECISIONS #64). Old blocks converted with the same weights.
 
 - **v45 (2026-10-24):** exercise notes and workout notes (DECISIONS #63). Kode.gs in Makrologg updated to match;
   the user deployed it (new /exec address, pasted into both apps 2026-10-24). Published at the user's OK.

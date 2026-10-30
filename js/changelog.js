@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 45;
+export const APP_VERSION = 46;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 46, date: '2026-10-30', items: [
+    '12-Week Strength Period: enter your real 1RM for each lift. The block works out the training weights from 95 % of it. A block you already started keeps exactly the same weights; it now shows your 1RM instead of the training max.',
+  ] },
   { v: 45, date: '2026-10-24', items: [
     'Notes for a whole exercise: ⋮ on the exercise → Add note. Handy for "beltless" or "shoulder 0/10" without typing it on every set.',
     'Notes for the whole workout: ⋮ at the top → Add workout note. The old "comment" is now called the workout name.',

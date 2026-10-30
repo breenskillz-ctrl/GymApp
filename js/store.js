@@ -74,6 +74,13 @@ function migrate() {
   for (const b of state.blocks || []) {
     if (['bt-russian', 'bt-smolov-jr'].includes(b.templateId) && b.base === 90 && !b.baseChecked) b.base = 100;
     b.baseChecked = true;
+    // The 12-week block used to take a training max at base 100 %; it now takes the real 1RM at base 95 % (DECISIONS #64).
+    // Old blocks are converted so every planned weight stays the same: 1RM = training max ÷ 0.95.
+    if (b.templateId === 'bt-strength-12' && b.base === 100 && !b.rmBase) {
+      for (const id of Object.keys(b.maxes || {})) b.maxes[id] = Math.round((b.maxes[id] / 0.95) * 2) / 2;
+      b.base = 95;
+    }
+    if (b.templateId === 'bt-strength-12') b.rmBase = true;
   }
   // Body measurements: arm and thigh are now measured per side (DECISIONS #33); a single old value becomes the right side
   for (const b of state.body || []) {

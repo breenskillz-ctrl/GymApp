@@ -5,6 +5,14 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #64 · 2026-10-30 · 12-week block takes the real 1RM (base 95 %)
+**Decision:** `bt-strength-12` now has `base: 95`: the user enters the real 1RM and the block works from a 95 % training max.
+Blocks started earlier (base 100 with a training max) are converted once in `migrate()`: maxes ÷ 0.95 (rounded to 0.5),
+base 95, so every planned weight stays the same. New blocks get `rmBase: true` so the conversion never touches them.
+**Reason:** The user did not want to work out a training max himself; with a training max typed as the 1RM, the test week
+came out about 5 % too heavy (e.g. 222.5 deadlift from 200).
+**Status:** Active. Changes #62 (base 100).
+
 ## #63 · 2026-10-24 · Exercise notes and workout notes
 **Decision:** `entry.note` (one note per exercise in a workout, ⋮ → Add note) and `day.note` (a note for the whole workout,
 day menu → Add workout note). The old day "comment" is `day.title` and is now labelled "Workout name". Notes show in

@@ -121,9 +121,9 @@ export const BLOCK_TEMPLATES = [
   },
   {
     id: 'bt-strength-12',
-    base: 100, // percentages of a training max (about 95 % of the best 1RM)
+    base: 95, // the percentages are of a training max = 95 % of the real 1RM the user enters (DECISIONS #64)
     name: '12-Week Strength Period',
-    desc: 'Squat, bench, deadlift and overhead press over 12 weeks: volume (weeks 1–4), heavier (5–8), heavy singles and a test in week 12. 5 days A–E with accessories (E is light and can be skipped in a busy week); weeks 4, 8 and 11 are lighter. Enter a training max (about 95 % of your best 1RM) for each lift.',
+    desc: 'Squat, bench, deadlift and overhead press over 12 weeks: volume (weeks 1–4), heavier (5–8), heavy singles and a test in week 12. 5 days A–E with accessories (E is light and can be skipped in a busy week); weeks 4, 8 and 11 are lighter. Enter your real 1RM for each lift; the block works from 95 % of it.',
     slots: [
       { key: 'squat', label: 'Squat (day A)', ex: 'squat' },
       { key: 'bench', label: 'Bench (days B and D)', ex: 'bench-press' },
@@ -172,6 +172,7 @@ export function createBlock(template, { name, lifts, maxes, base }) {
     pos: { w: 0, d: 0 },
     started: dateKey(),
     finished: false,
+    rmBase: true, // maxes are real 1RMs (see migrate() in store.js)
   };
   state.blocks.unshift(block);
   save();

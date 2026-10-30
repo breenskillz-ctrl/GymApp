@@ -134,7 +134,7 @@ function maxesForm(lifts, maxes, base) {
         <label class="max-input">1RM (${u})<input class="input" name="max-${esc(l.key)}" inputmode="decimal" value="${maxes[l.ex] ?? ''}" placeholder="e.g. 150"></label>
       </div>`).join('')}
     <label>Base: % of 1RM to calculate from<input class="input" name="base" type="number" inputmode="numeric" min="50" max="110" value="${base}"></label>
-    <p class="sub">100 % = your real 1RM (Russian Squat, Smolov Jr.). 5/3/1 uses a 90 % training max.</p>`;
+    <p class="sub">Enter your real 1RM. Base 100 % = work from the 1RM itself (Russian Squat, Smolov Jr.); 5/3/1 uses a 90 % and the 12-week block a 95 % training max.</p>`;
 }
 
 function openStartDialog(t) {
