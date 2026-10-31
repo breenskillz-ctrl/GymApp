@@ -342,17 +342,20 @@ export function setVolume(s) {
 
 export function records(exId) {
   const ex = getExercise(exId);
-  const rec = { maxW: null, maxR: null, best1rm: null, maxVol: null, maxT: null, maxD: null, sessions: 0 };
+  // maxW = heaviest weight actually lifted (most reps wins a tie), single = heaviest set of exactly 1 rep,
+  // best1rm = best estimated 1RM with the set it came from (DECISIONS #65)
+  const rec = { maxW: null, maxR: null, best1rm: null, single: null, maxVol: null, maxT: null, maxD: null, sessions: 0 };
   for (const h of history(exId)) {
     rec.sessions++;
     let vol = 0;
     for (const s of h.sets) {
-      if (s.w != null && (!rec.maxW || s.w > rec.maxW.v)) rec.maxW = { v: s.w, r: s.r, date: h.date };
+      if (s.w != null && (!rec.maxW || s.w > rec.maxW.v || (s.w === rec.maxW.v && (s.r || 0) > (rec.maxW.r || 0)))) rec.maxW = { v: s.w, r: s.r, date: h.date };
+      if (s.w && s.r === 1 && (!rec.single || s.w > rec.single.v)) rec.single = { v: s.w, date: h.date };
       if (s.r != null && (!rec.maxR || s.r > rec.maxR.v)) rec.maxR = { v: s.r, date: h.date };
       if (s.t != null && (!rec.maxT || s.t > rec.maxT.v)) rec.maxT = { v: s.t, date: h.date };
       if (s.d != null && (!rec.maxD || s.d > rec.maxD.v)) rec.maxD = { v: s.d, date: h.date };
       const one = e1rm(s.w, s.r);
-      if (one && (!rec.best1rm || one > rec.best1rm.v)) rec.best1rm = { v: one, date: h.date };
+      if (one && (!rec.best1rm || one > rec.best1rm.v)) rec.best1rm = { v: one, w: s.w, r: s.r, date: h.date };
       vol += setVolume(s);
     }
     if (ex.type === 'wr' && vol && (!rec.maxVol || vol > rec.maxVol.v)) rec.maxVol = { v: vol, date: h.date };

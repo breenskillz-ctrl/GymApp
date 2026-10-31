@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 46;
+export const APP_VERSION = 47;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 47, date: '2026-10-31', items: [
+    'Personal records now show what you actually lifted first: the heaviest lift with reps and date, and your best single (1RM) when you have done one. The estimated 1RM shows which set it came from.',
+  ] },
   { v: 46, date: '2026-10-30', items: [
     '12-Week Strength Period: enter your real 1RM for each lift. The block works out the training weights from 95 % of it. A block you already started keeps exactly the same weights; it now shows your 1RM instead of the training max.',
   ] },

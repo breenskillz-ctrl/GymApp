@@ -5,6 +5,13 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #65 · 2026-10-31 · Personal records lead with actual lifts
+**Decision:** The exercise detail's record tiles show, in order: Heaviest lift (weight × reps, date; most reps wins a tie),
+Best single (1RM) when a 1-rep set exists, Est. 1RM with the set it came from and the date, Best volume (date), Sessions.
+`records()` adds `single` and stores `w`/`r` on `best1rm`. The day's records dialog also leads with the heaviest lift.
+**Reason:** The user wanted his real max weight shown, not only an estimate.
+**Status:** Active
+
 ## #64 · 2026-10-30 · 12-week block takes the real 1RM (base 95 %)
 **Decision:** `bt-strength-12` now has `base: 95`: the user enters the real 1RM and the block works from a 95 % training max.
 Blocks started earlier (base 100 with a training max) are converted once in `migrate()`: maxes ÷ 0.95 (rounded to 0.5),

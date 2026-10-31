@@ -100,9 +100,13 @@ export function openExerciseDetail(id, onChange) {
 
   const recTiles = [];
   if (ex.type === 'wr') {
-    recTiles.push(['Est. 1RM', rec.best1rm ? `${fmtNum(rec.best1rm.v)} ${u}` : '–']);
-    recTiles.push(['Heaviest', rec.maxW ? `${fmtNum(rec.maxW.v, 2)} ${u}` : '–']);
-    recTiles.push(['Best volume', rec.maxVol ? `${fmtNum(rec.maxVol.v, 0)} ${u}` : '–']);
+    // Actual lifts first, then the estimate (DECISIONS #65)
+    const when = (r) => fmtDate(r.date, false);
+    recTiles.push(['Heaviest lift', rec.maxW ? `${fmtNum(rec.maxW.v, 2)} ${u}${rec.maxW.r ? ` × ${rec.maxW.r}` : ''}` : '–', rec.maxW && when(rec.maxW)]);
+    if (rec.single) recTiles.push(['Best single (1RM)', `${fmtNum(rec.single.v, 2)} ${u}`, when(rec.single)]);
+    recTiles.push(['Est. 1RM', rec.best1rm ? `${fmtNum(rec.best1rm.v)} ${u}` : '–',
+      rec.best1rm && `from ${fmtNum(rec.best1rm.w, 2)} × ${rec.best1rm.r} · ${when(rec.best1rm)}`]);
+    recTiles.push(['Best volume', rec.maxVol ? `${fmtNum(rec.maxVol.v, 0)} ${u}` : '–', rec.maxVol && when(rec.maxVol)]);
   } else if (ex.type === 'r') {
     recTiles.push(['Most reps', rec.maxR ? rec.maxR.v : '–']);
   } else if (ex.type === 't') {
@@ -130,7 +134,7 @@ export function openExerciseDetail(id, onChange) {
         <span class="title">${esc(progressionText(ex.id))}</span>
         <span class="sub">Exercise settings: ${hasRange(ex) ? 'rep range, weight step and ' : ''}rest time</span></span>${icon('edit')}</button>
       <h3 class="section-title">Personal records</h3>
-      <div class="tiles">${recTiles.map(([l, v]) => `<div class="tile"><span class="tile-val">${v}</span><span class="tile-label">${l}</span></div>`).join('')}</div>
+      <div class="tiles">${recTiles.map(([l, v, sub]) => `<div class="tile"><span class="tile-val">${v}</span><span class="tile-label">${l}</span>${sub ? `<span class="tile-sub">${esc(sub)}</span>` : ''}</div>`).join('')}</div>
       <h3 class="section-title">Progress</h3>
       <div class="seg" data-metrics>${metrics.map(([k, l], i) => `<button class="${i ? '' : 'active'}" data-metric="${k}">${l}</button>`).join('')}</div>
       <div class="chart-box"><canvas></canvas></div>

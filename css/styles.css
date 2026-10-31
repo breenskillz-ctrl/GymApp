@@ -196,6 +196,7 @@ textarea.input { resize: vertical; }
 .modal .tile { background: var(--card2); }
 .tile-val { font-size: calc(20px * var(--fs)); font-weight: 700; }
 .tile-label { font-size: calc(12px * var(--fs)); color: var(--muted); }
+.tile-sub { font-size: calc(11px * var(--fs)); color: var(--muted); opacity: .8; }
 .chart-box { width: 100%; margin: 6px 0; }
 .chart-box canvas { display: block; }
 .hbar { display: flex; align-items: center; gap: 10px; margin: 7px 0; font-size: calc(13px * var(--fs)); }

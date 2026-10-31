@@ -369,7 +369,7 @@ function openDayRecords() {
     const rec = records(e.ex);
     const newPR = e.sets.some((s) => s.done && isPR(e.ex, logState.date, s));
     let best = 'No records yet';
-    if (ex.type === 'wr' && rec.best1rm) best = `Est. 1RM ${fmtNum(rec.best1rm.v, 1)} ${u} · heaviest ${fmtNum(rec.maxW.v, 2)} ${u}`;
+    if (ex.type === 'wr' && rec.best1rm) best = `Heaviest ${fmtNum(rec.maxW.v, 2)} ${u}${rec.maxW.r ? ` × ${rec.maxW.r}` : ''} · est. 1RM ${fmtNum(rec.best1rm.v, 1)} ${u}`;
     else if (ex.type === 'r' && rec.maxR) best = `Most reps: ${rec.maxR.v}`;
     else if (ex.type === 't' && rec.maxT) best = `Longest: ${fmtTime(rec.maxT.v)}`;
     else if (ex.type === 'dt' && rec.maxD) best = `Longest: ${fmtNum(rec.maxD.v, 2)} km`;

@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-31 (v46 published: 12-week block takes the real 1RM, DECISIONS #64)_
+_Last updated: 2026-10-31 (v47 built: records lead with actual lifts, DECISIONS #65)_
 
 ## About the user
 
@@ -24,6 +24,8 @@ _Last updated: 2026-10-31 (v46 published: 12-week block takes the real 1RM, DECI
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
+
+- **v47 (2026-10-31):** record tiles show heaviest lift × reps + date, best single, est. 1RM with its source set (DECISIONS #65).
 
 - **v46 (2026-10-30):** 12-week block takes the real 1RM, base 95 % (DECISIONS #64). Old blocks converted with the same weights. Published 2026-10-31 at the user's OK.
 
