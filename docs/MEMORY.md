@@ -26,6 +26,7 @@ _Last updated: 2026-11-03 (v47 + v48 published: records and 12-week block main l
 ## Current status
 
 - **v48 (2026-11-03):** 12-week block = main lifts only, Mon squat / Tue bench / Wed deadlift / Fri light paused/high-bar squat / Sat paused bench + press + light beltless deadlift (DECISIONS #66). User runs his own Hybrid PPL program for accessories.
+- 2026-11-03: coach scheduled tasks (daily + weekly) now use the v48 day mapping and a %-table of the block; the plan doc's A–E table is outdated.
 
 - **v47 (2026-10-31):** record tiles show heaviest lift × reps + date, best single, est. 1RM with its source set (DECISIONS #65).
 
