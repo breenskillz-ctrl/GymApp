@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-11-03 (v50 built: optional plan mode with check boxes, DECISIONS #68; waiting for OK to publish)_
+_Last updated: 2026-11-03 (v50 published: optional plan mode with check boxes, DECISIONS #68)_
 
 ## About the user
 
