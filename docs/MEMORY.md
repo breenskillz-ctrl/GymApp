@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-11-03 (v47 + v48 published: records and 12-week block main lifts only on the PPL week, DECISIONS #65, #66)_
+_Last updated: 2026-11-03 (v49 built: block days in any order, DECISIONS #67; not published yet)_
 
 ## About the user
 
@@ -25,6 +25,7 @@ _Last updated: 2026-11-03 (v47 + v48 published: records and 12-week block main l
 
 ## Current status
 
+- **v49 (2026-11-03):** block days can be done in any order: schedule → add / mark done / undo; next = first day not done (DECISIONS #67).
 - **v48 (2026-11-03):** 12-week block = main lifts only, Mon squat / Tue bench / Wed deadlift / Fri light paused/high-bar squat / Sat paused bench + press + light beltless deadlift (DECISIONS #66). User runs his own Hybrid PPL program for accessories.
 - 2026-11-03: coach scheduled tasks (daily + weekly) now use the v48 day mapping and a %-table of the block; the plan doc's A–E table is outdated.
 

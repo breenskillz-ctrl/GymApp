@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 48;
+export const APP_VERSION = 49;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 49, date: '2026-11-03', items: [
+    'Blocks: do the days in any order. In the schedule, tap any day to add it to today, mark it done without logging it, or undo it. Done days show a tick and the date, and the next day is the first one you have not done. Removing a block exercise from a workout opens that day again.',
+  ] },
   { v: 48, date: '2026-11-03', items: [
     '12-Week Strength Period is now main lifts only, on a Mon–Sat week: Mon squat, Tue bench, Wed heavy deadlift, Fri light paused or high-bar squat, Sat paused bench, overhead press and a light beltless deadlift. Add your own accessories from your program. A block you already started keeps its week, day and weights.',
   ] },

@@ -1,11 +1,12 @@
 // Blocks page: running blocks (position, next workout, schedule) and templates to start from (DECISIONS #23).
 import { state, save, getExercise, bestE1rmOf } from '../store.js';
 import {
-  esc, icon, openModal, topBar, toast, go, menuDialog, confirmDialog, dateKey, num, fmtNum,
+  esc, icon, openModal, topBar, toast, go, menuDialog, confirmDialog, dateKey, num, fmtNum, fmtDate,
 } from '../utils.js';
 import {
-  allBlockTemplates, getBlockTemplate, templateLifts, createBlock, blockSize, blockIndex, moveBlock, addBlockWorkout,
-  dayText, bestSince, setWeight, templateBase, amrapResults,
+  allBlockTemplates, getBlockTemplate, templateLifts, createBlock, blockSize, blockDoneCount, addBlockWorkout,
+  dayText, bestSince, setWeight, templateBase, amrapResults, syncBlocks, loggedDays, isMarked, markDay,
+  removeLoggedDay, restartBlock,
 } from '../blocks.js';
 import { goToDate } from './log.js';
 import { openExercisePicker } from './picker.js';
@@ -17,6 +18,7 @@ const redraw = () => renderBlocks(rootEl, { embedded });
 
 // Compact cards for running blocks, shown at the top of Programs and in the "From program" sheet
 export function activeBlocksHtml() {
+  syncBlocks();
   const running = state.blocks.filter((b) => !b.finished);
   if (!running.length) return '';
   return `<h3 class="section-title">Active blocks</h3>${running.map((b) => {
@@ -45,14 +47,14 @@ export function onBannerClick(e, date, onAdded) {
 
 function blockCard(b) {
   const size = blockSize(b);
-  const done = b.finished ? size : blockIndex(b);
+  const done = blockDoneCount(b);
   const lifts = Object.entries(b.maxes).map(([id, max]) => `${esc(getExercise(id).name)} ${fmtNum(max, 1)} ${state.settings.unit}`).join(' · ');
   const next = b.weeks[b.pos.w].days[b.pos.d];
   return `
     <section class="card block-card" data-block="${esc(b.id)}">
       <div class="row between">
         <div class="grow"><span class="title">${esc(b.name)}</span>
-          <span class="sub">${b.finished ? 'Finished' : `Week ${b.pos.w + 1} of ${b.weeks.length} · Day ${b.pos.d + 1} of ${b.weeks[b.pos.w].days.length}`}</span></div>
+          <span class="sub">${b.finished ? 'Finished' : `Week ${b.pos.w + 1} of ${b.weeks.length} · Day ${b.pos.d + 1} of ${b.weeks[b.pos.w].days.length} · ${done} of ${size} done`}</span></div>
         <button class="icon-btn" data-bact="menu" aria-label="Block menu">${icon('more')}</button>
       </div>
       <div class="bar"><span style="width:${(done / size) * 100}%"></span></div>
@@ -62,7 +64,7 @@ function blockCard(b) {
         <button class="btn primary block" data-bact="finish">Update 1RM</button>` : `
         <p class="block-next"><span class="muted">Next:</span> ${esc(next.name)} – ${esc(dayText(b, next))}</p>
         <button class="btn primary block" data-bact="next">${icon('plus')} Add next workout to today</button>`}
-      <button class="btn ghost block" data-bact="schedule">${icon('calendar')} Schedule</button>
+      <button class="btn ghost block" data-bact="schedule">${icon('calendar')} Schedule – pick, add or undo days</button>
     </section>`;
 }
 
@@ -70,6 +72,7 @@ function blockCard(b) {
 export function renderBlocks(root, opts = {}) {
   rootEl = root;
   embedded = !!opts.embedded;
+  syncBlocks();
   const running = state.blocks;
   root.innerHTML = `
     ${embedded ? '' : topBar('Blocks', `<button class="icon-btn" data-act="new" aria-label="New block template">${icon('plus')}</button>`)}
@@ -107,14 +110,14 @@ async function blockMenu(b) {
   const tpl = getBlockTemplate(b.templateId);
   const items = [
     { value: 'skip', label: 'Skip next day', icon: 'right' },
-    { value: 'back', label: 'Go back one day', icon: 'left' },
+    { value: 'schedule', label: 'Pick or undo days', icon: 'calendar' },
     { value: 'maxes', label: 'Edit 1RM and base %', icon: 'edit' },
   ];
   if (tpl && !tpl.slots) items.push({ value: 'tpl', label: 'Edit template', icon: 'list' });
   items.push({ value: 'del', label: 'Remove block', icon: 'trash', danger: true });
   const v = await menuDialog(b.name, items);
-  if (v === 'skip') { moveBlock(b, 1); redraw(); }
-  if (v === 'back') { moveBlock(b, -1); redraw(); }
+  if (v === 'skip') { markDay(b, b.pos.w, b.pos.d, true); redraw(); }
+  if (v === 'schedule') openSchedule(b);
   if (v === 'maxes') openMaxesDialog(b);
   if (v === 'tpl') openBlockEditor(tpl, redraw);
   if (v === 'del' && await confirmDialog(`Remove "${b.name}"? Workouts you already logged are kept.`, 'Remove')) {
@@ -215,11 +218,7 @@ function openMaxesDialog(b, title = 'Edit 1RM', suggested = null, note = '') {
           if (v) b.maxes[l.ex] = v;
         }
         b.base = Number(f.get('base')) || b.base;
-        if (f.get('restart')) {
-          b.pos = { w: 0, d: 0 };
-          b.finished = false;
-          b.started = dateKey();
-        }
+        if (f.get('restart')) restartBlock(b);
         save();
         close();
         toast('Saved');
@@ -249,15 +248,17 @@ function openFinishDialog(b) {
   openMaxesDialog(b, 'Update 1RM', suggested);
 }
 
-// The whole block as a table: weeks × days, with the calculated weights
+// The whole block as a table: weeks × days, with the calculated weights. Tap a day to add it, mark it or undo it.
 function openSchedule(b) {
   const u = state.settings.unit;
   const named = new Set(b.weeks.flatMap((wk) => wk.days.flatMap((dd) => dd.items.map((i) => i.ex)))).size > 1;
-  const cell = (w, d) => {
+  const cell = (w, d, logged) => {
     const bd = b.weeks[w].days[d];
     const isNext = !b.finished && w === b.pos.w && d === b.pos.d;
-    const past = b.finished || w < b.pos.w || (w === b.pos.w && d < b.pos.d);
-    return `<button class="sched-cell ${isNext ? 'next' : ''} ${past ? 'past' : ''}" data-w="${w}" data-d="${d}">
+    const date = logged[`${w}-${d}`];
+    const marked = !date && isMarked(b, w, d);
+    return `<button class="sched-cell ${isNext ? 'next' : ''} ${date || marked ? 'past' : ''}" data-w="${w}" data-d="${d}">
+      ${date ? `<span class="sc-done">${icon('check')} ${Number(date.slice(8))}.${Number(date.slice(5, 7))}</span>` : marked ? `<span class="sc-done">${icon('check')} Done</span>` : ''}
       ${bd.items.map((it) => {
         const ex = getExercise(it.ex);
         if (it.kind === 'normal') return `<span class="sc-line muted">${esc(ex.name)} ${it.sets}×${it.reps}</span>`;
@@ -271,16 +272,22 @@ function openSchedule(b) {
     </button>`;
   };
   const days = Math.max(...b.weeks.map((w) => w.days.length));
-  // Show exercise names only when the block has more than one exercise
+  // Column heads: the weekday from day names like "Mon · Squat", otherwise "Day N"
+  const head = (i) => {
+    const pre = b.weeks[0].days[i]?.name.split(' · ')[0];
+    return pre && pre.length <= 4 && b.weeks[0].days[i].name.includes(' · ') ? pre : `Day ${i + 1}`;
+  };
+  const grid = () => {
+    const logged = loggedDays(b);
+    return `<span></span>${Array.from({ length: days }, (_, i) => `<span class="sched-h">${esc(head(i))}</span>`).join('')}
+      ${b.weeks.map((wk, w) => `<span class="sched-h">Week ${w + 1}</span>${wk.days.map((_, d) => cell(w, d, logged)).join('')}`).join('')}`;
+  };
   openModal(`
     <div class="modal-head"><h2 class="grow">${esc(b.name)}</h2>
       <button class="icon-btn" data-close aria-label="Close">${icon('close')}</button></div>
-    <p class="sub" style="margin:-8px 0 10px">Weights in ${u}, sets × reps. Tap a day to add it to today.</p>
+    <p class="sub" style="margin:-8px 0 10px">Weights in ${u}, sets × reps. Tap any day to add it, mark it done or undo it. The outlined day is next.</p>
     <div class="scroll">
-      <div class="sched" style="--days:${days}">
-        <span></span>${Array.from({ length: days }, (_, i) => `<span class="sched-h">Day ${i + 1}</span>`).join('')}
-        ${b.weeks.map((wk, w) => `<span class="sched-h">Week ${w + 1}</span>${wk.days.map((_, d) => cell(w, d)).join('')}`).join('')}
-      </div>
+      <div class="sched" style="--days:${days}">${grid()}</div>
     </div>`, {
     className: 'sheet',
     onMount(m, close) {
@@ -289,11 +296,37 @@ function openSchedule(b) {
         if (!c) return;
         const w = Number(c.dataset.w);
         const d = Number(c.dataset.d);
-        if (!await confirmDialog(`Add week ${w + 1}, day ${d + 1} to today? The block continues from the day after it.`, 'Add')) return;
-        addBlockWorkout(b, dateKey(), w, d);
-        close();
-        goToDate(dateKey());
-        go('log');
+        const date = loggedDays(b)[`${w}-${d}`];
+        const marked = !date && isMarked(b, w, d);
+        const bd = b.weeks[w].days[d];
+        const items = [{ value: 'add', label: 'Add to today', icon: 'plus' }];
+        if (date) {
+          items.push({ value: 'open', label: `Open workout · ${fmtDate(date, false)}`, icon: 'right' });
+          items.push({ value: 'unlog', label: 'Remove from the log', icon: 'trash', danger: true });
+        } else if (marked) {
+          items.push({ value: 'unmark', label: 'Mark as not done', icon: 'close' });
+        } else {
+          items.push({ value: 'mark', label: 'Mark as done (without logging)', icon: 'check' });
+        }
+        const v = await menuDialog(`Week ${w + 1} · ${bd.name}`, items, dayText(b, bd));
+        if (!v) return;
+        if (v === 'add') {
+          addBlockWorkout(b, dateKey(), w, d);
+          close();
+          goToDate(dateKey());
+          go('log');
+          toast('Block workout added – tap a set to log it');
+          return;
+        }
+        if (v === 'open') { close(); goToDate(date); go('log'); return; }
+        if (v === 'unlog') {
+          if (!await confirmDialog(`Remove the block sets for week ${w + 1}, day ${d + 1} from ${fmtDate(date, false)}? Other exercises that day are kept.`, 'Remove')) return;
+          removeLoggedDay(b, w, d);
+        }
+        if (v === 'mark') markDay(b, w, d, true);
+        if (v === 'unmark') markDay(b, w, d, false);
+        m.querySelector('.sched').innerHTML = grid();
+        if (rootEl?.isConnected) redraw();
       });
     },
   });

@@ -5,6 +5,17 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #67 · 2026-11-03 · Block days can be done in any order
+**Decision:** A block no longer steps through a fixed position. A day is done when its sets are in the log (entries with
+`block: { id, w, d }`) or when the user marked it done without logging (`b.marked: ['w-d']`). `syncBlock()` sets `b.pos`
+to the first day that is not done and `b.finished` when none is left; it runs at startup and when block views render.
+Removing a block exercise from the log makes that day open again. Schedule: tap any day → Add to today / Open workout /
+Remove from the log / Mark as done / Mark as not done; done days show ✓ and the date. "Go back one day" is gone; "Skip next
+day" marks it done. Restart sets `b.since` (logs before it don't count) and clears `marked`. On the first run old blocks
+mark every unlogged day before their old position, so nothing moves.
+**Reason:** The user wants to add or remove days he has done or plans to do instead of being forced through them in order.
+**Status:** Active
+
 ## #66 · 2026-11-03 · 12-week block: main lifts only, on the Hybrid PPL week
 **Decision:** `bt-strength-12` holds only the main lifts on five days that match the user's Hybrid PPL program:
 Mon squat (heavy), Tue bench (heavy), Wed heavy deadlift with belt, Fri light paused / high-bar squat (new % table

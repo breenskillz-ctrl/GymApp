@@ -4,7 +4,7 @@
 //   { slot|ex, kind: 'normal', sets: n, reps: r }                       – accessory with normal rep-range suggestions
 // Custom templates store pct items compactly as { count, reps, pct, amrapLast } and are expanded when a block starts.
 import {
-  state, save, getDay, addEntry, getExercise, getProgression, history,
+  state, save, getDay, addEntry, getExercise, getProgression, history, cleanupDay,
 } from './store.js';
 import { uid, e1rm, dateKey } from './utils.js';
 
@@ -182,7 +182,7 @@ function expandItem(item, lifts) {
 }
 
 // ---------- Running blocks ----------
-// block: { id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }
+// block: { id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d } (next day), marked: ['w-d'], started, since?, finished }
 export function createBlock(template, { name, lifts, maxes, base }) {
   const block = {
     id: 'b-' + uid(),
@@ -192,6 +192,7 @@ export function createBlock(template, { name, lifts, maxes, base }) {
     maxes,
     weeks: template.weeks.map((w) => ({ days: w.days.map((d) => ({ name: d.name, items: d.items.map((it) => expandItem(it, lifts)) })) })),
     pos: { w: 0, d: 0 },
+    marked: [], // days done without logging them (see syncBlock)
     started: dateKey(),
     finished: false,
     rmBase: true, // maxes are real 1RMs (see migrate() in store.js)
@@ -206,29 +207,89 @@ export function blockSize(b) {
   return b.weeks.reduce((n, w) => n + w.days.length, 0);
 }
 
-export function blockIndex(b) {
-  let n = 0;
-  for (let w = 0; w < b.pos.w; w++) n += b.weeks[w].days.length;
-  return n + b.pos.d;
+// ---------- Done days (DECISIONS #67) ----------
+// A block day is done when its sets are in the log (entries carry block: { id, w, d }) or when the user marked it
+// done without logging it (b.marked, e.g. skipped or trained elsewhere). The next day is the first one not done,
+// so days can be added, done out of order, removed from the log or un-marked in any order.
+const dayKey = (w, d) => `${w}-${d}`;
+
+// Log dates per block day: { 'w-d': latest date }. Logs before a restart (b.since) don't count.
+export function loggedDays(b) {
+  const out = {};
+  for (const [date, day] of Object.entries(state.log)) {
+    if (b.since && date < b.since) continue;
+    for (const e of day.entries) {
+      if (e.block?.id !== b.id) continue;
+      const k = dayKey(e.block.w, e.block.d);
+      if (!out[k] || date > out[k]) out[k] = date;
+    }
+  }
+  return out;
 }
 
-// Move the position by +1 or -1 day
-export function moveBlock(b, step) {
-  let { w, d } = b.pos;
-  if (step > 0) {
-    d++;
-    if (d >= b.weeks[w].days.length) { w++; d = 0; }
-    if (w >= b.weeks.length) { b.finished = true; w = b.weeks.length - 1; d = b.weeks[w].days.length - 1; }
-  } else {
-    if (b.finished) { // un-finish: the last day becomes "next" again
-      b.finished = false;
-      save();
-      return;
-    }
-    d--;
-    if (d < 0) { w = Math.max(0, w - 1); d = w === b.pos.w ? 0 : b.weeks[w].days.length - 1; }
+export const isMarked = (b, w, d) => (b.marked || []).includes(dayKey(w, d));
+
+// Recompute the next day (b.pos) and b.finished from what is done
+export function syncBlock(b, logged = loggedDays(b)) {
+  if (!b.marked) { // first run after the update: days before the old position count as done
+    b.marked = [];
+    b.weeks.forEach((wk, w) => wk.days.forEach((_, d) => {
+      const before = w < b.pos.w || (w === b.pos.w && d < b.pos.d) || (b.finished && w === b.pos.w && d === b.pos.d);
+      if (before && !logged[dayKey(w, d)]) b.marked.push(dayKey(w, d));
+    }));
   }
-  b.pos = { w, d };
+  let next = null;
+  for (let w = 0; w < b.weeks.length && !next; w++) {
+    for (let d = 0; d < b.weeks[w].days.length; d++) {
+      if (!logged[dayKey(w, d)] && !isMarked(b, w, d)) { next = { w, d }; break; }
+    }
+  }
+  const last = b.weeks.length - 1;
+  b.finished = !next;
+  b.pos = next || { w: last, d: b.weeks[last].days.length - 1 };
+}
+
+export function syncBlocks() {
+  const before = JSON.stringify((state.blocks || []).map((b) => [b.pos, b.finished, b.marked]));
+  for (const b of state.blocks || []) syncBlock(b);
+  if (JSON.stringify(state.blocks.map((b) => [b.pos, b.finished, b.marked])) !== before) save();
+}
+
+export function blockDoneCount(b) {
+  const logged = loggedDays(b);
+  let n = 0;
+  b.weeks.forEach((wk, w) => wk.days.forEach((_, d) => { if (logged[dayKey(w, d)] || isMarked(b, w, d)) n++; }));
+  return n;
+}
+
+// Mark a day done (without logging it) or not done
+export function markDay(b, w, d, done) {
+  const k = dayKey(w, d);
+  b.marked = (b.marked || []).filter((x) => x !== k);
+  if (done) b.marked.push(k);
+  syncBlock(b);
+  save();
+}
+
+// Take a block day's sets out of the log again (all dates since the block started or restarted)
+export function removeLoggedDay(b, w, d) {
+  for (const [date, day] of Object.entries(state.log)) {
+    if (b.since && date < b.since) continue;
+    const before = day.entries.length;
+    day.entries = day.entries.filter((e) => !(e.block?.id === b.id && e.block.w === w && e.block.d === d));
+    if (day.entries.length === before) continue;
+    if (!day.entries.length && day.title?.startsWith(b.name)) day.title = '';
+    cleanupDay(date);
+  }
+  markDay(b, w, d, false);
+}
+
+// Start the block over: nothing counts as done until it is logged again
+export function restartBlock(b) {
+  b.since = dateKey();
+  b.started = dateKey();
+  b.marked = [];
+  syncBlock(b);
   save();
 }
 
@@ -273,8 +334,7 @@ export function addBlockWorkout(b, date, w = b.pos.w, d = b.pos.d) {
       ...(s.amrap ? { amrap: true, goal: s.reps, c: 'AMRAP – as many reps as possible' } : {}),
     }));
   }
-  b.pos = { w, d };
-  moveBlock(b, 1);
+  syncBlock(b);
   save();
 }
 
