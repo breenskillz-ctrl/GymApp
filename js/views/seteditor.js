@@ -125,7 +125,12 @@ export function openSetEditor(date, entry, index, onDone) {
       </div>
       <div class="tag-row" aria-label="Variant">${SET_TAGS.map((t) => `<button type="button" class="tag-btn ${tags.has(t.id) ? 'active' : ''}"
         data-tag="${t.id}" aria-pressed="${tags.has(t.id)}">${t.label}</button>`).join('')}</div>
-      <button type="submit" class="btn primary block save-set">${icon('check')} ${editing ? 'Save set' : 'Add set'}</button>
+      ${state.settings.planFirst ? (existing?.done ? `
+      <button type="submit" class="btn primary block save-set" data-done="1">${icon('check')} Save set</button>
+      <button type="submit" class="btn ghost block save-plan" data-done="0">Mark as not done</button>` : `
+      <button type="submit" class="btn primary block save-set" data-done="0">${editing ? 'Save plan' : 'Add to plan'}</button>
+      <button type="submit" class="btn ghost block save-done" data-done="1">${icon('check')} ${editing ? 'Save and mark done' : 'Add as done'}</button>`)
+    : `<button type="submit" class="btn primary block save-set">${icon('check')} ${editing ? 'Save set' : 'Add set'}</button>`}
     </form>`, {
     className: 'dialog set-dialog',
     onMount(m, close) {
@@ -197,7 +202,10 @@ export function openSetEditor(date, entry, index, onDone) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const v = cur();
-        const set = { w: v.w ?? null, r: v.r ?? null, t: v.t ?? null, d: v.d ?? null, done: true, lvl, at: existing?.done && existing.at ? existing.at : Date.now() };
+        // Plan mode (DECISIONS #68): the pressed button decides; Enter in a field uses the primary button
+        const done = (e.submitter || m.querySelector('.save-set')).dataset.done !== '0';
+        const set = { w: v.w ?? null, r: v.r ?? null, t: v.t ?? null, d: v.d ?? null, done, lvl };
+        if (done) set.at = existing?.done && existing.at ? existing.at : Date.now();
         const c = m.querySelector('[data-comment]').value.trim();
         if (c) set.c = c;
         if (tags.size) set.tags = SET_TAGS.map((t) => t.id).filter((id) => tags.has(id));
@@ -206,8 +214,8 @@ export function openSetEditor(date, entry, index, onDone) {
         if (editing) entry.sets[index] = set; else entry.sets.push(set);
         save();
         close();
-        if (isPR(entry.ex, date, set)) toast('🏆 New personal record!');
-        if (state.settings.autoRest && date === dateKey() && lvl !== 'warmup') startRest(getRest(entry.ex));
+        if (done && isPR(entry.ex, date, set)) toast('🏆 New personal record!');
+        if (done && !existing?.done && state.settings.autoRest && date === dateKey() && lvl !== 'warmup') startRest(getRest(entry.ex));
         onDone?.();
       });
     },

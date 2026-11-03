@@ -43,6 +43,12 @@ export function copyToToday(key) {
   save();
 }
 
+// "Plan first, tick off when done" (settings.planFirst, DECISIONS #68): new sets are saved as a plan, and sets and whole
+// exercises are ticked off with check boxes
+const planMode = () => !!state.settings.planFirst;
+const dataSets = (entry) => entry.sets.filter(setHasData);
+const entryDone = (entry) => dataSets(entry).length > 0 && dataSets(entry).every((s) => s.done);
+
 const tagLabel = (id) => SET_TAGS.find((t) => t.id === id)?.label || id;
 
 // One set as a compact two-line column: "120 KG / 2 REP"
@@ -70,6 +76,8 @@ function setColHtml(ex, s, i) {
     ${s.tags?.length ? `<span class="set-tags">${s.tags.map(tagLabel).join(' · ')}</span>` : ''}
     ${s.c ? `<span class="set-note">${esc(s.c)}</span>` : ''}
     ${suggestionDelta(s) ? `<span class="set-delta">${esc(suggestionDelta(s))}</span>` : ''}
+    ${planMode() && setHasData(s) ? `<span class="set-tick ${s.done ? 'on' : ''}" data-act="tick-set" data-set="${i}" role="checkbox"
+      aria-checked="${s.done}" aria-label="Set done">${icon('check')}</span>` : ''}
   </button>`;
 }
 
@@ -81,10 +89,12 @@ function entryHtml(entry) {
   const planned = plannedSets(entry).length;
   const stalled = !entry.block && !entry.deload && !entry.sets.some((s) => s.done) && isStalled(entry.ex, logState.date);
   return `
-    <section class="ex-card" data-entry="${entry.id}">
+    <section class="ex-card ${planMode() ? 'plan-mode' : ''} ${planMode() && entryDone(entry) ? 'is-done' : ''}" data-entry="${entry.id}">
       <div class="ex-body">
         <div class="ex-head">
           <button class="ex-title" data-act="info">${esc(exLabel(ex))}</button>
+          ${planMode() && dataSets(entry).length ? `<button class="ex-check ${entryDone(entry) ? 'on' : ''}" data-act="tick-entry" role="checkbox"
+            aria-checked="${entryDone(entry)}" aria-label="Exercise done">${icon('check')}</button>` : ''}
           <button class="icon-btn" data-act="entry-menu" aria-label="Menu">${icon('more')}</button>
         </div>
         ${entry.note ? `<button class="ex-note" data-act="entry-note">${esc(entry.note)}</button>` : ''}
@@ -92,7 +102,7 @@ function entryHtml(entry) {
           <button class="set-col add-chip" data-act="add-set" aria-label="Add set">${icon('plus')}<span>Set</span></button></div>
         ${stalled ? `<div class="stall">No progress in 3 sessions.
           <button class="text-btn accent" data-act="deload">Deload −10&nbsp;%</button></div>` : ''}
-        ${planned > 1 ? `<button class="log-all" data-act="log-all">${icon('check')} Log all ${planned} as suggested</button>` : ''}
+        ${planned > 1 && !planMode() ? `<button class="log-all" data-act="log-all">${icon('check')} Log all ${planned} as suggested</button>` : ''}
       </div>
     </section>`;
 }
@@ -157,7 +167,7 @@ export function renderLog(root) {
       <button class="text-btn accent" data-act="backup">Back up</button>
       <button class="icon-btn sm" data-act="backup-later" aria-label="Remind me later">${icon('close')}</button></div>` : ''}
     ${entries.length ? `
-      <p class="day-summary">${sum.exs} exs · ${sum.sets} sets${sum.vol ? ` · ${fmtNum(sum.vol, 0)} ${state.settings.unit}` : ''}${mins ? ` · ${mins} min` : ''}</p>
+      <p class="day-summary">${planMode() ? `${entries.filter(entryDone).length} of ${sum.exs} exs done` : `${sum.exs} exs`} · ${sum.sets} sets${sum.vol ? ` · ${fmtNum(sum.vol, 0)} ${state.settings.unit}` : ''}${mins ? ` · ${mins} min` : ''}</p>
       ${day.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
       ${day.note ? `<button class="day-note" data-act="day-note">${esc(day.note)}</button>` : ''}
       <div class="entries">${entries.map(entryHtml).join('')}</div>` : `
@@ -201,6 +211,8 @@ function onClick(e) {
     case 'entry-menu': return openEntryMenu(entry);
     case 'add-set': return openSetEditor(date, entry, null, rerender);
     case 'log-all': return logAll(entry);
+    case 'tick-set': return tickSet(entry, Number(b.dataset.set));
+    case 'tick-entry': return entryDone(entry) ? untickAll(entry) : logAll(entry, 'Exercise done');
     case 'backup':
       (canShareFiles() ? shareBackup() : downloadBackup()).then(rerender);
       return undefined;
@@ -248,8 +260,35 @@ async function editEntryNote(entry) {
   rerender();
 }
 
+// Tick one set off, or back to planned (plan mode)
+function tickSet(entry, i) {
+  const s = entry.sets[i];
+  if (!s) return;
+  const date = logState.date;
+  if (s.done) {
+    s.done = false;
+    delete s.at;
+  } else {
+    s.done = true;
+    s.at = Date.now();
+    s.lvl = s.lvl || 'normal';
+    delete s.last;
+    if (isPR(entry.ex, date, s)) toast('🏆 New personal record!');
+    if (s.lvl !== 'warmup' && state.settings.autoRest && date === dateKey()) startRest(getRest(entry.ex));
+  }
+  save();
+  rerender();
+}
+
+// Un-tick a whole exercise: its sets become a plan again
+function untickAll(entry) {
+  for (const s of entry.sets) { s.done = false; delete s.at; }
+  save();
+  rerender();
+}
+
 // Mark every suggested set of a card as done, exactly as suggested
-function logAll(entry) {
+function logAll(entry, msg = 'All sets logged') {
   const date = logState.date;
   const now = Date.now();
   let pr = false;
@@ -264,7 +303,7 @@ function logAll(entry) {
   }
   save();
   rerender();
-  toast(pr ? '🏆 Logged – new personal record!' : 'All sets logged');
+  toast(pr ? '🏆 Logged – new personal record!' : msg);
   if (work && state.settings.autoRest && date === dateKey()) startRest(getRest(entry.ex));
 }
 

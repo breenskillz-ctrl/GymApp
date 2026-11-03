@@ -334,6 +334,7 @@ export function openSettings(onChange) {
       <label>Default rest time (seconds)<input class="input" type="number" min="5" step="5" data-rest value="${st.rest}"></label>
       <label class="switch"><input type="checkbox" data-auto ${st.autoRest ? 'checked' : ''}> Start rest timer automatically when a set is completed</label>
       <label class="switch"><input type="checkbox" data-sound ${st.sound ? 'checked' : ''}> Play a sound when the timer finishes</label>
+      <label class="switch"><input type="checkbox" data-plan ${st.planFirst ? 'checked' : ''}> Plan first, tick off when done: new sets are saved as a plan, with check boxes for sets and exercises</label>
       <label class="switch"><input type="checkbox" data-awake ${st.keepAwake ? 'checked' : ''}> Keep the screen on during a workout</label>
       <h3 class="section-title">Data</h3>
       <p class="muted small">All data is stored only on this device. A backup file holds everything, progress photos included.</p>
@@ -376,6 +377,7 @@ export function openSettings(onChange) {
       m.querySelector('[data-rest]').addEventListener('change', (e) => { st.rest = Math.max(5, Number(e.target.value) || 90); save(); });
       m.querySelector('[data-auto]').addEventListener('change', (e) => { st.autoRest = e.target.checked; save(); });
       m.querySelector('[data-sound]').addEventListener('change', (e) => { st.sound = e.target.checked; save(); });
+      m.querySelector('[data-plan]').addEventListener('change', (e) => { st.planFirst = e.target.checked; save(); });
       m.querySelector('[data-awake]').addEventListener('change', (e) => { st.keepAwake = e.target.checked; save(); updateWakeLock(); });
       // Coach sync (DECISIONS #60)
       const syncEl = m.querySelector('[data-sync-status]');

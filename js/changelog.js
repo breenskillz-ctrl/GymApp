@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 49;
+export const APP_VERSION = 50;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 50, date: '2026-11-03', items: [
+    'New setting: "Plan first, tick off when done" (Settings). When it is on, sets you add are saved as a plan, and you tick off each set or the whole exercise with a check box when you have done it. Off by default, so nothing changes unless you turn it on.',
+  ] },
   { v: 49, date: '2026-11-03', items: [
     'Blocks: do the days in any order. In the schedule, tap any day to add it to today, mark it done without logging it, or undo it. Done days show a tick and the date, and the next day is the first one you have not done. Removing a block exercise from a workout opens that day again.',
   ] },

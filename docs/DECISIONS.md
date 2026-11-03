@@ -5,6 +5,18 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #68 · 2026-11-03 · Optional plan mode: plan first, tick off when done
+**Decision:** New setting `settings.planFirst` (default off, Settings → "Plan first, tick off when done"). When on, the set
+editor's main button saves the set as planned (`done: false`) and a second button saves it as done; a done set gets
+"Save set" / "Mark as not done". Every set with numbers gets a small round check box, and each exercise card a big one that
+ticks all its sets (rest timer and PR toast as usual) or un-ticks them. "Log all as suggested" is hidden in plan mode, and
+the day line shows "N of M exs done". Planned sets still don't count in records, history, charts or the coach sync. Off =
+exactly the old behaviour. The setting is per device, so each person chooses on their own phone. "Copy workout to today"
+(day menu and History) already copies a past workout as a plan.
+**Reason:** The user's girlfriend wants to enter exercises with sets and reps as a plan and tick them off when done; the
+user likes the current flow, so it is a setting.
+**Status:** Active
+
 ## #67 · 2026-11-03 · Block days can be done in any order
 **Decision:** A block no longer steps through a fixed position. A day is done when its sets are in the log (entries with
 `block: { id, w, d }`) or when the user marked it done without logging (`b.marked: ['w-d']`). `syncBlock()` sets `b.pos`

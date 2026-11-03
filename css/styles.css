@@ -893,3 +893,16 @@ body.auth-open { overflow: hidden; }
 .home-btn span { flex: 1; min-width: 0; }
 .home-btn b { display: block; font-family: var(--f-num); font-weight: 600; font-size: calc(24px * var(--fs)); letter-spacing: .02em; }
 .home-btn small { display: block; color: var(--muted); font-size: calc(13px * var(--fs)); margin-top: 2px; }
+
+/* Plan mode (DECISIONS #68): check boxes on sets and exercises */
+.ex-card.plan-mode .sets { gap: 10px; padding-top: 4px; }
+.set-tick { position: absolute; top: -7px; right: -7px; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--bg); border: 1.5px solid var(--line2); color: transparent; }
+.set-tick .ico { width: 12px; height: 12px; stroke-width: 3; }
+.set-tick.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.ex-check { flex: none; width: 30px; height: 30px; margin: 5px 4px 0; border-radius: 50%; display: grid; place-items: center;
+  border: 1.5px solid var(--line2); color: transparent; }
+.ex-check .ico { width: 17px; height: 17px; stroke-width: 3; }
+.ex-check.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.ex-card.is-done .ex-title { color: var(--muted); }
+.set-dialog .save-done, .set-dialog .save-plan { margin-top: 6px; }
