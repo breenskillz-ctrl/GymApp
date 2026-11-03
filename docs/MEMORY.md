@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-11-03 (v49 built: block days in any order, DECISIONS #67; not published yet)_
+_Last updated: 2026-11-03 (v49 published: block days in any order, DECISIONS #67)_
 
 ## About the user
 
