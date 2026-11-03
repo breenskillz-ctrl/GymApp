@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 47;
+export const APP_VERSION = 48;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 48, date: '2026-11-03', items: [
+    '12-Week Strength Period is now main lifts only, on a Mon–Sat week: Mon squat, Tue bench, Wed deadlift, Fri paused or high-bar squat, Sat paused bench and overhead press. Add your own accessories from your program. A block you already started keeps its week, day and weights.',
+  ] },
   { v: 47, date: '2026-10-31', items: [
     'Personal records now show what you actually lifted first: the heaviest lift with reps and date, and your best single (1RM) when you have done one. The estimated 1RM shows which set it came from.',
   ] },

@@ -5,6 +5,16 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #66 · 2026-11-03 · 12-week block: main lifts only, on the Hybrid PPL week
+**Decision:** `bt-strength-12` holds only the main lifts on five days that match the user's Hybrid PPL program:
+Mon squat (heavy), Tue bench (heavy), Wed deadlift, Fri paused / high-bar squat (new % table `P12.fri`, 65–80 % of the
+training max, same light weeks), Sat paused bench + overhead press. Test week: Mon squat, Tue bench, Wed deadlift,
+Sat press. Accessories come from the user's own program. Running blocks are rebuilt once at startup by
+`upgradeStrengthBlocks()` (lifts read from the old week 1, maxes/base/position kept); new blocks get `mainOnly: true`.
+**Reason:** The user wants the block to drive only the main lifts and to fit his Hybrid PPL days; his record period
+(Apr–May 2026) had squat twice a week on those days.
+**Status:** Active. Changes #62 (A–E with accessories, day E).
+
 ## #65 · 2026-10-31 · Personal records lead with actual lifts
 **Decision:** The exercise detail's record tiles show, in order: Heaviest lift (weight × reps, date; most reps wins a tie),
 Best single (1RM) when a 1-rep set exists, Est. 1RM with the set it came from and the date, Best volume (date), Sessions.

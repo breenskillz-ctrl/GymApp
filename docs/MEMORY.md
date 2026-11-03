@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-10-31 (v47 built: records lead with actual lifts, DECISIONS #65)_
+_Last updated: 2026-11-03 (v48 built: 12-week block main lifts only on the PPL week, DECISIONS #66)_
 
 ## About the user
 
@@ -24,6 +24,8 @@ _Last updated: 2026-10-31 (v47 built: records lead with actual lifts, DECISIONS 
 - Doesn't want to be sent to GitHub settings. Solve it in code or git whenever possible.
 
 ## Current status
+
+- **v48 (2026-11-03):** 12-week block = main lifts only, Mon squat / Tue bench / Wed deadlift / Fri paused squat / Sat paused bench + press (DECISIONS #66). User runs his own Hybrid PPL program for accessories.
 
 - **v47 (2026-10-31):** record tiles show heaviest lift × reps + date, best single, est. 1RM with its source set (DECISIONS #65).
 

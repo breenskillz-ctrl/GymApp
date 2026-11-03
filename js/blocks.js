@@ -34,8 +34,8 @@ const sets531 = (week) => week.map(([pct, reps, amrap]) => ({ pct, reps, ...(amr
 // Smolov Jr: the same four days for three weeks; weeks 2 and 3 add one and two weight steps (5 kg lower body, 2.5 kg upper body)
 const SMOLOV_DAYS = [[6, 70, 6], [7, 75, 5], [8, 80, 4], [10, 85, 3]];
 
-// 12-week strength period (DECISIONS #62): three phases (accumulation 1–4, transmutation 5–8, realization 9–12) for
-// squat, bench, deadlift and overhead press, 5 days A–E with accessories. Week 12 is a test week with three attempts.
+// 12-week strength period (DECISIONS #62, #66): three phases (accumulation 1–4, transmutation 5–8, realization 9–12) for
+// squat, bench, deadlift and overhead press, main lifts only on a five-day week. Week 12 is a test week with three attempts.
 // [sets, % of training max, reps] per week; the percentages give clean 2.5 kg steps from typical training maxes.
 const P12 = {
   squat: [[[4, 72.5, 6]], [[4, 76, 6]], [[4, 79.5, 5]], [[3, 72.5, 5]], [[5, 83, 4]], [[5, 86, 3]], [[4, 89.5, 3]], [[3, 79.5, 3]],
@@ -49,39 +49,31 @@ const P12 = {
   ohp: [[[3, 70.5, 8]], [[3, 73.5, 8]], [[3, 76.5, 6]], [[3, 70.5, 6]], [[4, 79.5, 5]], [[4, 82.5, 5]], [[4, 88, 4]], [[3, 73.5, 5]],
     [[3, 91, 3]], [[3, 94, 3]], [[3, 76.5, 3]], [[1, 94, 1], [1, 103, 1], [1, 112, 1]]],
 };
-const LIGHT12 = [3, 7, 10]; // weeks 4, 8 and 11: lighter, accessories drop to 2 sets
+// Friday squat (paused or high-bar), % of the squat training max: lighter than Monday, same light weeks (DECISIONS #66)
+P12.fri = [[[3, 65, 5]], [[3, 67.5, 5]], [[3, 70, 4]], [[2, 62.5, 5]], [[4, 72.5, 3]], [[4, 75, 3]], [[3, 77.5, 3]], [[2, 67.5, 3]],
+  [[3, 80, 2]], [[2, 80, 2]], [[2, 70, 2]], null];
 const pctItem = (slot, groups, extra = {}) => ({
   slot, kind: 'pct', ...extra, sets: groups.flatMap(([n, pct, reps]) => S(n, pct, reps)),
 });
-const acc = (ex, sets, reps) => ({ ex, kind: 'normal', sets, reps });
-const A12 = [['romanian-deadlift', 3, 8], ['leg-press', 3, 12], ['leg-curl', 3, 12], ['standing-calf-raise', 3, 12]];
-const B12 = [['smith-incline-press', 3, 8], ['barbell-row', 3, 8]];
-const B12b = [['lat-pulldown', 3, 10], ['lateral-raise', 3, 15], ['triceps-pushdown', 3, 12]];
-const C12 = [['bulgarian-split-squat', 3, 8], ['hip-thrust', 3, 10], ['leg-extension', 3, 12], ['back-extension', 3, 12], ['hanging-leg-raise', 3, 12]];
-const D12 = [['seated-cable-row', 3, 10], ['pull-ups', 3, 8], ['db-curl', 3, 10], ['overhead-triceps-extension', 3, 12], ['reverse-flyes', 3, 15]];
-// Day E: no main lift, so the heavy lifts are unchanged. Second hit for biceps, calves, side delts and core, a third
-// quad session without spinal load, and shoulder care (face pulls). Skip it with › in a busy week.
-const E12 = [['hack-squat', 3, 10], ['t-bar-row', 3, 10], ['cable-lateral-raise', 3, 15], ['face-pull', 3, 15],
-  ['hammer-curl', 3, 12], ['seated-calf-raise', 3, 15], ['ab-wheel', 3, 10]];
-const accs = (list, w) => list.map(([ex, n, r]) => acc(ex, LIGHT12.includes(w) ? 2 : n, r));
 const TEST = { note: 'Test: first attempt easy, second heavy but safe, third is the record attempt' };
+// Main lifts only, laid on the Hybrid PPL week (DECISIONS #66): the rest of each session comes from the user's own
+// program. Mon heavy squat, Tue heavy bench, Wed deadlift, Fri paused / high-bar squat, Sat paused bench + press.
 const STRENGTH12 = P12.squat.map((_, w) => {
-  const test = w === 11;
-  if (test) {
+  if (w === 11) {
     return { days: [
-      day('A · Squat test', [pctItem('squat', P12.squat[w], TEST)]),
-      day('B · Bench + press test', [pctItem('bench', P12.bench[w], TEST),
-        pctItem('ohp', P12.ohp[w], { note: 'Only if the shoulder feels 0–2 out of 10' })]),
-      day('C · Deadlift test', [pctItem('dl', P12.dl[w], TEST)]),
+      day('Mon · Squat test', [pctItem('squat', P12.squat[w], TEST)]),
+      day('Tue · Bench test', [pctItem('bench', P12.bench[w], TEST)]),
+      day('Wed · Deadlift test', [pctItem('dl', P12.dl[w], TEST)]),
+      day('Sat · Press test', [pctItem('ohp', P12.ohp[w], { note: 'Only if the shoulder feels 0–2 out of 10' })]),
     ] };
   }
   return { days: [
-    day('A · Squat', [pctItem('squat', P12.squat[w]), ...accs(A12, w)]),
-    day('B · Bench + press', [pctItem('bench', P12.bench[w]), ...accs(B12, w), pctItem('ohp', P12.ohp[w]), ...accs(B12b, w)]),
-    day('C · Deadlift', [pctItem('dl', P12.dl[w]), ...accs(C12, w)]),
-    day('D · Upper volume', [acc('db-incline-press', LIGHT12.includes(w) ? 2 : 3, 10),
-      pctItem('bench', P12.pause[w], { tags: ['paused'], note: 'Paused: 1–2 s still on the chest' }), ...accs(D12, w)]),
-    day('E · Pump + weak points', accs(E12, w)),
+    day('Mon · Squat', [pctItem('squat', P12.squat[w])]),
+    day('Tue · Bench', [pctItem('bench', P12.bench[w])]),
+    day('Wed · Deadlift', [pctItem('dl', P12.dl[w])]),
+    day('Fri · Paused or high-bar squat', [pctItem('squat', P12.fri[w], { tags: ['paused'], note: 'Paused 2 s at the bottom, or high-bar' })]),
+    day('Sat · Paused bench + press', [pctItem('bench', P12.pause[w], { tags: ['paused'], note: 'Paused: 1–2 s still on the chest' }),
+      pctItem('ohp', P12.ohp[w])]),
   ] };
 });
 
@@ -123,16 +115,40 @@ export const BLOCK_TEMPLATES = [
     id: 'bt-strength-12',
     base: 95, // the percentages are of a training max = 95 % of the real 1RM the user enters (DECISIONS #64)
     name: '12-Week Strength Period',
-    desc: 'Squat, bench, deadlift and overhead press over 12 weeks: volume (weeks 1–4), heavier (5–8), heavy singles and a test in week 12. 5 days A–E with accessories (E is light and can be skipped in a busy week); weeks 4, 8 and 11 are lighter. Enter your real 1RM for each lift; the block works from 95 % of it.',
+    desc: 'Main lifts only, laid on a five-day week: Mon squat, Tue bench, Wed deadlift, Fri paused or high-bar squat, Sat paused bench + overhead press. Add your own accessories. Volume (weeks 1–4), heavier (5–8), heavy singles and a test in week 12; weeks 4, 8 and 11 are lighter. Enter your real 1RM for each lift; the block works from 95 % of it.',
     slots: [
-      { key: 'squat', label: 'Squat (day A)', ex: 'squat' },
-      { key: 'bench', label: 'Bench (days B and D)', ex: 'bench-press' },
-      { key: 'dl', label: 'Deadlift (day C)', ex: 'deadlift' },
-      { key: 'ohp', label: 'Overhead press (day B)', ex: 'overhead-press' },
+      { key: 'squat', label: 'Squat (Mon and Fri)', ex: 'squat' },
+      { key: 'bench', label: 'Bench (Tue and Sat)', ex: 'bench-press' },
+      { key: 'dl', label: 'Deadlift (Wed)', ex: 'deadlift' },
+      { key: 'ohp', label: 'Overhead press (Sat)', ex: 'overhead-press' },
     ],
     weeks: STRENGTH12,
   },
 ];
+
+// The 12-week block used to have five days A–E with accessories; it is now main lifts only on a Mon–Sat week
+// (DECISIONS #66). A running block is rebuilt from the template once, keeping its lifts, maxes, base and position
+// (day indexes line up: A→Mon squat, B→Tue bench, C→Wed deadlift, D→Fri, E→Sat).
+export function upgradeStrengthBlocks() {
+  const t = BLOCK_TEMPLATES.find((x) => x.id === 'bt-strength-12');
+  let changed = false;
+  for (const b of state.blocks || []) {
+    if (b.templateId !== 'bt-strength-12' || b.mainOnly) continue;
+    const first = (b.weeks[0]?.days || []).map((d) => d.items.filter((i) => i.kind === 'pct').map((i) => i.ex));
+    const lifts = {
+      squat: first[0]?.[0] || 'squat',
+      bench: first[1]?.[0] || 'bench-press',
+      dl: first[2]?.[0] || 'deadlift',
+      ohp: first[1]?.[1] || 'overhead-press',
+    };
+    b.weeks = t.weeks.map((w) => ({ days: w.days.map((d) => ({ name: d.name, items: d.items.map((it) => expandItem(it, lifts)) })) }));
+    const w = Math.min(b.pos.w, b.weeks.length - 1);
+    b.pos = { w, d: Math.min(b.pos.d, b.weeks[w].days.length - 1) };
+    b.mainOnly = true;
+    changed = true;
+  }
+  if (changed) save();
+}
 
 export const allBlockTemplates = () => [...(state.blockTemplates || []), ...BLOCK_TEMPLATES];
 export const getBlockTemplate = (id) => allBlockTemplates().find((t) => t.id === id);
@@ -173,6 +189,7 @@ export function createBlock(template, { name, lifts, maxes, base }) {
     started: dateKey(),
     finished: false,
     rmBase: true, // maxes are real 1RMs (see migrate() in store.js)
+    mainOnly: true, // built from the current templates (see upgradeStrengthBlocks)
   };
   state.blocks.unshift(block);
   save();
