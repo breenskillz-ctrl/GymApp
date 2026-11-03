@@ -52,12 +52,16 @@ const P12 = {
 // Friday squat (paused or high-bar), % of the squat training max: lighter than Monday, same light weeks (DECISIONS #66)
 P12.fri = [[[3, 65, 5]], [[3, 67.5, 5]], [[3, 70, 4]], [[2, 62.5, 5]], [[4, 72.5, 3]], [[4, 75, 3]], [[3, 77.5, 3]], [[2, 67.5, 3]],
   [[3, 80, 2]], [[2, 80, 2]], [[2, 70, 2]], null];
+// Saturday deadlift: light and beltless, % of the deadlift training max (the heavy one with a belt is Wednesday)
+P12.dlLight = [[[3, 65, 5]], [[3, 67.5, 5]], [[3, 70, 4]], [[2, 60, 4]], [[3, 72.5, 3]], [[3, 75, 3]], [[3, 75, 3]], [[2, 65, 3]],
+  [[3, 75, 2]], [[2, 70, 2]], [[2, 65, 2]], null];
 const pctItem = (slot, groups, extra = {}) => ({
   slot, kind: 'pct', ...extra, sets: groups.flatMap(([n, pct, reps]) => S(n, pct, reps)),
 });
 const TEST = { note: 'Test: first attempt easy, second heavy but safe, third is the record attempt' };
 // Main lifts only, laid on the Hybrid PPL week (DECISIONS #66): the rest of each session comes from the user's own
-// program. Mon heavy squat, Tue heavy bench, Wed deadlift, Fri paused / high-bar squat, Sat paused bench + press.
+// program. Mon heavy squat, Tue heavy bench, Wed heavy deadlift (belt), Fri light paused / high-bar squat,
+// Sat paused bench + press + light beltless deadlift.
 const STRENGTH12 = P12.squat.map((_, w) => {
   if (w === 11) {
     return { days: [
@@ -70,10 +74,11 @@ const STRENGTH12 = P12.squat.map((_, w) => {
   return { days: [
     day('Mon · Squat', [pctItem('squat', P12.squat[w])]),
     day('Tue · Bench', [pctItem('bench', P12.bench[w])]),
-    day('Wed · Deadlift', [pctItem('dl', P12.dl[w])]),
-    day('Fri · Paused or high-bar squat', [pctItem('squat', P12.fri[w], { tags: ['paused'], note: 'Paused 2 s at the bottom, or high-bar' })]),
-    day('Sat · Paused bench + press', [pctItem('bench', P12.pause[w], { tags: ['paused'], note: 'Paused: 1–2 s still on the chest' }),
-      pctItem('ohp', P12.ohp[w])]),
+    day('Wed · Heavy deadlift', [pctItem('dl', P12.dl[w])]),
+    day('Fri · Light squat (paused or high-bar)', [pctItem('squat', P12.fri[w], { tags: ['paused'], note: 'Paused 2 s at the bottom, or high-bar' })]),
+    day('Sat · Paused bench, press, light deadlift', [pctItem('bench', P12.pause[w], { tags: ['paused'], note: 'Paused: 1–2 s still on the chest' }),
+      pctItem('ohp', P12.ohp[w]),
+      pctItem('dl', P12.dlLight[w], { tags: ['beltless'], note: 'Light and beltless: fast reps, perfect positions' })]),
   ] };
 });
 
@@ -115,11 +120,11 @@ export const BLOCK_TEMPLATES = [
     id: 'bt-strength-12',
     base: 95, // the percentages are of a training max = 95 % of the real 1RM the user enters (DECISIONS #64)
     name: '12-Week Strength Period',
-    desc: 'Main lifts only, laid on a five-day week: Mon squat, Tue bench, Wed deadlift, Fri paused or high-bar squat, Sat paused bench + overhead press. Add your own accessories. Volume (weeks 1–4), heavier (5–8), heavy singles and a test in week 12; weeks 4, 8 and 11 are lighter. Enter your real 1RM for each lift; the block works from 95 % of it.',
+    desc: 'Main lifts only, laid on a five-day week: Mon squat, Tue bench, Wed heavy deadlift, Fri light paused or high-bar squat, Sat paused bench, overhead press and light beltless deadlift. Add your own accessories. Volume (weeks 1–4), heavier (5–8), heavy singles and a test in week 12; weeks 4, 8 and 11 are lighter. Enter your real 1RM for each lift; the block works from 95 % of it.',
     slots: [
       { key: 'squat', label: 'Squat (Mon and Fri)', ex: 'squat' },
       { key: 'bench', label: 'Bench (Tue and Sat)', ex: 'bench-press' },
-      { key: 'dl', label: 'Deadlift (Wed)', ex: 'deadlift' },
+      { key: 'dl', label: 'Deadlift (Wed and Sat)', ex: 'deadlift' },
       { key: 'ohp', label: 'Overhead press (Sat)', ex: 'overhead-press' },
     ],
     weeks: STRENGTH12,
@@ -129,11 +134,12 @@ export const BLOCK_TEMPLATES = [
 // The 12-week block used to have five days A–E with accessories; it is now main lifts only on a Mon–Sat week
 // (DECISIONS #66). A running block is rebuilt from the template once, keeping its lifts, maxes, base and position
 // (day indexes line up: A→Mon squat, B→Tue bench, C→Wed deadlift, D→Fri, E→Sat).
+export const STRENGTH_LAYOUT = 2; // raise when the 12-week template's days change, so running blocks are rebuilt
 export function upgradeStrengthBlocks() {
   const t = BLOCK_TEMPLATES.find((x) => x.id === 'bt-strength-12');
   let changed = false;
   for (const b of state.blocks || []) {
-    if (b.templateId !== 'bt-strength-12' || b.mainOnly) continue;
+    if (b.templateId !== 'bt-strength-12' || (b.layout || 0) >= STRENGTH_LAYOUT) continue;
     const first = (b.weeks[0]?.days || []).map((d) => d.items.filter((i) => i.kind === 'pct').map((i) => i.ex));
     const lifts = {
       squat: first[0]?.[0] || 'squat',
@@ -144,7 +150,7 @@ export function upgradeStrengthBlocks() {
     b.weeks = t.weeks.map((w) => ({ days: w.days.map((d) => ({ name: d.name, items: d.items.map((it) => expandItem(it, lifts)) })) }));
     const w = Math.min(b.pos.w, b.weeks.length - 1);
     b.pos = { w, d: Math.min(b.pos.d, b.weeks[w].days.length - 1) };
-    b.mainOnly = true;
+    b.layout = STRENGTH_LAYOUT;
     changed = true;
   }
   if (changed) save();
@@ -189,7 +195,7 @@ export function createBlock(template, { name, lifts, maxes, base }) {
     started: dateKey(),
     finished: false,
     rmBase: true, // maxes are real 1RMs (see migrate() in store.js)
-    mainOnly: true, // built from the current templates (see upgradeStrengthBlocks)
+    layout: STRENGTH_LAYOUT, // built from the current templates (see upgradeStrengthBlocks)
   };
   state.blocks.unshift(block);
   save();

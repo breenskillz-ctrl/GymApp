@@ -7,10 +7,12 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ## #66 · 2026-11-03 · 12-week block: main lifts only, on the Hybrid PPL week
 **Decision:** `bt-strength-12` holds only the main lifts on five days that match the user's Hybrid PPL program:
-Mon squat (heavy), Tue bench (heavy), Wed deadlift, Fri paused / high-bar squat (new % table `P12.fri`, 65–80 % of the
-training max, same light weeks), Sat paused bench + overhead press. Test week: Mon squat, Tue bench, Wed deadlift,
+Mon squat (heavy), Tue bench (heavy), Wed heavy deadlift with belt, Fri light paused / high-bar squat (new % table
+`P12.fri`, 65–80 % of the training max, same light weeks), Sat paused bench + overhead press + light beltless deadlift
+(`P12.dlLight`, 60–75 %). Heavy deadlift is Wednesday, not Saturday, so it never lands the day after Friday's squat and two
+days before Monday's heavy squat. Test week: Mon squat, Tue bench, Wed deadlift,
 Sat press. Accessories come from the user's own program. Running blocks are rebuilt once at startup by
-`upgradeStrengthBlocks()` (lifts read from the old week 1, maxes/base/position kept); new blocks get `mainOnly: true`.
+`upgradeStrengthBlocks()` (lifts read from the old week 1, maxes/base/position kept); new blocks get `layout: STRENGTH_LAYOUT` (2); raise it when the template's days change.
 **Reason:** The user wants the block to drive only the main lifts and to fit his Hybrid PPL days; his record period
 (Apr–May 2026) had squat twice a week on those days.
 **Status:** Active. Changes #62 (A–E with accessories, day E).

@@ -7,7 +7,7 @@ const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
   { v: 48, date: '2026-11-03', items: [
-    '12-Week Strength Period is now main lifts only, on a Mon–Sat week: Mon squat, Tue bench, Wed deadlift, Fri paused or high-bar squat, Sat paused bench and overhead press. Add your own accessories from your program. A block you already started keeps its week, day and weights.',
+    '12-Week Strength Period is now main lifts only, on a Mon–Sat week: Mon squat, Tue bench, Wed heavy deadlift, Fri light paused or high-bar squat, Sat paused bench, overhead press and a light beltless deadlift. Add your own accessories from your program. A block you already started keeps its week, day and weights.',
   ] },
   { v: 47, date: '2026-10-31', items: [
     'Personal records now show what you actually lifted first: the heaviest lift with reps and date, and your best single (1RM) when you have done one. The estimated 1RM shows which set it came from.',
