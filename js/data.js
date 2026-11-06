@@ -365,10 +365,10 @@ export const PROGRAMS = [
     workouts: [
       W('Mon · Legs + hypers', [['back-extension', 3, 10], ['hack-squat', 3, 10], ['leg-extension', 3, 10], ['leg-curl', 3, 10], ['calf-press', 3, 10], ['cable-crunch', 3, 10]]),
       W('Tue · Chest + triceps', [['db-incline-press', 3, 10], ['cable-overhead-extension', 3, 10], ['single-arm-pushdown', 3, 10], ['lateral-raise', 3, 10], ['cable-reverse-fly', 3, 10], ['cable-crossover', 3, 10], ['pec-deck', 3, 10]]),
-      W('Wed · Back + biceps', [['pull-ups', 3, 10], ['barbell-row', 3, 10], ['straight-arm-pulldown', 3, 10], ['single-arm-pulldown', 3, 10], ['cable-curl', 3, 10], ['lat-pulldown', 3, 10]]),
+      W('Wed · Back + biceps', [['pull-ups', 3, 10], ['barbell-row', 3, 10], ['straight-arm-pulldown', 3, 10], ['single-arm-pulldown', 3, 10], ['cable-curl', 3, 10], ['db-curl', 3, 10], ['lat-pulldown', 3, 10]]),
       W('Thu · Walk, cardio or rest', [['walking', 1, null]]),
       W('Fri · Lower + hypers', [['back-extension', 3, 10], ['hack-squat', 3, 10], ['leg-extension', 3, 10], ['leg-curl', 3, 10], ['calf-press', 3, 10], ['cable-crunch', 3, 10], ['cable-reverse-fly', 3, 10]]),
-      W('Sat · Upper', [['seated-cable-row', 3, 10], ['lat-pulldown', 3, 10], ['overhead-press', 3, 10], ['incline-cable-fly', 3, 10], ['lateral-raise', 3, 10], ['cable-reverse-fly', 3, 10], ['db-curl', 3, 10], ['cable-overhead-extension', 3, 10]]),
+      W('Sat · Upper', [['seated-cable-row', 3, 10], ['lat-pulldown', 3, 10], ['overhead-press', 3, 10], ['incline-cable-fly', 3, 10], ['lateral-raise', 3, 10], ['cable-reverse-fly', 3, 10], ['cable-curl', 3, 10], ['db-curl', 3, 10], ['cable-overhead-extension', 3, 10]]),
       W('Sun · Walk, cardio or rest', [['walking', 1, null]]),
     ],
   },
