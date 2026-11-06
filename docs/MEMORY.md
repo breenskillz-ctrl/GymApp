@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-11-03 (v50 published: optional plan mode with check boxes, DECISIONS #68)_
+_Last updated: 2026-11-06 (v51 built: built-in Hybrid PPL program, DECISIONS #69; waiting for OK)_
 
 ## About the user
 
@@ -25,6 +25,7 @@ _Last updated: 2026-11-03 (v50 published: optional plan mode with check boxes, D
 
 ## Current status
 
+- **v51 (2026-11-06):** built-in "Hybrid PPL" program from the user's own split + 2 new exercises (DECISIONS #69).
 - **v50 (2026-11-03):** optional "Plan first, tick off when done" setting (for the girlfriend): sets saved as plan, check boxes per set and per exercise (DECISIONS #68).
 - **v49 (2026-11-03):** block days can be done in any order: schedule → add / mark done / undo; next = first day not done (DECISIONS #67).
 - **v48 (2026-11-03):** 12-week block = main lifts only, Mon squat / Tue bench / Wed deadlift / Fri light paused/high-bar squat / Sat paused bench + press + light beltless deadlift (DECISIONS #66). User runs his own Hybrid PPL program for accessories.

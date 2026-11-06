@@ -2,10 +2,14 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 50;
+export const APP_VERSION = 51;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 51, date: '2026-11-06', items: [
+    'New program: Hybrid PPL, a five-day split with legs twice a week and walking days. It holds the accessories and pairs with the 12-Week Strength Period block for the main lifts. Tap ⋮ → "Copy and customise" to make your own version.',
+    'New exercises: Single Arm Pulldown and Single Arm Tricep Extension (cable).',
+  ] },
   { v: 50, date: '2026-11-03', items: [
     'New setting: "Plan first, tick off when done" (Settings). When it is on, sets you add are saved as a plan, and you tick off each set or the whole exercise with a check box when you have done it. Off by default, so nothing changes unless you turn it on.',
   ] },
