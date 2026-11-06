@@ -8,8 +8,8 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 ## #69 · 2026-11-06 · Built-in "Hybrid PPL" program (the user's own split)
 **Decision:** The user's own Hybrid PPL is now a built-in program (`p-hybrid-ppl`, Advanced, 5 days + walking on Thu/Sun),
 accessories only, so it pairs with the 12-Week Strength Period block for the main lifts. Others start from it with "Copy and
-customise". His custom exercises without a built-in match got new built-ins: `single-arm-pulldown` and
-`single-arm-pushdown`; "Rear delt flies" maps to `cable-reverse-fly`, "Overhead Tricep Extension" to the cable version (what
+customise". His custom exercises without a built-in match got new built-ins: `cable-one-arm-row` (One Arm Row · Cable, his "Single arm pulldown")
+and `single-arm-pushdown`; "Rear delt flies" maps to `cable-reverse-fly`, "Overhead Tricep Extension" to the cable version (what
 he logs). Walking days use `walking` with one set and no target.
 **Reason:** The user wants his program available to everyone as a starting point.
 **Status:** Active
