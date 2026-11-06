@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-11-06 (v51 built: built-in Hybrid PPL program, DECISIONS #69; waiting for OK)_
+_Last updated: 2026-11-06 (v51 published: built-in Hybrid PPL program, DECISIONS #69)_
 
 ## About the user
 
