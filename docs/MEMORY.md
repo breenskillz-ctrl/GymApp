@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-11-10 (v52 built: ten usability fixes, DECISIONS #70; waiting for OK to publish. Makrologg Kode.gs needs a new version for the «Oppsett» tab)_
+_Last updated: 2026-11-10 (v52 published: ten usability fixes, DECISIONS #70. Makrologg Kode.gs needs a new version for the «Oppsett» tab – reminder set for 20:45)_
 
 ## About the user
 
