@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-11-10 (v53 built: readiness on Home, DECISIONS #71; waiting for OK. Kode.gs needs a new version for «Oppsett» + Garmin read – reminder 20:45)_
+_Last updated: 2026-11-10 (v53 published: readiness on Home, DECISIONS #71. Kode.gs needs a new version for «Oppsett» + Garmin read – reminder 20:45)_
 
 ## About the user
 
