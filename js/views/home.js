@@ -10,6 +10,10 @@ import { setWeight } from '../blocks.js';
 import { todayPlan, startToday, workoutName, weekdayOf } from '../today.js';
 import { backupDue, shareBackup, downloadBackup, canShareFiles } from '../backup.js';
 import { save } from '../store.js';
+import {
+  garminRows, cachedRows, readiness, applyReadiness, readinessApplied,
+} from '../readiness.js';
+import { sheetUrl } from '../sync.js';
 
 export function greeting() {
   const h = new Date().getHours();
@@ -83,6 +87,21 @@ function weekHtml(today) {
   </section>`;
 }
 
+// Today's readiness from the watch (DECISIONS #71); empty without data
+function readyHtml(today, rows) {
+  const r = readiness(rows, today);
+  if (!r) return '';
+  const day = getDay(today);
+  const canApply = r.pct && !readinessApplied(today) && day?.entries.some((e) => e.block && e.sets.some((s) => !s.done && s.w));
+  const applied = readinessApplied(today);
+  return `<div class="ready ready-${r.level}">
+    <div class="rd-head"><i class="rd-dot"></i><b>${esc(r.text)}</b></div>
+    <div class="rd-facts">${r.facts.map(esc).join(' · ')}</div>
+    ${applied ? `<div class="rd-facts">Block sets lowered by ${applied} % today.</div>` : ''}
+    ${canApply ? `<button class="text-btn accent rd-apply" data-go="ready">Lower today’s block sets by ${r.pct} %</button>` : ''}
+  </div>`;
+}
+
 // Newest personal record in the last 60 days
 function latestRecord(today) {
   const from = addDays(today, -60);
@@ -114,6 +133,7 @@ export function renderHome(root) {
       <h2 class="hello-title">Are you ready to grind${name ? `, <span>${esc(name)}</span>` : ''}?</h2>
     </section>
     ${todayCardHtml(today)}
+    <div id="ready-slot">${readyHtml(today, cachedRows())}</div>
     ${weekHtml(today)}
     ${rec ? `<button class="home-card rec-card" data-go="records"><span class="gold">${icon('trophy')}</span>
       <span class="grow"><b>Latest record</b><small>${esc(exLabel(rec.ex))}${rec.what ? ` · ${esc(rec.what)}` : ''} · ${fmtDate(rec.date, false)}</small></span>${icon('right')}</button>` : ''}
@@ -121,6 +141,13 @@ export function renderHome(root) {
       <span class="grow">${state.lastBackup ? `Last backup ${Math.floor((Date.now() - state.lastBackup) / 86400000)} days ago` : 'Your data is only on this phone'}</span>
       <button class="text-btn accent" data-go="backup">Back up</button>
       <button class="icon-btn sm" data-go="backup-later" aria-label="Remind me later">${icon('close')}</button></div>` : ''}`;
+
+  if (sheetUrl()) {
+    garminRows().then((rows) => {
+      const slot = root.querySelector('#ready-slot');
+      if (slot?.isConnected) slot.innerHTML = readyHtml(today, rows);
+    });
+  }
 
   root.onclick = (e) => {
     const day = e.target.closest('[data-day]');
@@ -135,6 +162,12 @@ export function renderHome(root) {
     }
     if (b.dataset.go === 'log') { logState.date = today; go('log'); }
     if (b.dataset.go === 'records') go('records');
+    if (b.dataset.go === 'ready') {
+      const r = readiness(cachedRows(), today);
+      const n = r ? applyReadiness(r.pct, today) : 0;
+      toast(n ? `${n} sets lowered by ${r.pct} %` : 'Nothing to change');
+      renderHome(root);
+    }
     if (b.dataset.go === 'backup') (canShareFiles() ? shareBackup() : downloadBackup()).then(() => renderHome(root));
     if (b.dataset.go === 'backup-later') { state.backupSnooze = Date.now(); save(); renderHome(root); }
   };

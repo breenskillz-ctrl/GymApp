@@ -61,6 +61,7 @@ js/wakelock.js        Screen wake lock while today has exercises (settings.keepA
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart(), barChart(), multiLineChart(), stackedBarChart() on canvas
 js/today.js           Today's workout: weekdayOf(), myProgram(), todayPlan(), startToday(), workoutName() (DECISIONS #70)
+js/readiness.js       Readiness from the watch via the coach sheet (GET ?read=garmin): garminRows(), readiness(), applyReadiness() (#71)
 js/views/home.js      Home (start page, back-button root): today card + Start button, this week, latest record, backup reminder (#57, #70)
 js/views/history.js   History: workout count + muscle-group mix, compact workout cards, "Start workout" → today's log
 js/views/log.js       Day view (cards with set chips + "+" chip, ‹ day › nav, "Add exercise" pill, day menu, calendar, records)

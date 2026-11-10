@@ -5,6 +5,17 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #71 · 2026-11-10 · Readiness from the watch on Home
+**Decision:** `js/readiness.js` reads the last 10 days of the Garmin tab through the coach sheet's Apps Script
+(`GET ?read=garmin&pid=p0`, cached 30 min in `gymapp.garmin`, per device). Today's row is scored: sleep hours (<5 / <6.5),
+sleep score (<50 / <65), HRV against the 7-day average (<85 % / <92 %), resting pulse (>avg+4) and body battery (<40).
+Result: good (train as planned), reduced (main lift −5 %) or poor (−10 % and drop the last set), shown under the today card
+with the numbers. "Lower today's block sets by N %" changes only planned, non-warmup sets of block entries and stores
+`day.readiness`. Hidden when the sheet is not connected or there is no row for today. The plan itself is fixed: days are
+never moved because of shifts (the user wants a fixed plan regardless of work).
+**Reason:** Idea #6 from the 10-ideas list; the user often trains after short sleep around night shifts.
+**Status:** Active
+
 ## #70 · 2026-11-10 · v52: ten usability fixes (start today, last time, clearer sets, history, trend, programs)
 **Decision:** After a review of every screen the user asked for all ten proposals:
 1. `js/today.js`: weekday from workout names (English/Norwegian, e.g. "Tue · Bench", "Tirsdag Chest+Tri");

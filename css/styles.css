@@ -993,3 +993,14 @@ body.auth-open { overflow: hidden; }
 .prog-grid.small .prog-name { font-size: calc(13px * var(--fs)); }
 .prog-grid.small .lvl-badge { display: none; }
 .workout-row.focus { outline: 1.5px solid var(--accent-hi); }
+
+/* Readiness from the watch (DECISIONS #71) */
+.ready { margin: -2px 0 12px; padding: 12px 16px; background: var(--card); border-radius: var(--radius); border-left: 3px solid var(--c); }
+.ready-good { --c: var(--accent-hi); }
+.ready-reduced { --c: var(--gold); }
+.ready-poor { --c: var(--red); }
+.rd-head { display: flex; align-items: center; gap: 8px; font-size: calc(14.5px * var(--fs)); }
+.rd-head b { font-weight: 600; }
+.rd-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+.rd-facts { margin-top: 4px; color: var(--muted); font-size: calc(12.5px * var(--fs)); }
+.rd-apply { margin-top: 6px; padding: 4px 0; }

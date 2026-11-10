@@ -2,7 +2,7 @@
 
 Current state of the project. Update it at the end of every task; remove anything that is no longer true.
 
-_Last updated: 2026-11-10 (v52 published: ten usability fixes, DECISIONS #70. Makrologg Kode.gs needs a new version for the «Oppsett» tab – reminder set for 20:45)_
+_Last updated: 2026-11-10 (v53 built: readiness on Home, DECISIONS #71; waiting for OK. Kode.gs needs a new version for «Oppsett» + Garmin read – reminder 20:45)_
 
 ## About the user
 
@@ -25,6 +25,7 @@ _Last updated: 2026-11-10 (v52 published: ten usability fixes, DECISIONS #70. Ma
 
 ## Current status
 
+- **v53 (2026-11-10):** readiness from the watch on Home (needs Kode.gs with `?read=garmin`), DECISIONS #71. Ideas list 10.11: user wants #2 dishes weighed in the pot, #3 weekly kcal budget, #7 meal plan + shopping list (all Makrologg – another session is working on Makrologg, ask before touching it), #4 maybe, #9 sleep plan around night shifts. Dropped: #1 shift-based moving of days (fixed plan), #5 hunger log. #10 already exists (progression).
 - **v52 (2026-11-10):** Start today's workout (block + own program by weekday), Home today card, "Last:" on cards, filled done sets, set editor tidy-up, History done-only + names, trend main lifts, Log tab, backup on Home after 14 d, setup sync to «Oppsett», programs as day lists (DECISIONS #70).
 - **v51 (2026-11-06):** built-in "Hybrid PPL" program from the user's own split + 2 new exercises (DECISIONS #69).
 - **v50 (2026-11-03):** optional "Plan first, tick off when done" setting (for the girlfriend): sets saved as plan, check boxes per set and per exercise (DECISIONS #68).
