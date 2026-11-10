@@ -73,7 +73,8 @@ function records() {
     const { date, ...rest } = b;
     out.push({ t: 'body', pid: PID, person, date, unit: state.settings.unit, ...rest });
   }
-  return out.sort((a, b) => (a.date < b.date ? 1 : -1));
+  // The setup row goes first (its fixed date would otherwise put it last), then the newest days
+  return out.sort((a, b) => (a.t === 'setup') - (b.t === 'setup') ? (a.t === 'setup' ? -1 : 1) : (a.date < b.date ? 1 : -1));
 }
 
 // The user's own programs, running blocks (1RMs and progress) and a few settings, so the coach sees changes made on the
@@ -122,15 +123,22 @@ export async function runSync() {
   sync.err = null;
   notify();
   const st = readState();
-  const todo = records().filter((r) => st.sent[recKey(r)] !== hash(JSON.stringify(r))).slice(0, 40);
+  const pending = records().filter((r) => st.sent[recKey(r)] !== hash(JSON.stringify(r)) && !(r.t === 'setup' && sync.skipSetup));
+  sync.left = pending.length;
+  const todo = pending.slice(0, 40);
   try {
     for (const r of todo) {
       try {
         await send(url, r);
       } catch (e) {
-        // An older Apps Script without the «Oppsett» tab: skip the setup row instead of blocking everything else
+        // An older Apps Script without the «Oppsett» tab: skip the setup row (not marked as sent, so it goes once the
+        // script is updated) instead of blocking everything else
         if (r.t !== 'setup' || !/ukjent type/.test(e?.message || '')) throw e;
+        sync.skipSetup = true;
+        continue;
       }
+      sync.left = Math.max(0, (sync.left || 0) - 1);
+      notify();
       st.sent[recKey(r)] = hash(JSON.stringify(r));
       st.last = Date.now();
       writeState(st);
@@ -141,7 +149,7 @@ export async function runSync() {
   sync.busy = false;
   notify();
   if (sync.err) syncSoon(10 * 60000); // try again in 10 minutes
-  else if (pendingCount()) syncSoon(1000);
+  else if (pendingCount() > (sync.skipSetup ? 1 : 0)) syncSoon(1000);
 }
 
 export function syncSoon(ms = 5000) {
@@ -159,7 +167,7 @@ export function resendAll() {
 
 export function syncStatus() {
   if (!sheetUrl()) return 'Not connected.';
-  if (sync.busy) return 'Sending…';
+  if (sync.busy) return sync.left ? `Sending… ${sync.left} left.` : 'Sending…';
   const st = readState();
   const last = st.last ? `Last sent ${new Date(st.last).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.` : 'Nothing sent yet.';
   if (sync.err) return `${sync.err}. ${last} Trying again later.`;

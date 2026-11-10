@@ -2,10 +2,14 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 53;
+export const APP_VERSION = 54;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 54, date: '2026-11-10', items: [
+    'Coach sync shows how many items are left while it sends.',
+    'Your programs and blocks are sent to the coach sheet first, not last.',
+  ] },
   { v: 53, date: '2026-11-10', items: [
     'Readiness on Home: last night’s sleep, HRV, resting pulse and body battery from your watch (via the coach sheet) give a simple advice for today’s main lift. If recovery is low, one tap lowers today’s planned block sets by 5 or 10 %.',
   ] },
