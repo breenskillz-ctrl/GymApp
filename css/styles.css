@@ -906,3 +906,90 @@ body.auth-open { overflow: hidden; }
 .ex-check.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .ex-card.is-done .ex-title { color: var(--muted); }
 .set-dialog .save-done, .set-dialog .save-plan { margin-top: 6px; }
+
+/* ---------- v52 (DECISIONS #70) ---------- */
+/* Home: today's workout, this week, latest record */
+.today-card { margin: 14px 0 12px; padding: 18px; background: var(--card); border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); }
+.today-card.quiet { border-color: var(--line); }
+.tc-kicker { font-size: calc(12px * var(--fs)); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-hi); font-weight: 600; }
+.tc-title { font-family: var(--f-num); font-weight: 600; font-size: calc(24px * var(--fs)); line-height: 1.15; margin: 4px 0 10px; }
+.tc-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line);
+  font-size: calc(14px * var(--fs)); }
+.tc-row b { font-weight: 600; white-space: nowrap; }
+.tc-empty { margin: 0 0 4px; font-size: calc(14px * var(--fs)); }
+.tc-btn { margin-top: 12px; min-height: 50px; font-size: calc(16px * var(--fs)); }
+.home-card { display: block; width: 100%; text-align: left; background: var(--card); border-radius: var(--radius);
+  padding: 14px 18px; margin-bottom: 12px; }
+.week-card .wc-head { display: flex; justify-content: space-between; align-items: baseline; font-size: calc(15px * var(--fs)); }
+.week-card .wc-head .muted { font-size: calc(13px * var(--fs)); }
+.wc-days { display: flex; justify-content: space-between; margin-top: 12px; }
+.wc-day { display: grid; justify-items: center; gap: 6px; font-size: calc(12px * var(--fs)); color: var(--muted); }
+.wc-day i { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--line2); }
+.wc-day i.done { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.wc-day i.today { border: 2px solid var(--accent-hi); }
+.wc-day i.planned { border-style: dashed; border-color: var(--accent-hi); }
+.wc-day .ico { width: 16px; height: 16px; stroke-width: 3; }
+.rec-card { display: flex; align-items: center; gap: 14px; }
+.rec-card b { display: block; font-weight: 600; }
+.rec-card small { display: block; color: var(--muted); font-size: calc(13px * var(--fs)); margin-top: 2px; }
+.rec-card > .ico:last-child { color: var(--muted); width: 18px; height: 18px; }
+.home-backup { margin-top: 4px; }
+
+/* Log: last session line, clearly done sets, start button on an empty day */
+.ex-last { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: calc(13px * var(--fs)); margin: -2px 0 8px; }
+.ex-last .ico { width: 14px; height: 14px; flex: none; }
+.ex-last b { color: var(--text2); font-weight: 500; }
+.ex-card .sets { gap: 8px; }
+.ex-card .set-col { min-width: 62px; }
+.set-col.done { background: color-mix(in srgb, var(--accent) 24%, var(--card2)); border: 1.5px solid var(--accent); }
+.set-col.done.pr { border-color: var(--gold); }
+.set-col.planned { opacity: .8; }
+.set-ok { position: absolute; top: -7px; right: -7px; width: 19px; height: 19px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent); color: var(--accent-ink); }
+.set-ok .ico { width: 11px; height: 11px; stroke-width: 3; }
+.set-col.done.pr .set-ok { background: var(--gold); }
+.log-start { margin-top: 18px; min-height: 48px; padding: 0 22px; }
+.log-start-sub { margin-top: 8px; font-size: calc(13px * var(--fs)); }
+
+/* Set editor: last time, labelled rows, all levels visible, fewer tags */
+.se-last { display: block; margin-top: 6px; font-size: calc(13px * var(--fs)); color: var(--muted); }
+.se-last b { color: var(--text); font-weight: 500; }
+.se-label { font-size: calc(11px * var(--fs)); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 10px 2px 0; }
+.set-dialog .lvl-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; overflow: visible; margin: 6px 0 10px; }
+.set-dialog .lvl-btn { justify-content: center; border: 1px solid var(--line2); padding: 9px 4px; }
+.set-dialog .tag-row { margin-top: 6px; }
+.tag-btn.tag-more { border-style: dashed; color: var(--muted); }
+.se-actions { position: sticky; bottom: -1px; background: var(--dialog); padding-top: 6px; margin: 0 -2px; }
+
+/* History: muscle groups as one thin bar */
+.mix-bar { display: flex; gap: 2px; height: 10px; border-radius: 6px; overflow: hidden; margin-top: 12px; }
+.mix-bar i { display: block; min-width: 3px; }
+.mix-legend.row { flex-direction: row; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; }
+.mix-legend.row span { gap: 6px; }
+.mix-legend.row b { margin-left: 0; color: var(--text); }
+
+/* Progress: strength trend chips */
+.trend-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.trend-chip { padding: 6px 11px; border-radius: 999px; font-size: calc(12.5px * var(--fs)); font-weight: 600;
+  background: color-mix(in srgb, var(--c) 20%, transparent); color: var(--c); }
+.trend-chip.add { background: none; border: 1px dashed var(--line2); color: var(--muted); font-weight: 500; }
+
+/* Programs: own programs as day lists, built-ins as a smaller grid */
+.my-prog { background: var(--card); border-radius: var(--radius); padding: 6px 14px 4px; margin-bottom: 10px; }
+.mp-head { display: flex; align-items: center; gap: 8px; padding: 8px 0; }
+.mp-head .prog-more { position: static; color: var(--muted); }
+.mp-name { display: block; font-family: var(--f-num); font-weight: 600; font-size: calc(21px * var(--fs)); }
+.mp-head .sub { display: block; font-size: calc(13px * var(--fs)); }
+.mp-day { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); font-size: calc(14.5px * var(--fs)); cursor: pointer; }
+.mp-day > .ico { width: 16px; height: 16px; color: var(--muted); }
+.mp-wd { width: 34px; flex: none; font-size: calc(11.5px * var(--fs)); font-weight: 700; letter-spacing: .06em; color: var(--muted); }
+.mp-day.today .mp-wd { color: var(--accent-hi); }
+.mp-add { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+  background: var(--accent); color: var(--accent-ink); font-size: calc(13px * var(--fs)); font-weight: 600; }
+.mp-add .ico { width: 14px; height: 14px; }
+.prog-grid.small { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.prog-grid.small .prog-tile { aspect-ratio: 1 / 1; }
+.prog-grid.small .prog-name { font-size: calc(13px * var(--fs)); }
+.prog-grid.small .lvl-badge { display: none; }
+.workout-row.focus { outline: 1.5px solid var(--accent-hi); }

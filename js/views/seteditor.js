@@ -32,6 +32,9 @@ export function suggestionDelta(s) {
   return parts.join(' ');
 }
 
+// "7 Nov"
+const shortDate = (k) => { const [y, mo, d] = k.split('-').map(Number); return `${d} ${new Date(y, mo - 1, d).toLocaleString('en-GB', { month: 'short' })}`; };
+
 export const levelColor = (id) => LEVELS.find((l) => l.id === id)?.color;
 export const exLabel = (ex) => (ex.equip && !['Other', 'Bodyweight'].includes(ex.equip) ? `${ex.name} · ${ex.equip}` : ex.name);
 
@@ -65,6 +68,20 @@ function historyHtml(ex, date) {
     ${h.sets.map((s) => `<span class="pill">${esc(setText(ex, s))}</span>`).join('')}</div>`).join('');
 }
 
+// The tags to show without "More": those already on the set, then the most used (this exercise first), max 3
+function topTags(exId, active) {
+  const count = {};
+  for (const day of Object.values(state.log)) {
+    for (const e of day.entries) {
+      for (const st of e.sets) for (const t of st.tags || []) count[t] = (count[t] || 0) + (e.ex === exId ? 10 : 1);
+    }
+  }
+  const ranked = SET_TAGS.map((t) => t.id).sort((a, b) => (count[b] || 0) - (count[a] || 0));
+  const out = [...active];
+  for (const id of ranked) if (out.length < 3 && !out.includes(id)) out.push(id);
+  return out;
+}
+
 /**
  * Open the set editor.
  * @param {string} date  day key
@@ -87,6 +104,11 @@ export function openSetEditor(date, entry, index, onDone) {
   const tags = new Set(existing?.tags || src.tags || []); // a new set keeps the variant of the set before it
   const fields = fieldsFor(ex.type);
   const tools = ex.type === 'wr' ? ['history', 'calc', 'plates'] : ['history'];
+  // Last session's matching set, shown under the title (DECISIONS #70)
+  const prevDay = history(ex.id, date)[0];
+  const prevSet = prevDay ? prevDay.sets.filter((s) => s.lvl !== 'warmup')[n - 1] || prevDay.sets[prevDay.sets.length - 1] : null;
+  // Tags: the ones in use plus the user's most used, up to 3; the rest behind "More"
+  const shownTags = topTags(ex.id, tags);
   let tool = null;
 
   openModal(`
@@ -95,6 +117,7 @@ export function openSetEditor(date, entry, index, onDone) {
         <div>
           <h2>Set №${n}</h2>
           <span class="sub">${esc(exLabel(ex))}</span>
+          ${prevSet && !(existing && !existing.done && existing.last) ? `<span class="se-last">Last time: <b>${esc(setText(ex, prevSet))}</b> · ${shortDate(prevDay.date)}</span>` : ''}
         </div>
         <div class="se-tools">
           ${tools.includes('plates') ? `<button type="button" class="icon-btn" data-tool="plates" aria-label="Plate calculator">${icon('plates')}</button>` : ''}
@@ -119,18 +142,23 @@ export function openSetEditor(date, entry, index, onDone) {
           </div>
         </div>`).join('')}</div>
       <label class="se-comment">${icon('comment')}<input data-comment placeholder="Add comment" value="${esc(existing?.c || '')}"></label>
+      <div class="se-label">How did it feel?</div>
       <div class="lvl-row">
         ${LEVELS.map((l) => `<button type="button" class="lvl-btn ${l.id === lvl ? 'active' : ''}" style="--c:${l.color}" data-lvl="${l.id}">
           <span class="dot" style="background:${l.color}"></span>${l.label}</button>`).join('')}
       </div>
+      <div class="se-label">Variant</div>
       <div class="tag-row" aria-label="Variant">${SET_TAGS.map((t) => `<button type="button" class="tag-btn ${tags.has(t.id) ? 'active' : ''}"
-        data-tag="${t.id}" aria-pressed="${tags.has(t.id)}">${t.label}</button>`).join('')}</div>
+        data-tag="${t.id}" aria-pressed="${tags.has(t.id)}" ${shownTags.includes(t.id) ? '' : 'hidden'}>${t.label}</button>`).join('')}${shownTags.length < SET_TAGS.length
+  ? '<button type="button" class="tag-btn tag-more" data-more-tags>More</button>' : ''}</div>
+      <div class="se-actions">
       ${state.settings.planFirst ? (existing?.done ? `
       <button type="submit" class="btn primary block save-set" data-done="1">${icon('check')} Save set</button>
       <button type="submit" class="btn ghost block save-plan" data-done="0">Mark as not done</button>` : `
       <button type="submit" class="btn primary block save-set" data-done="0">${editing ? 'Save plan' : 'Add to plan'}</button>
       <button type="submit" class="btn ghost block save-done" data-done="1">${icon('check')} ${editing ? 'Save and mark done' : 'Add as done'}</button>`)
     : `<button type="submit" class="btn primary block save-set">${icon('check')} ${editing ? 'Save set' : 'Add set'}</button>`}
+      </div>
     </form>`, {
     className: 'dialog set-dialog',
     onMount(m, close) {
@@ -176,6 +204,11 @@ export function openSetEditor(date, entry, index, onDone) {
         if (lb) {
           lvl = lb.dataset.lvl;
           m.querySelectorAll('[data-lvl]').forEach((b) => b.classList.toggle('active', b === lb));
+          return;
+        }
+        if (e.target.closest('[data-more-tags]')) {
+          m.querySelectorAll('.tag-btn[hidden]').forEach((b) => { b.hidden = false; });
+          e.target.closest('[data-more-tags]').remove();
           return;
         }
         const tg = e.target.closest('[data-tag]');

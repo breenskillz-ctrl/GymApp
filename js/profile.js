@@ -1,7 +1,7 @@
 // Local profile (DECISIONS #45): a name for the greeting, and an optional username + password that locks the app on this
 // device. Everything stays on the phone. The password is stored as a salted PBKDF2 hash; it keeps casual eyes out but does
 // not encrypt the workout data.
-import { state, save, dayHasWork } from './store.js';
+import { state, save, dayDone } from './store.js';
 import { esc, icon, openModal, confirmDialog, promptDialog, toast } from './utils.js';
 
 const SESSION = 'gymapp.session'; // '1' while signed in (localStorage when "stay signed in", else sessionStorage)
@@ -41,7 +41,7 @@ function signOut() {
 
 export const profileName = () => state.profile?.name || '';
 export const hasPassword = () => !!state.profile?.passHash;
-export const workoutCount = () => Object.keys(state.log).filter(dayHasWork).length;
+export const workoutCount = () => Object.keys(state.log).filter(dayDone).length;
 
 export function updateDrawerUser() {
   const el = document.getElementById('drawer-user');

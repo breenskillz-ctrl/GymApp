@@ -1,7 +1,7 @@
 // Progress: statistics, charts, records, body weight and settings.
 import { GROUPS, GROUP_COLORS } from '../data.js';
 import {
-  state, save, dayHasWork, getExercise, records, setVolume, resetState,
+  state, save, dayHasWork, dayDone, getExercise, records, setVolume, resetState,
 } from '../store.js';
 import {
   esc, icon, topBar, applyTextScale, dateKey, addDays, weekStart, parseKey, fmtDate, fmtNum, num, toast, confirmDialog, openModal,
@@ -16,11 +16,12 @@ import {
 } from '../backup.js';
 import { lineChart, barChart, multiLineChart, stackedBarChart } from '../charts.js';
 import { openExerciseDetail } from './exercises.js';
+import { exLabel } from './seteditor.js';
 import { updateWakeLock } from '../wakelock.js';
 import { sheetUrl, syncStatus, syncSoon, resendAll, onSyncChange } from '../sync.js';
 
 function stats() {
-  const days = Object.keys(state.log).filter(dayHasWork).sort();
+  const days = Object.keys(state.log).filter(dayDone).sort();
   const today = dateKey();
   const thisWeek = weekStart(today);
   const month = addDays(today, -29);
@@ -70,9 +71,11 @@ function stats() {
 
 
 // ---------- Strength trend and weekly sets (DECISIONS #29) ----------
-const LINE_COLORS = ['#6b97e0', '#ff8a3d', '#f2b705', '#43c463'];
+const LINE_COLORS = ['#6b97e0', '#ff8a3d', '#f2b705', '#a259ff', '#43c463'];
+const MAIN_LIFTS = ['squat', 'bench-press', 'deadlift', 'overhead-press'];
 
-// Best estimated 1RM per month for the four weighted lifts trained most often in the last 12 months.
+// Best estimated 1RM per month in the last 12 months. Shows the lifts picked in settings.trendLifts, else the main lifts
+// (squat, bench, deadlift, press) that have data, else the four trained most often (DECISIONS #70).
 // Sets above 12 reps are left out, because the 1RM estimate gets unreliable there.
 function strengthTrend() {
   const now = parseKey(dateKey());
@@ -98,8 +101,13 @@ function strengthTrend() {
       best[e.ex][m] = Math.max(best[e.ex][m] || 0, top);
     }
   }
-  const ids = Object.keys(count).sort((a, b) => count[b] - count[a]).slice(0, 4);
+  const ranked = Object.keys(count).sort((a, b) => count[b] - count[a]);
+  const picked = (state.settings.trendLifts || []).filter((id) => count[id]);
+  const main = MAIN_LIFTS.filter((id) => count[id]);
+  const ids = picked.length ? picked.slice(0, 5) : main.length ? main : ranked.slice(0, 4);
   return {
+    available: ranked,
+    ids,
     labels: months.map((m) => MONTHS[Number(m.slice(5)) - 1].slice(0, 3)),
     series: ids.map((id, i) => ({
       id, name: getExercise(id).name, color: LINE_COLORS[i], values: months.map((m) => best[id][m] || null),
@@ -192,7 +200,9 @@ export function renderProgress(root) {
     <section class="card">
       <h3>Strength trend <span class="muted">(best est. 1RM per month)</span></h3>
       <div class="chart-box"><canvas id="c-trend"></canvas></div>
-      ${trend.series.length ? legendHtml(trend.series) : ''}
+      ${trend.available.length ? `<div class="trend-chips">${trend.series.map((x) => `<button class="trend-chip" data-trend-del="${esc(x.id)}"
+        style="--c:${x.color}" aria-label="Hide ${esc(x.name)}">${esc(x.name)}</button>`).join('')}
+        ${trend.series.length < 5 && trend.available.length > trend.series.length ? '<button class="trend-chip add" data-act="trend-add">+ Choose</button>' : ''}</div>` : ''}
     </section>
 
     <section class="card">
@@ -257,7 +267,23 @@ export function renderProgress(root) {
     if (ex) return openExerciseDetail(ex.dataset.ex);
     const ms = e.target.closest('[data-measure]');
     if (ms) { bodyMeasure = ms.dataset.measure; return renderProgress(root); }
+    const td = e.target.closest('[data-trend-del]');
+    if (td) {
+      state.settings.trendLifts = trend.ids.filter((id) => id !== td.dataset.trendDel);
+      save();
+      return renderProgress(root);
+    }
     const a = e.target.closest('[data-act]')?.dataset.act;
+    if (a === 'trend-add') {
+      menuDialog('Show in strength trend', trend.available.filter((id) => !trend.ids.includes(id)).slice(0, 25)
+        .map((id) => ({ value: id, label: exLabel(getExercise(id)) }))).then((v) => {
+        if (!v) return;
+        state.settings.trendLifts = [...trend.ids, v];
+        save();
+        renderProgress(root);
+      });
+      return;
+    }
     if (a === 'settings') openSettings(() => renderProgress(root));
     if (a === 'body-list') openBodyWeight(() => renderProgress(root));
     if (a === 'photos') openProgressPhotos();

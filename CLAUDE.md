@@ -60,7 +60,8 @@ js/photodb.js         Progress photos in IndexedDB (addPhoto/allPhotos/deletePho
 js/wakelock.js        Screen wake lock while today has exercises (settings.keepAwake)
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart(), barChart(), multiLineChart(), stackedBarChart() on canvas
-js/views/home.js      Home (start page, back-button root): greeting + Exercise / Programs / History buttons with status (#57, #59)
+js/today.js           Today's workout: weekdayOf(), myProgram(), todayPlan(), startToday(), workoutName() (DECISIONS #70)
+js/views/home.js      Home (start page, back-button root): today card + Start button, this week, latest record, backup reminder (#57, #70)
 js/views/history.js   History: workout count + muscle-group mix, compact workout cards, "Start workout" → today's log
 js/views/log.js       Day view (cards with set chips + "+" chip, ‹ day › nav, "Add exercise" pill, day menu, calendar, records)
 js/views/seteditor.js Set editor dialog (fields, −/+, comment, levels, history/1RM/plate tools)
@@ -82,7 +83,7 @@ android-app/          Android app (Capacitor 8, appId app.loadlog): loads the li
 {
   customExercises: [{ id: 'c-…', name, group, equip, type, desc }],
   customPrograms:  [{ id: 'cp-…', name, desc, level, days, workouts: [{ id, name, exercises: [{ ex, sets, reps }] }] }],
-  log:  { 'YYYY-MM-DD': { title, note?, duration?, entries: [{ id, ex, note?, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, tags?, at?, last?, pct?, amrap?, goal? }] }] } },
+  log:  { 'YYYY-MM-DD': { title, workout?, note?, duration?, entries: [{ id, ex, note?, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, tags?, at?, last?, pct?, amrap?, goal? }] }] } },
   body: [{ date: 'YYYY-MM-DD', weight?, chest?, waist?, armL?, armR?, thighL?, thighR? }],
   food?: { … },   // left over from the removed Food tab (v39–v40, DECISIONS #59); nothing reads it, keep it untouched
   profile: { name, username, passHash?, salt?, iterations?, created },   // or profileSkipped: true (DECISIONS #45)
@@ -91,7 +92,7 @@ android-app/          Android app (Capacitor 8, appId app.loadlog): loads the li
   blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],
   blockTemplates: [ /* the user's own templates, compact items */ ],
   lastBackup, backupSnooze, lastAutoBackup,   // backup files add backupVersion: 2 and photos: [...] (not stored in state)
-  settings: { unit: 'kg'|'lb', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true }
+  settings: { unit: 'kg'|'lb', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst, myProgram?, trendLifts?, sheetUrl? }
 }
 ```
 

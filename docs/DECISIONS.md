@@ -5,6 +5,28 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #70 · 2026-11-10 · v52: ten usability fixes (start today, last time, clearer sets, history, trend, programs)
+**Decision:** After a review of every screen the user asked for all ten proposals:
+1. `js/today.js`: weekday from workout names (English/Norwegian, e.g. "Tue · Bench", "Tirsdag Chest+Tri");
+   `todayPlan()` = the running block's open day for today's weekday + the matching day of "my program"
+   (`settings.myProgram`, set from the program ⋮ menu, else the first own program with weekday names); `startToday()` adds
+   both (skips exercises already on the day) and stores `day.workout` = program day name.
+2. Home: today card (plan or progress + "Start today's workout"/"Continue"), this week (Mon–Sun), latest record.
+3. Log cards show "Last: 90 kg × 6, 6, 6 · 3 Nov" (previous session, warmups left out).
+4. Done sets are filled (accent) with a tick badge; planned sets are dimmer.
+5. Set editor: "Last time" line, labelled rows, all six levels in a 3×2 grid, max 3 tags (in use + most used) with "More",
+   sticky save button.
+6. History lists and counts only days with done sets (`dayDone()` in store; also workout count, week count, Progress).
+   Card title = `workoutName(day)` (program day, else block day, else time of day). Pie → thin bar.
+7. Strength trend: `settings.trendLifts`, default the four main lifts with data; chips to hide, "+ Choose" to add (max 5).
+8. Tab "Exercise" → "Log".
+9. Backup reminder only on Home and after 14 days (counts `lastAutoBackup`). The coach sync sends a `setup` record
+   (own programs, running blocks with 1RM/base/progress, settings) to a new «Oppsett» tab (Makrologg Kode.gs; not forwarded
+   to Supabase). An older script answers "ukjent type"; the app then skips that record instead of blocking the sync.
+10. Programs: own programs as lists of days with "Add today" on today's weekday; built-ins as a smaller 3-column grid.
+**Reason:** The user wants fewer taps per session and screens that show what matters; the coach should see phone-only setup.
+**Status:** Active
+
 ## #69 · 2026-11-06 · Built-in "Hybrid PPL" program (the user's own split)
 **Decision:** The user's own Hybrid PPL is now a built-in program (`p-hybrid-ppl`, Advanced, 5 days + walking on Thu/Sun),
 accessories only, so it pairs with the 12-Week Strength Period block for the main lifts. Others start from it with "Copy and

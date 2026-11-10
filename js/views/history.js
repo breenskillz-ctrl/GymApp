@@ -1,7 +1,8 @@
 // History: earlier workouts as compact cards, newest first (DECISIONS #36). The app opens here.
 import {
-  state, save, getExercise, dayHasWork, daySummary, dayDuration, isPR, getDay,
+  state, save, getExercise, dayHasWork, dayDone, daySummary, dayDuration, isPR, getDay,
 } from '../store.js';
+import { workoutName, todayPlan, startToday } from '../today.js';
 import {
   esc, icon, dateKey, fmtDate, fmtNum, e1rm, MONTHS, parseKey, go, menuDialog, confirmDialog, toast,
 } from '../utils.js';
@@ -21,8 +22,10 @@ function bestSet(ex, sets) {
   return pool.reduce((a, b) => (score(b) > score(a) ? b : a), pool[0]);
 }
 
-// Time of day from the first logged set; imported days have no times
+// The program day or block day ("Tirsdag Chest+Tri"), else the time of day from the first logged set (DECISIONS #70)
 function title(day) {
+  const named = workoutName(day);
+  if (named) return esc(named);
   const first = Math.min(...day.entries.flatMap((e) => e.sets.filter((s) => s.at).map((s) => s.at)));
   if (!Number.isFinite(first)) return 'Workout';
   const h = new Date(first).getHours();
@@ -48,21 +51,6 @@ function groupMix(range) {
   return GROUPS.filter((g) => count[g]).map((g) => [g, count[g]]).sort((a, b) => b[1] - a[1]);
 }
 
-// Pizza-style pie: one slice per muscle group, with thin gaps between the slices
-function pieSvg(pct) {
-  const R = 50;
-  if (pct.length === 1) return `<svg class="mix-pie" viewBox="-52 -52 104 104"><circle r="${R}" fill="${GROUP_COLORS[pct[0][0]]}"/></svg>`;
-  let a = -Math.PI / 2;
-  const pt = (ang) => `${(R * Math.cos(ang)).toFixed(2)} ${(R * Math.sin(ang)).toFixed(2)}`;
-  const slices = pct.map(([g, p]) => {
-    const b = a + (p / 100) * 2 * Math.PI;
-    const d = `M0 0L${pt(a)}A${R} ${R} 0 ${b - a > Math.PI ? 1 : 0} 1 ${pt(b)}Z`;
-    a = b;
-    return `<path d="${d}" fill="${GROUP_COLORS[g]}"/>`;
-  }).join('');
-  return `<svg class="mix-pie" viewBox="-52 -52 104 104" aria-hidden="true">${slices}</svg>`;
-}
-
 function mixHtml() {
   const mix = groupMix(mixRange);
   const total = mix.reduce((a, [, n]) => a + n, 0);
@@ -71,9 +59,8 @@ function mixHtml() {
   if (!total) return `<div class="mix"><div class="mix-head"><span>Muscle groups</span>${range}</div><p class="muted mix-empty">No sets logged yet.</p></div>`;
   return `<div class="mix">
     <div class="mix-head"><span>Muscle groups</span>${range}</div>
-    <div class="mix-body">${pieSvg(pct)}
-      <div class="mix-legend">${pct.map(([g, p]) => `<span><i class="gdot" style="--c:${GROUP_COLORS[g]}"></i>${esc(g)}<b>${Math.round(p)}%</b></span>`).join('')}</div>
-    </div>
+    <div class="mix-bar" aria-hidden="true">${pct.map(([g, p]) => `<i style="flex:${p};background:${GROUP_COLORS[g]}"></i>`).join('')}</div>
+    <div class="mix-legend row">${pct.map(([g, p]) => `<span><i class="gdot" style="--c:${GROUP_COLORS[g]}"></i>${esc(g)} <b>${Math.round(p)}%</b></span>`).join('')}</div>
   </div>`;
 }
 
@@ -91,7 +78,7 @@ function weekCount() {
   const d = new Date();
   d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
   const from = dateKey(d);
-  return Object.keys(state.log).filter((k) => k >= from && dayHasWork(k)).length;
+  return Object.keys(state.log).filter((k) => k >= from && dayDone(k)).length;
 }
 
 const fmtDuration = (min) => (min >= 60 ? `${Math.floor(min / 60)}h ${min % 60}m` : `${min}m`);
@@ -113,7 +100,7 @@ function cardHtml(key) {
   return `<article class="h-card" data-day="${key}">
     <div class="h-head">
       <div class="grow"><h3>${title(day)}</h3>
-        ${day.title ? `<div class="h-comment">${esc(day.title)}</div>` : ''}<div class="sub">${fmtDate(key)}</div></div>
+        ${day.title && !day.title.endsWith(workoutName(day) || '\u0000') ? `<div class="h-comment">${esc(day.title)}</div>` : ''}<div class="sub">${fmtDate(key)}</div></div>
       <button class="icon-btn h-more" data-more="${key}" aria-label="Workout menu">${icon('more')}</button>
     </div>
     <div class="h-stats">
@@ -126,9 +113,11 @@ function cardHtml(key) {
 }
 
 export function renderHistory(root) {
-  const days = Object.keys(state.log).filter(dayHasWork).sort().reverse();
+  const days = Object.keys(state.log).filter(dayDone).sort().reverse(); // planned-only days are not workouts yet
   const today = dateKey();
   const hasToday = dayHasWork(today);
+  const plan = hasToday ? null : todayPlan(today);
+  const canStart = plan && (plan.bd || plan.workout);
   let shown = 0;
   let lastMonth = '';
 
@@ -142,7 +131,7 @@ export function renderHistory(root) {
     <div class="h-list">${days.length ? '' : `<div class="empty-day"><h2>No workouts yet</h2>
       <p class="muted">Tap "Start workout" to log your first one.</p></div>`}</div>
     <div class="h-more-sentinel"></div>
-    <div class="fab-wrap"><button class="fab-ext" data-act="start">${icon('plus')}${hasToday ? 'Continue workout' : 'Start workout'}</button></div>`;
+    <div class="fab-wrap"><button class="fab-ext" data-act="start">${icon('plus')}${hasToday ? 'Continue workout' : canStart ? 'Start today’s workout' : 'Start workout'}</button></div>`;
 
   const list = root.querySelector('.h-list');
   const more = () => {
@@ -190,7 +179,10 @@ export function renderHistory(root) {
       root.querySelector('.mix').outerHTML = mixHtml();
       return;
     }
-    if (a === 'start') return open(today);
+    if (a === 'start') {
+      if (canStart) { startToday(today); toast('Today’s workout is ready – tap a set to log it'); }
+      return open(today);
+    }
     if (a === 'calendar') return openCalendar();
     const card = e.target.closest('[data-day]');
     if (card) open(card.dataset.day);

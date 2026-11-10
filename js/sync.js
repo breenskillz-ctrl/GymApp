@@ -2,6 +2,8 @@
 // Apps Script web app (the script lives in the Makrologg repo: data/coach/Kode.gs), so Claude can follow the training.
 // Only records that changed since the last send go out; their fingerprints are kept per device in SYNC_KEY.
 import { state, getExercise, allExercises } from './store.js';
+import { blockSize, blockDoneCount } from './blocks.js';
+import { myProgram } from './today.js';
 import { e1rm } from './utils.js';
 import { profileName } from './profile.js';
 
@@ -65,12 +67,31 @@ function records() {
       ...(day.note ? { note: day.note } : {}), ...(notes.length ? { notes } : {}),
     });
   }
+  out.push(setupRecord(person));
   for (const b of state.body || []) {
     if (!b?.date) continue;
     const { date, ...rest } = b;
     out.push({ t: 'body', pid: PID, person, date, unit: state.settings.unit, ...rest });
   }
   return out.sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+
+// The user's own programs, running blocks (1RMs and progress) and a few settings, so the coach sees changes made on the
+// phone (DECISIONS #70). One row per person in «Oppsett»; the fixed date keeps it a single row that is updated in place.
+function setupRecord(person) {
+  const target = (x) => {
+    const ex = getExercise(x.ex);
+    return `${nameOf(ex)} ${x.sets}×${x.reps ?? '–'}${ex.type === 't' ? 's' : ''}`;
+  };
+  const programs = (state.customPrograms || []).map((p) => `${p.name}: ${p.workouts.map((w) => `${w.name} = ${w.exercises.map(target).join(', ')}`).join(' | ')}`).join(' || ');
+  const blocks = (state.blocks || []).filter((b) => !b.finished).map((b) => {
+    const maxes = Object.entries(b.maxes || {}).map(([id, kg]) => `${nameOf(getExercise(id))} ${kg}`).join(', ');
+    const next = b.weeks[b.pos.w]?.days[b.pos.d]?.name || '';
+    return `${b.name}: 1RM ${maxes} · base ${b.base} % · ${blockDoneCount(b)} of ${blockSize(b)} days done · next W${b.pos.w + 1} D${b.pos.d + 1} ${next}`;
+  }).join(' || ');
+  const st = state.settings;
+  const settings = `unit ${st.unit} · rest ${st.rest}s · plan first ${st.planFirst ? 'on' : 'off'}`;
+  return { t: 'setup', pid: PID, person, date: '2000-01-01', mine: myProgram()?.name || '', programs, blocks, settings };
 }
 
 const recKey = (r) => `${r.t}|${r.pid}|${r.date}`;
@@ -104,7 +125,12 @@ export async function runSync() {
   const todo = records().filter((r) => st.sent[recKey(r)] !== hash(JSON.stringify(r))).slice(0, 40);
   try {
     for (const r of todo) {
-      await send(url, r);
+      try {
+        await send(url, r);
+      } catch (e) {
+        // An older Apps Script without the «Oppsett» tab: skip the setup row instead of blocking everything else
+        if (r.t !== 'setup' || !/ukjent type/.test(e?.message || '')) throw e;
+      }
       st.sent[recKey(r)] = hash(JSON.stringify(r));
       st.last = Date.now();
       writeState(st);

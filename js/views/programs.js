@@ -3,7 +3,7 @@ import {
   state, save, allPrograms, getProgram, saveProgram, deleteProgram, getExercise,
 } from '../store.js';
 import {
-  esc, icon, openModal, confirmDialog, toast, topBar, go, promptDialog, menuDialog, dateKey, fmtDate,
+  esc, icon, openModal, confirmDialog, toast, topBar, go, promptDialog, menuDialog, dateKey, fmtDate, parseKey,
 } from '../utils.js';
 import { programArt } from '../icons.js';
 import { openExercisePicker } from './picker.js';
@@ -11,6 +11,7 @@ import { startWorkout, goToDate } from './log.js';
 import { exLabel } from './seteditor.js';
 import { renderBlocks, activeBlocksHtml, onBannerClick } from './blocks.js';
 import { openBlockEditor } from './blockeditor.js';
+import { weekdayOf, weekdayShort, myProgram } from '../today.js';
 
 export const LEVEL_OPTIONS = ['Beginner', 'Intermediate', 'Advanced'];
 
@@ -19,8 +20,35 @@ const levelClass = (lvl) => {
   return ['beginner', 'intermediate', 'advanced'].includes(l) ? `lvl-${l}` : 'lvl-other';
 };
 
-function gridHtml() {
-  return `<div class="prog-grid">${allPrograms().map((p) => `
+// Your own programs as compact lists with their days; the day for `date` gets an "Add" button (DECISIONS #70)
+function myProgramsHtml(date) {
+  const own = allPrograms().filter((p) => !p.builtin);
+  if (!own.length) return '';
+  const wd = parseKey(date).getDay();
+  const mine = myProgram();
+  const addLabel = date === dateKey() ? 'Add today' : 'Add';
+  return `<h3 class="section-title">My programs</h3>${own.map((p) => `
+    <section class="my-prog" data-id="${esc(p.id)}">
+      <div class="mp-head" role="button" tabindex="0" data-open>
+        <span class="grow"><span class="mp-name">${esc(p.name)}</span>
+          <span class="sub">${[p.days && `${p.days} days a week`, p.level, mine?.id === p.id && 'My program'].filter(Boolean).map(esc).join(' · ')}</span></span>
+        <button class="icon-btn prog-more" data-more aria-label="Program menu">${icon('more')}</button>
+      </div>
+      ${p.workouts.map((w) => {
+        const d = weekdayOf(w.name);
+        const today = d != null && d === wd;
+        const n = w.exercises.length;
+        return `<div class="mp-day ${today ? 'today' : ''}" data-w="${esc(w.id)}" role="button" tabindex="0">
+          <span class="mp-wd">${d != null ? weekdayShort(d).toUpperCase() : ''}</span>
+          <span class="grow">${esc(d != null ? w.name.replace(/^\S+\s*/, '') || w.name : w.name)}<span class="muted"> · ${n} exercise${n === 1 ? '' : 's'}</span></span>
+          ${today ? `<button class="mp-add" data-add-w="${esc(w.id)}">${icon('plus')} ${addLabel}</button>` : icon('right')}
+        </div>`;
+      }).join('')}
+    </section>`).join('')}<h3 class="section-title">Built-in programs</h3>`;
+}
+
+function gridHtml(builtinOnly = false) {
+  return `<div class="prog-grid ${builtinOnly ? 'small' : ''}">${allPrograms().filter((p) => !builtinOnly || p.builtin).map((p) => `
     <div class="prog-tile" data-id="${esc(p.id)}" role="button" tabindex="0">
       ${programArt(p.id)}
       <span class="prog-name">${esc(p.name)}</span>
@@ -41,6 +69,15 @@ async function onGridClick(e, ctx) {
   if (!tile) return;
   const p = getProgram(tile.dataset.id);
   if (e.target.closest('[data-more]')) return programMenu(p, ctx);
+  const add = e.target.closest('[data-add-w]');
+  if (add) {
+    startWorkout(p, p.workouts.find((w) => w.id === add.dataset.addW), ctx.date);
+    toast(`${p.name} added – tap a set to log it`);
+    ctx.onAdded();
+    return;
+  }
+  const row = e.target.closest('[data-w]');
+  if (row && tile.classList.contains('my-prog')) return openProgramDetail(p, ctx, row.dataset.w);
   openProgramDetail(p, ctx);
 }
 
@@ -65,7 +102,7 @@ export function renderPrograms(root, opts = {}) {
       <div class="tab-body"></div>`;
     const body = root.querySelector('.tab-body');
     if (tab === 'blocks') renderBlocks(body, { embedded: true });
-    else body.innerHTML = `${activeBlocksHtml()}${gridHtml()}`;
+    else body.innerHTML = `${activeBlocksHtml()}${myProgramsHtml(ctx.date)}${gridHtml(allPrograms().some((p) => !p.builtin))}`;
   };
   root.onclick = (e) => {
     const t = e.target.closest('[data-tab]');
@@ -86,7 +123,7 @@ export function openProgramsSheet({ date, onAdded }) {
       const body = m.querySelector('.sheet-body');
       const draw = () => {
         body.innerHTML = `<div class="modal-head"><h2 class="grow">Programs</h2><div class="actions">${headActions}</div></div>
-          <div class="scroll">${activeBlocksHtml()}${state.blocks.some((b) => !b.finished) ? '<h3 class="section-title">Programs</h3>' : ''}${gridHtml()}</div>`;
+          <div class="scroll">${activeBlocksHtml()}${myProgramsHtml(date)}${gridHtml(allPrograms().some((p) => !p.builtin))}</div>`;
       };
       const ctx = { date, refresh: draw, onAdded: () => { close(); onAdded?.(); } };
       body.addEventListener('click', (e) => {
@@ -106,7 +143,7 @@ const target = (x) => {
   return `${x.sets} × ${x.reps ?? '–'}`;
 };
 
-function openProgramDetail(p, ctx) {
+function openProgramDetail(p, ctx, focusId = null) {
   const dayLabel = ctx.date === dateKey() ? 'today' : fmtDate(ctx.date, false);
   openModal(`
     <div class="modal-head">
@@ -119,7 +156,7 @@ function openProgramDetail(p, ctx) {
       <p class="sub">${[p.level, p.days && `${p.days} days/week`].filter(Boolean).map(esc).join(' · ')}</p>
       <h3 class="section-title">Pick a workout to add to ${esc(dayLabel)}</h3>
       ${p.workouts.map((w) => `
-        <button class="workout-row" data-w="${esc(w.id)}">
+        <button class="workout-row ${w.id === focusId ? 'focus' : ''}" data-w="${esc(w.id)}">
           <span class="grow">
             <span class="title">${esc(w.name)}</span>
             <span class="sub">${w.exercises.map((x) => `${esc(exLabel(getExercise(x.ex)))} <span class="muted">${target(x)}</span>`).join(' · ')}</span>
@@ -129,6 +166,7 @@ function openProgramDetail(p, ctx) {
     </div>`, {
     className: 'sheet',
     onMount(m, close) {
+      m.querySelector('.workout-row.focus')?.scrollIntoView({ block: 'center' });
       m.addEventListener('click', (e) => {
         if (e.target.closest('[data-more]')) {
           programMenu(p, { ...ctx, refresh: () => { close(); ctx.refresh(); } });
@@ -148,6 +186,7 @@ function openProgramDetail(p, ctx) {
 async function programMenu(p, ctx) {
   const items = [];
   if (!p.builtin) items.push({ value: 'rename', label: 'Rename', icon: 'edit' }, { value: 'edit', label: 'Edit', icon: 'list' });
+  if (!p.builtin && myProgram()?.id !== p.id) items.push({ value: 'mine', label: 'Use for “Start today’s workout”', icon: 'check' });
   items.push({ value: 'copy', label: p.builtin ? 'Copy and customise' : 'Duplicate', icon: 'copy' });
   items.push({ value: 'export', label: 'Export to file', icon: 'download' });
   if (!p.builtin) items.push({ value: 'delete', label: 'Delete', icon: 'trash', danger: true });
@@ -167,6 +206,7 @@ async function programMenu(p, ctx) {
     copy.workouts.forEach((w) => { delete w.id; });
     openProgramEditor(copy, ctx.refresh);
   }
+  if (v === 'mine') { state.settings.myProgram = p.id; save(); ctx.refresh(); toast(`${p.name} is now your program`); }
   if (v === 'export') exportProgram(p);
   if (v === 'delete' && await confirmDialog(`Delete the program "${p.name}"?`)) {
     deleteProgram(p.id);

@@ -213,6 +213,12 @@ export function dayHasWork(key) {
 
 export const doneSets = (entry) => entry.sets.filter((s) => s.done);
 
+// A day counts as a workout once at least one set is done; days with only planned sets don't (DECISIONS #70)
+export function dayDone(key) {
+  const d = state.log[key];
+  return !!d && d.entries.some((e) => e.sets.some((s) => s.done && [s.w, s.r, s.t, s.d].some((v) => v != null && v !== '')));
+}
+
 export const setHasData = (s) => [s.w, s.r, s.t, s.d].some((v) => v != null && v !== '');
 
 // All previous sessions with an exercise, newest first: [{ date, sets }]

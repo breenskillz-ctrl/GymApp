@@ -1,8 +1,9 @@
 // Day view: the workout log for one day.
 import {
   state, save, getDay, cleanupDay, addEntry, getExercise, dayHasWork, isPR, daySummary, records, makeSets,
-  warmupSets, getRest, dayDuration, isStalled, deloadEntry, setHasData,
+  warmupSets, getRest, dayDuration, isStalled, deloadEntry, setHasData, history,
 } from '../store.js';
+import { todayPlan, startToday } from '../today.js';
 import { startRest } from '../timer.js';
 import {
   esc, icon, openModal, confirmDialog, dateKey, addDays, fmtTime, fmtNum, toast,
@@ -12,10 +13,9 @@ import { exerciseThumb } from '../icons.js';
 import { SET_TAGS } from '../data.js';
 import { profileName } from '../profile.js';
 import { openExercisePicker } from './picker.js';
-import { openExerciseDetail, openProgressionDialog, progressionText } from './exercises.js';
+import { openExerciseDetail, openProgressionDialog, progressionText, setText } from './exercises.js';
 import { openSetEditor, levelColor, exLabel, suggestionDelta } from './seteditor.js';
 import { openAddSheet } from './addsheet.js';
-import { backupDue, shareBackup, downloadBackup, canShareFiles } from '../backup.js';
 
 export const logState = { date: dateKey() };
 
@@ -70,15 +70,30 @@ function setColHtml(ex, s, i) {
   const pr = s.done && isPR(ex.id, logState.date, s);
   // Solid edge = done; dashed edge = suggested set, in the colour of the level it had last time (DECISIONS #44)
   const color = s.done ? levelColor(s.lvl || 'normal') : s.lvl ? levelColor(s.lvl) : null;
-  return `<button class="set-col ${s.done ? '' : 'planned'} ${pr ? 'pr' : ''}" data-act="edit-set" data-set="${i}"
+  return `<button class="set-col ${s.done ? 'done' : 'planned'} ${pr ? 'pr' : ''}" data-act="edit-set" data-set="${i}"
     ${color ? `style="--c:${color}"` : ''}>
     <span class="line">${l1}</span>${l2 ? `<span class="line">${l2}</span>` : ''}
     ${s.tags?.length ? `<span class="set-tags">${s.tags.map(tagLabel).join(' · ')}</span>` : ''}
     ${s.c ? `<span class="set-note">${esc(s.c)}</span>` : ''}
     ${suggestionDelta(s) ? `<span class="set-delta">${esc(suggestionDelta(s))}</span>` : ''}
     ${planMode() && setHasData(s) ? `<span class="set-tick ${s.done ? 'on' : ''}" data-act="tick-set" data-set="${i}" role="checkbox"
-      aria-checked="${s.done}" aria-label="Set done">${icon('check')}</span>` : ''}
+      aria-checked="${s.done}" aria-label="Set done">${icon('check')}</span>` : s.done ? `<span class="set-ok">${icon('check')}</span>` : ''}
   </button>`;
+}
+
+// "Last: 90 kg × 6, 6, 6 · 3 Nov" – the previous session with this exercise (DECISIONS #70)
+export function lastText(ex, key) {
+  const prev = history(ex.id, key)[0];
+  if (!prev) return '';
+  const work = prev.sets.filter((s) => s.lvl !== 'warmup');
+  const sets = work.length ? work : prev.sets;
+  const d = parseKey(prev.date);
+  const when = `${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}`;
+  if (ex.type === 'wr' && sets.every((s) => s.w === sets[0].w)) {
+    return `${sets[0].w != null ? `${fmtNum(sets[0].w, 2)} ${state.settings.unit}` : 'BW'} × ${sets.map((s) => s.r ?? '–').join(', ')} · ${when}`;
+  }
+  const parts = sets.slice(0, 4).map((s) => setText(ex, s).replace(` ${state.settings.unit} × `, '×'));
+  return `${parts.join(', ')}${sets.length > 4 ? ' …' : ''} · ${when}`;
 }
 
 // Planned (suggested) sets that already have numbers and can be logged in one tap
@@ -98,6 +113,7 @@ function entryHtml(entry) {
           <button class="icon-btn" data-act="entry-menu" aria-label="Menu">${icon('more')}</button>
         </div>
         ${entry.note ? `<button class="ex-note" data-act="entry-note">${esc(entry.note)}</button>` : ''}
+        ${lastText(ex, logState.date) ? `<div class="ex-last">${icon('history')}<span>Last: <b>${esc(lastText(ex, logState.date))}</b></span></div>` : ''}
         <div class="sets">${entry.sets.map((s, i) => setColHtml(ex, s, i)).join('')}
           <button class="set-col add-chip" data-act="add-set" aria-label="Add set">${icon('plus')}<span>Set</span></button></div>
         ${stalled ? `<div class="stall">No progress in 3 sessions.
@@ -138,7 +154,11 @@ function emptyDayHtml(key) {
     const name = profileName();
     [head, sub] = PUSH_LINES[n].map((t) => t.replace('{name}', name ? `, ${name}` : ''));
   }
-  return `<div class="empty-day log-empty"><h2>${esc(head)}</h2><p>${esc(sub)}</p></div>`;
+  const plan = key >= today ? todayPlan(key) : null;
+  const can = plan && (plan.bd || plan.workout);
+  return `<div class="empty-day log-empty"><h2>${esc(head)}</h2><p>${esc(sub)}</p>
+    ${can ? `<button class="btn primary log-start" data-act="start-today">${icon('plus')} Start ${key === today ? 'today’s' : 'this day’s'} workout</button>
+      <p class="muted log-start-sub">${esc([plan.bd?.day.name, plan.workout?.name].filter(Boolean).join(' + '))}</p>` : ''}</div>`;
 }
 
 export function renderLog(root) {
@@ -162,10 +182,6 @@ export function renderLog(root) {
       <button class="icon-btn" data-act="timers" aria-label="Timers">${icon('timer')}</button>
       <button class="icon-btn" data-act="day-menu" aria-label="More">${icon('more')}</button>
     </header>
-    ${isToday && backupDue() ? `<div class="backup-banner">${icon('download')}
-      <span class="grow">${state.lastBackup ? `Last backup ${Math.floor((Date.now() - state.lastBackup) / 86400000)} days ago` : 'Your data is only on this phone'}</span>
-      <button class="text-btn accent" data-act="backup">Back up</button>
-      <button class="icon-btn sm" data-act="backup-later" aria-label="Remind me later">${icon('close')}</button></div>` : ''}
     ${entries.length ? `
       <p class="day-summary">${planMode() ? `${entries.filter(entryDone).length} of ${sum.exs} exs done` : `${sum.exs} exs`} · ${sum.sets} sets${sum.vol ? ` · ${fmtNum(sum.vol, 0)} ${state.settings.unit}` : ''}${mins ? ` · ${mins} min` : ''}</p>
       ${day.title ? `<button class="day-comment" data-act="comment">${esc(day.title)}</button>` : ''}
@@ -195,6 +211,10 @@ function onClick(e) {
     case 'prev-day': return goToDate(addDays(logState.date, -1));
     case 'next-day': return goToDate(addDays(logState.date, 1));
     case 'timers': return go('timers');
+    case 'start-today':
+      startToday(date);
+      toast('Workout ready – tap a set to log it');
+      return rerender();
     case 'day-menu': return openDayMenu();
     case 'records': return openDayRecords();
     case 'comment': return editComment();
@@ -213,13 +233,6 @@ function onClick(e) {
     case 'log-all': return logAll(entry);
     case 'tick-set': return tickSet(entry, Number(b.dataset.set));
     case 'tick-entry': return entryDone(entry) ? untickAll(entry) : logAll(entry, 'Exercise done');
-    case 'backup':
-      (canShareFiles() ? shareBackup() : downloadBackup()).then(rerender);
-      return undefined;
-    case 'backup-later':
-      state.backupSnooze = Date.now();
-      save();
-      return rerender();
     case 'deload':
       deloadEntry(entry);
       toast('Weights lowered by 10 % for this session');
@@ -486,6 +499,7 @@ export function openCalendar() {
 export function startWorkout(program, workout, key = logState.date) {
   const day = getDay(key, true);
   if (!day.title) day.title = `${program.name} – ${workout.name}`;
+  day.workout = workout.name;
   workout.exercises.forEach((w) => addEntry(key, w.ex, { sets: w.sets, reps: w.reps }));
   save();
 }

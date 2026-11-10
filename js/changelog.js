@@ -2,10 +2,19 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 51;
+export const APP_VERSION = 52;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 52, date: '2026-11-10', items: [
+    'Home shows today’s workout – your block day and your own program day for this weekday – with one “Start today’s workout” button, plus this week and your latest record.',
+    'Each exercise card shows what you did last time, and done sets are filled in with a tick.',
+    'Set editor: all levels visible, your most used variants first (the rest under “More”), and last time’s set at the top.',
+    'History only counts workouts with done sets and names them after the program day. Muscle groups are shown as one thin bar.',
+    'Strength trend shows the main lifts; tap a lift to hide it or “+ Choose” to add one.',
+    'Programs: your own programs are listed first with their days and an “Add today” button. The tab “Exercise” is now called “Log”.',
+    'The backup reminder moved to Home and only shows after 14 days. Your programs, blocks and settings are sent to the coach sheet.',
+  ] },
   { v: 51, date: '2026-11-06', items: [
     'New program: Hybrid PPL, a five-day split with legs twice a week and walking days. It holds the accessories and pairs with the 12-Week Strength Period block for the main lifts. Tap ⋮ → "Copy and customise" to make your own version.',
     'New exercises: One Arm Row and Single Arm Tricep Extension with a cable.',

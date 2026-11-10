@@ -108,11 +108,11 @@ export async function restoreBackup(data) {
   return Array.isArray(photos) ? importPhotoList(photos) : 0;
 }
 
-// Show the backup reminder when there is data and no backup (or snooze) in the last 7 days
+// Show the backup reminder (on Home, DECISIONS #70) when there is data and no backup or snooze in the last 14 days
 export function backupDue() {
-  const week = 7 * 86400000;
-  const last = Math.max(state.lastBackup || 0, state.backupSnooze || 0);
-  if (Date.now() - last < week) return false;
+  const days = 14 * 86400000;
+  const last = Math.max(state.lastBackup || 0, state.lastAutoBackup || 0, state.backupSnooze || 0);
+  if (Date.now() - last < days) return false;
   return Object.keys(state.log).filter(dayHasWork).length >= 3;
 }
 
