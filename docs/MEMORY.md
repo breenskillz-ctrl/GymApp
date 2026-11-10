@@ -25,6 +25,10 @@ _Last updated: 2026-11-10 (v53 published: readiness on Home, DECISIONS #71. Kode
 
 ## Current status
 
+- **2026-11-10 (Makrologg, not Loadlog):** content 21 (dishes + weekly budget) and content 22 (shared weekly menu + shopping list,
+  `menu` doc, "Fra ukemenyen" card on Day) published to Makrologg main. Sleep plan doc: https://claude.ai/artifact/6JJTfrBpcYwpyBHuSoCJ9g.
+  **The user has ANAPHYLACTIC allergy to chicken and fish** (tolerates egg and shellfish): never use them in examples, suggestions or
+  test data. Stored in the coach Vektlogg `mal.allergi` and both coach prompts. He declined the 10 Makrologg ideas from 10.11 (none to build).
 - **v53 (2026-11-10):** readiness from the watch on Home (needs Kode.gs with `?read=garmin`), DECISIONS #71. Ideas list 10.11: user wants #2 dishes weighed in the pot, #3 weekly kcal budget, #7 meal plan + shopping list (all Makrologg – another session is working on Makrologg, ask before touching it), #4 maybe, #9 sleep plan around night shifts. Dropped: #1 shift-based moving of days (fixed plan), #5 hunger log. #10 already exists (progression).
 - **v52 (2026-11-10):** Start today's workout (block + own program by weekday), Home today card, "Last:" on cards, filled done sets, set editor tidy-up, History done-only + names, trend main lifts, Log tab, backup on Home after 14 d, setup sync to «Oppsett», programs as day lists (DECISIONS #70).
 - **v51 (2026-11-06):** built-in "Hybrid PPL" program from the user's own split + 2 new exercises (DECISIONS #69).
