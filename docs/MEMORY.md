@@ -25,6 +25,7 @@ _Last updated: 2026-11-10 (v53 published: readiness on Home, DECISIONS #71. Kode
 
 ## Current status
 
+- **v54 (2026-11-10):** coach sync sends the setup row first, keeps a skipped setup row pending, shows "Sending… N left". Published.
 - **2026-11-10 (Makrologg, not Loadlog):** content 21 (dishes + weekly budget) and content 22 (shared weekly menu + shopping list,
   `menu` doc, "Fra ukemenyen" card on Day) published to Makrologg main. Sleep plan doc: https://claude.ai/artifact/6JJTfrBpcYwpyBHuSoCJ9g.
   **The user has ANAPHYLACTIC allergy to chicken and fish** (tolerates egg and shellfish): never use them in examples, suggestions or
