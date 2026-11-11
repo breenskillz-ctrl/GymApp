@@ -5,6 +5,11 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #73 · 2026-11-11 · Heaviest plate 20 kg by default
+**Decision:** the plate line and plate tool use `settings.maxPlate` (default 20, choice 25/20 in Settings, kg only).
+**Why:** the user's gym has no 25 kg plates; 100 kg showed "25 + 15" instead of "20 + 20".
+**Status:** Active.
+
 ## #72 · 2026-11-11 · v55: the workout on the gym floor (14 of 15 review points)
 **Decision:** after a fresh review the user picked 14 changes (all but the shoulder score), shown as mockups first:
 - Planned sets: white text, dashed 1.5 px edge; done: filled accent; the next set to do has a blue ring.

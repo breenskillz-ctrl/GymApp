@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 55;
+export const APP_VERSION = 56;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 56, date: '2026-11-11', items: [
+    'The plate line uses 20 kg as the heaviest plate. Gyms with 25 kg plates can choose that in Settings.',
+  ] },
   { v: 55, date: '2026-11-11', items: [
     'Planned sets are white with a dashed edge, done sets are filled, and the next set has a blue ring.',
     'The main lift comes first on Home and in the log, with plates per side under it.',

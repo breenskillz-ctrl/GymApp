@@ -93,7 +93,7 @@ android-app/          Android app (Capacitor 8, appId app.loadlog): loads the li
   blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],
   blockTemplates: [ /* the user's own templates, compact items */ ],
   lastBackup, backupSnooze, lastAutoBackup,   // backup files add backupVersion: 2 and photos: [...] (not stored in state)
-  settings: { unit: 'kg'|'lb', rest: 90, restMain: 180, autoWarmup: true, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst, myProgram?, trendLifts?, sheetUrl? }
+  settings: { unit: 'kg'|'lb', rest: 90, restMain: 180, autoWarmup: true, maxPlate: 20, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst, myProgram?, trendLifts?, sheetUrl? }
 }
 ```
 

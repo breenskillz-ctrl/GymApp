@@ -16,7 +16,7 @@ const defaults = () => ({
   blocks: [], // running and finished training blocks (js/blocks.js)
   blockTemplates: [], // the user's own block templates
   lastBackup: 0, // time of the last exported backup (weekly reminder)
-  settings: { unit: 'kg', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst: false, restMain: 180, autoWarmup: true },
+  settings: { unit: 'kg', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst: false, restMain: 180, autoWarmup: true, maxPlate: 20 },
 });
 
 export let state = defaults();

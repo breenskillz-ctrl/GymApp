@@ -42,7 +42,8 @@ export const exLabel = (ex) => (ex.equip && !['Other', 'Bodyweight'].includes(ex
 export function platesPerSide(total) {
   const lb = state.settings.unit === 'lb';
   const bar = lb ? 45 : 20;
-  const plates = lb ? [45, 35, 25, 10, 5, 2.5] : [25, 20, 15, 10, 5, 2.5, 1.25];
+  // Heaviest plate at the user's gym (settings.maxPlate, kg only): many gyms have no 25 kg plates
+  const plates = lb ? [45, 35, 25, 10, 5, 2.5] : [25, 20, 15, 10, 5, 2.5, 1.25].filter((p) => p <= (state.settings.maxPlate || 20));
   if (!total || total < bar) return null;
   let side = (total - bar) / 2;
   const used = [];

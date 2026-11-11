@@ -410,6 +410,8 @@ export function openSettings(onChange) {
       <label>Default rest time (seconds)<input class="input" type="number" min="5" step="5" data-rest value="${st.rest}"></label>
       <label>Rest after squat, bench, deadlift, press and block sets (seconds)<input class="input" type="number" min="5" step="15" data-rest-main value="${st.restMain || 180}"></label>
       <label class="switch"><input type="checkbox" data-warmup ${st.autoWarmup !== false ? 'checked' : ''}> Add warm-up sets to block lifts</label>
+      ${st.unit === 'kg' ? `<label>Heaviest plate at your gym<select class="input" data-max-plate>
+        ${[25, 20].map((v) => `<option value="${v}" ${(st.maxPlate || 20) === v ? 'selected' : ''}>${v} kg</option>`).join('')}</select></label>` : ''}
       <label class="switch"><input type="checkbox" data-auto ${st.autoRest ? 'checked' : ''}> Start rest timer automatically when a set is completed</label>
       <label class="switch"><input type="checkbox" data-sound ${st.sound ? 'checked' : ''}> Play a sound when the timer finishes</label>
       <label class="switch"><input type="checkbox" data-plan ${st.planFirst ? 'checked' : ''}> Plan first, tick off when done: new sets are saved as a plan, with check boxes for sets and exercises</label>
@@ -456,6 +458,7 @@ export function openSettings(onChange) {
       m.querySelector('[data-auto]').addEventListener('change', (e) => { st.autoRest = e.target.checked; save(); });
       m.querySelector('[data-rest-main]').addEventListener('change', (e) => { const v = num(e.target.value); if (v > 0) { st.restMain = v; save(); } });
       m.querySelector('[data-warmup]').addEventListener('change', (e) => { st.autoWarmup = e.target.checked; save(); });
+      m.querySelector('[data-max-plate]')?.addEventListener('change', (e) => { st.maxPlate = Number(e.target.value); save(); });
       m.querySelector('[data-sound]').addEventListener('change', (e) => { st.sound = e.target.checked; save(); });
       m.querySelector('[data-plan]').addEventListener('change', (e) => { st.planFirst = e.target.checked; save(); });
       m.querySelector('[data-awake]').addEventListener('change', (e) => { st.keepAwake = e.target.checked; save(); updateWakeLock(); });
