@@ -14,7 +14,7 @@ import {
   downloadBackup, shareBackup, canShareFiles, restoreBackup, storageStatus, requestPersist,
   canAutoBackup, autoBackupFolder, chooseBackupFolder, stopAutoBackup, autoBackup,
 } from '../backup.js';
-import { lineChart, barChart, multiLineChart, stackedBarChart } from '../charts.js';
+import { lineChart, barChart, multiLineChart, stackedBarChart, css } from '../charts.js';
 import { openExerciseDetail } from './exercises.js';
 import { exLabel } from './seteditor.js';
 import { updateWakeLock } from '../wakelock.js';
@@ -55,7 +55,7 @@ function stats() {
     const ws = addDays(thisWeek, -7 * i);
     const we = addDays(ws, 6);
     const d = parseKey(ws);
-    perWeek.push({ label: `${d.getDate()}.${d.getMonth() + 1}`, value: days.filter((k) => k >= ws && k <= we).length });
+    perWeek.push({ label: weekLbl(ws), value: days.filter((k) => k >= ws && k <= we).length });
   }
 
   return {
@@ -74,44 +74,83 @@ function stats() {
 const LINE_COLORS = ['#6b97e0', '#ff8a3d', '#f2b705', '#a259ff', '#43c463'];
 const MAIN_LIFTS = ['squat', 'bench-press', 'deadlift', 'overhead-press'];
 
-// Best estimated 1RM per month in the last 12 months. Shows the lifts picked in settings.trendLifts, else the main lifts
-// (squat, bench, deadlift, press) that have data, else the four trained most often (DECISIONS #70).
-// Sets above 12 reps are left out, because the 1RM estimate gets unreliable there.
+// "12 Oct": week labels with the month (DECISIONS #72)
+const weekLbl = (k) => { const d = parseKey(k); return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}`; };
+
+// Top set per week (DECISIONS #72): the heaviest work set of each lift per week, last 16 weeks. Heavy lifts count sets of
+// 1–6 reps, others up to 12. This follows what was actually lifted, so a volume week in a block does not look like a drop
+// the way an estimated 1RM did. Shows the lifts picked in settings.trendLifts, else the main lifts, else the most trained.
 function strengthTrend() {
-  const now = parseKey(dateKey());
-  const months = Array.from({ length: 12 }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
-  });
-  const from = months[0];
+  const thisWeek = weekStart(dateKey());
+  const weeks = Array.from({ length: 16 }, (_, i) => addDays(thisWeek, -7 * (15 - i)));
+  const from = weeks[0];
   const count = {};
   const best = {};
   for (const [date, day] of Object.entries(state.log)) {
-    const m = date.slice(0, 7);
-    if (m < from) continue;
+    if (date < from) continue;
+    const wk = weekStart(date);
     for (const e of day.entries) {
       if (getExercise(e.ex).type !== 'wr') continue;
+      const maxR = MAIN_LIFTS.includes(e.ex) ? 6 : 12;
       let top = 0;
-      for (const st of e.sets) {
-        if (st.done && st.lvl !== 'warmup' && st.r && st.r <= 12) top = Math.max(top, e1rm(st.w, st.r) || 0);
-      }
+      for (const st of e.sets) if (st.done && st.lvl !== 'warmup' && st.r && st.r <= maxR) top = Math.max(top, st.w || 0);
       if (!top) continue;
       count[e.ex] = (count[e.ex] || 0) + 1;
       best[e.ex] = best[e.ex] || {};
-      best[e.ex][m] = Math.max(best[e.ex][m] || 0, top);
+      best[e.ex][wk] = Math.max(best[e.ex][wk] || 0, top);
     }
   }
   const ranked = Object.keys(count).sort((a, b) => count[b] - count[a]);
   const picked = (state.settings.trendLifts || []).filter((id) => count[id]);
   const main = MAIN_LIFTS.filter((id) => count[id]);
   const ids = picked.length ? picked.slice(0, 5) : main.length ? main : ranked.slice(0, 4);
+  const labels = weeks.map(weekLbl);
   return {
     available: ranked,
     ids,
-    labels: months.map((m) => MONTHS[Number(m.slice(5)) - 1].slice(0, 3)),
+    labels,
     series: ids.map((id, i) => ({
-      id, name: getExercise(id).name, color: LINE_COLORS[i], values: months.map((m) => best[id][m] || null),
+      id, name: getExercise(id).name, color: LINE_COLORS[i], values: weeks.map((k) => best[id][k] || null),
     })),
+  };
+}
+
+// Main lifts in the running block (DECISIONS #72): planned top % per block week (dashed) against what was lifted, as % of
+// the training max (1RM × base %). One lift at a time.
+let blockLift = null;
+function blockChart() {
+  const b = (state.blocks || []).find((x) => !x.finished);
+  if (!b) return null;
+  const lifts = Object.keys(b.maxes || {}).filter((id) => b.weeks.some((w) => w.days.some((d) => d.items.some((it) => it.kind === 'pct' && it.ex === id))));
+  if (!lifts.length) return null;
+  if (!lifts.includes(blockLift)) blockLift = lifts[0];
+  const id = blockLift;
+  const tm = b.maxes[id] * (b.base / 100);
+  const plan = b.weeks.map((w) => Math.max(0, ...w.days.flatMap((d) => d.items.filter((it) => it.kind === 'pct' && it.ex === id)
+    .flatMap((it) => it.sets.filter((x) => !x.addSteps).map((x) => x.pct || 0)))) || null);
+  const done = b.weeks.map(() => null);
+  for (const day of Object.values(state.log)) {
+    for (const e of day.entries) {
+      if (e.block?.id !== b.id || e.ex !== id) continue;
+      const top = Math.max(0, ...e.sets.filter((x) => x.done && x.lvl !== 'warmup').map((x) => x.w || 0));
+      if (!top) continue;
+      const pct = Math.round((top / tm) * 1000) / 10;
+      done[e.block.w] = Math.max(done[e.block.w] || 0, pct);
+    }
+  }
+  const last = done.reduce((a, v, i) => (v != null ? i : a), -1);
+  let note = 'Nothing logged in the block yet';
+  if (last >= 0 && plan[last]) {
+    const diff = Math.round((done[last] - plan[last]) * 10) / 10;
+    note = Math.abs(diff) < 1 ? `Week ${last + 1}: on plan` : `Week ${last + 1}: ${fmtNum(Math.abs(diff), 1)} % ${diff > 0 ? 'over' : 'under'} plan`;
+  }
+  return {
+    lifts, id, note,
+    labels: b.weeks.map((_, i) => `W${i + 1}`),
+    series: [
+      { name: 'Plan', color: css('--muted2'), dash: true, values: plan },
+      { name: 'Done', color: css('--accent-hi'), values: done },
+    ],
   };
 }
 
@@ -132,8 +171,8 @@ function weeklyGroupSets() {
     }
   }
   return {
-    labels: weeks.map((k) => { const d = parseKey(k); return `${d.getDate()}.${d.getMonth() + 1}`; }),
-    series: GROUPS.concat('Other').filter((g) => data[g]).map((g) => ({ name: g, color: GROUP_COLORS[g] || GROUP_COLORS.Other, values: data[g] })),
+    labels: weeks.map(weekLbl),
+    series: [...new Set(GROUPS.concat('Other'))].filter((g) => data[g]).map((g) => ({ name: g, color: GROUP_COLORS[g] || GROUP_COLORS.Other, values: data[g] })),
   };
 }
 
@@ -178,9 +217,10 @@ export function renderProgress(root) {
   const mu = measureUnit(bodyMeasure);
   const mLabel = MEASURES.find(([k]) => k === bodyMeasure)[1];
   const trend = strengthTrend();
+  const block = blockChart();
   const weekly = weeklyGroupSets();
   const maxGroup = Math.max(1, ...Object.values(s.groupSets));
-  const groupsSorted = GROUPS.concat('Other').filter((g) => s.groupSets[g]).sort((a, b) => s.groupSets[b] - s.groupSets[a]);
+  const groupsSorted = [...new Set(GROUPS.concat('Other'))].filter((g) => s.groupSets[g]).sort((a, b) => s.groupSets[b] - s.groupSets[a]);
 
   root.innerHTML = `
     ${topBar('Progress', `<button class="icon-btn" data-act="settings" aria-label="Settings">${icon('settings')}</button>`)}
@@ -197,8 +237,15 @@ export function renderProgress(root) {
       <div class="chart-box"><canvas id="c-weeks"></canvas></div>
     </section>
 
+    ${block ? `<section class="card">
+      <h3>Main lifts in the block <span class="muted">(% of training max)</span></h3>
+      <div class="chart-box"><canvas id="c-block"></canvas></div>
+      <p class="muted small chart-note">${esc(block.note)} · dashed = plan</p>
+      <div class="trend-chips">${block.lifts.map((id) => `<button class="trend-chip ${id === block.id ? 'on' : ''}" data-block-lift="${esc(id)}">${esc(getExercise(id).name)}</button>`).join('')}</div>
+    </section>` : ''}
+
     <section class="card">
-      <h3>Strength trend <span class="muted">(best est. 1RM per month)</span></h3>
+      <h3>Top set per week <span class="muted">(heaviest work set)</span></h3>
       <div class="chart-box"><canvas id="c-trend"></canvas></div>
       ${trend.available.length ? `<div class="trend-chips">${trend.series.map((x) => `<button class="trend-chip" data-trend-del="${esc(x.id)}"
         style="--c:${x.color}" aria-label="Hide ${esc(x.name)}">${esc(x.name)}</button>`).join('')}
@@ -246,6 +293,7 @@ export function renderProgress(root) {
   requestAnimationFrame(() => {
     barChart(root.querySelector('#c-weeks'), s.perWeek);
     multiLineChart(root.querySelector('#c-trend'), trend.labels, trend.series, { format: (v) => fmtNum(v, 0) });
+    if (block) multiLineChart(root.querySelector('#c-block'), block.labels, block.series, { format: (v) => `${Math.round(v)}%` });
     stackedBarChart(root.querySelector('#c-weekly'), weekly.labels, weekly.series);
     lineChart(root.querySelector('#c-body'), body.slice(-60).map((b) => {
       const d = parseKey(b.date);
@@ -267,6 +315,8 @@ export function renderProgress(root) {
     if (ex) return openExerciseDetail(ex.dataset.ex);
     const ms = e.target.closest('[data-measure]');
     if (ms) { bodyMeasure = ms.dataset.measure; return renderProgress(root); }
+    const bl = e.target.closest('[data-block-lift]');
+    if (bl) { blockLift = bl.dataset.blockLift; renderProgress(root); return; }
     const td = e.target.closest('[data-trend-del]');
     if (td) {
       state.settings.trendLifts = trend.ids.filter((id) => id !== td.dataset.trendDel);
@@ -358,6 +408,8 @@ export function openSettings(onChange) {
         <span class="scale-preview">Bench Press · Barbell &nbsp; <span class="v">110</span><span class="u">kg</span> <span class="v">4</span><span class="u">rep</span></span>
       </label>
       <label>Default rest time (seconds)<input class="input" type="number" min="5" step="5" data-rest value="${st.rest}"></label>
+      <label>Rest after squat, bench, deadlift, press and block sets (seconds)<input class="input" type="number" min="5" step="15" data-rest-main value="${st.restMain || 180}"></label>
+      <label class="switch"><input type="checkbox" data-warmup ${st.autoWarmup !== false ? 'checked' : ''}> Add warm-up sets to block lifts</label>
       <label class="switch"><input type="checkbox" data-auto ${st.autoRest ? 'checked' : ''}> Start rest timer automatically when a set is completed</label>
       <label class="switch"><input type="checkbox" data-sound ${st.sound ? 'checked' : ''}> Play a sound when the timer finishes</label>
       <label class="switch"><input type="checkbox" data-plan ${st.planFirst ? 'checked' : ''}> Plan first, tick off when done: new sets are saved as a plan, with check boxes for sets and exercises</label>
@@ -402,6 +454,8 @@ export function openSettings(onChange) {
       scale.addEventListener('change', () => { st.textScale = Number(scale.value); save(); onChange(); });
       m.querySelector('[data-rest]').addEventListener('change', (e) => { st.rest = Math.max(5, Number(e.target.value) || 90); save(); });
       m.querySelector('[data-auto]').addEventListener('change', (e) => { st.autoRest = e.target.checked; save(); });
+      m.querySelector('[data-rest-main]').addEventListener('change', (e) => { const v = num(e.target.value); if (v > 0) { st.restMain = v; save(); } });
+      m.querySelector('[data-warmup]').addEventListener('change', (e) => { st.autoWarmup = e.target.checked; save(); });
       m.querySelector('[data-sound]').addEventListener('change', (e) => { st.sound = e.target.checked; save(); });
       m.querySelector('[data-plan]').addEventListener('change', (e) => { st.planFirst = e.target.checked; save(); });
       m.querySelector('[data-awake]').addEventListener('change', (e) => { st.keepAwake = e.target.checked; save(); updateWakeLock(); });

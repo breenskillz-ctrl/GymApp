@@ -44,7 +44,7 @@ export function setText(ex, s) {
   const u = state.settings.unit;
   switch (ex.type) {
     case 'wr': return `${s.w != null ? fmtNum(s.w, 2) + ' ' + u : '–'} × ${s.r ?? '–'}`;
-    case 'r': return `${s.r ?? '–'} reps${s.w ? ` (+${fmtNum(s.w, 2)} ${u})` : ''}`;
+    case 'r': return s.w ? `+${fmtNum(s.w, 2)} ${u} × ${s.r ?? '–'}` : `${s.r ?? '–'} reps`; // weighted pull-ups: "+20 kg × 10"
     case 't': return s.t != null ? fmtTime(s.t) : '–';
     case 'dt': return `${s.d != null ? fmtNum(s.d, 2) + ' km' : '–'}${s.t != null ? ' · ' + fmtTime(s.t) : ''}`;
     default: return '';

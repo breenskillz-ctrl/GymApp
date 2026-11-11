@@ -5,6 +5,36 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #72 · 2026-11-11 · v55: the workout on the gym floor (14 of 15 review points)
+**Decision:** after a fresh review the user picked 14 changes (all but the shoulder score), shown as mockups first:
+- Planned sets: white text, dashed 1.5 px edge; done: filled accent; the next set to do has a blue ring.
+- "Main lift": block entries and the big four (`isBigLift`: squat, bench-press, deadlift, overhead-press) get an accent edge
+  and a kicker; Home leads with the block's first % lift ("Deadlift 3 × 5 · 155 kg" + warm-up weights) and shows a strip of
+  block weeks (done, now, lighter = top % below the week before, test = last week of the 12-week template).
+- Warm-ups: `addBlockWorkout` puts `warmupSets()` in front of each % lift (`settings.autoWarmup`, default on). Deadlifts start
+  at 60 kg (135 lb) instead of the empty bar. Warm-ups are shown in their own row and don't count in volume, set counts or
+  `dayDone`. Readiness lowering rebuilds undone warm-ups.
+- Rest: `getRest(exId, entry)` = the exercise's own rest, else `settings.restMain` (180 s) for block sets and the big four,
+  else `settings.rest`. Supersets (`entry.ss`, set from the ⋮ menu, consecutive cards): `restFor()` starts rest only after
+  the round's last card that still has sets.
+- Focus: while a workout is going on (some sets done, some planned) finished cards fold to one line; tap opens them
+  (`logState.open`, reset when the date changes).
+- Rule line on non-block weighted cards: "6–12 reps · at 3 × 12: +2.5 kg" with a bar; green when all sets hit the top.
+- Plates per side under barbell cards (`platesPerSide()` from the set editor).
+- Day header: four tiles (minutes from the first set to now while training, sets done/planned, volume, records).
+- Summary: when the last planned set of today is done, once per day (`day.finished`), also from the day menu. Compares each
+  exercise's top set with the previous session.
+- Records (`recordInfo`): only main lifts (`isMainLift`: barbell, Legs/Chest/Back/Shoulders), a work set of 1–10 reps heavier
+  than an earlier set with at least as many reps. `isPR` now means this everywhere (trophies, toasts, Home, History).
+  Other exercises show their best set with "best" and no e1RM or rep maxes on the Records page.
+- History: one line per workout grouped by week (main lift + duration + records), tap for the detail table.
+- Progress: "Main lifts in the block" (plan % dashed vs lifted % of training max, one lift at a time) and "Top set per week"
+  (heaviest work set, 1–6 reps for the big four, ≤12 for others, 16 weeks) instead of e1RM per month, which made volume weeks
+  look like a drop. Week labels "12 Oct"; "Other" only once in legends; weighted bodyweight sets read "+20 kg × 10".
+**Why:** the user wanted the app judged as an active lifter would; these were the points that made the log harder to read
+in the gym or made the numbers misleading. Not done: shoulder score (#11 in the review).
+**Status:** Active.
+
 ## #71 · 2026-11-10 · Readiness from the watch on Home
 **Decision:** `js/readiness.js` reads the last 10 days of the Garmin tab through the coach sheet's Apps Script
 (`GET ?read=garmin&pid=p0`, cached 30 min in `gymapp.garmin`, per device). Today's row is scored: sleep hours (<5 / <6.5),

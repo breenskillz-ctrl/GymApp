@@ -1,7 +1,7 @@
 // Readiness (DECISIONS #71): last night's sleep, HRV, resting pulse and body battery from the watch, read from the coach
 // sheet (Apps Script GET ?read=garmin), turned into a plain suggestion for today's main lift. Only shown when the sheet
 // is connected and the sheet has watch data; the plan itself never changes unless the user taps "Apply".
-import { save, getDay } from './store.js';
+import { save, getDay, warmupSets } from './store.js';
 import { dateKey } from './utils.js';
 import { sheetUrl } from './sync.js';
 
@@ -85,6 +85,11 @@ export function applyReadiness(pct, key = dateKey()) {
       if (s.done || !s.w || s.lvl === 'warmup') continue;
       s.w = Math.max(0, Math.round((s.w * (1 - pct / 100)) / 2.5) * 2.5);
       n++;
+    }
+    // Warm-ups not done yet follow the new top weight
+    if (!e.sets.some((s) => s.lvl === 'warmup' && s.done) && e.sets.some((s) => s.lvl === 'warmup')) {
+      const work = e.sets.filter((s) => s.lvl !== 'warmup');
+      e.sets = [...warmupSets(e.ex, Math.max(0, ...work.map((s) => s.w || 0))), ...work];
     }
   }
   if (n) { day.readiness = pct; save(); }

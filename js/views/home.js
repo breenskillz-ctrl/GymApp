@@ -1,5 +1,5 @@
 // Home (start page, DECISIONS #57, #70): greeting, today's workout with one "Start" button, this week, latest record.
-import { state, getDay, getExercise, dayDone, isPR, setHasData } from '../store.js';
+import { state, getDay, getExercise, dayDone, isPR, setHasData, warmupSets } from '../store.js';
 import {
   esc, icon, dateKey, addDays, parseKey, fmtDate, fmtNum, go, toast,
 } from '../utils.js';
@@ -31,41 +31,84 @@ function blockItemText(b, it) {
   return `${same} × ${first.reps}${w ? ` · ${fmtNum(w, 2)} ${state.settings.unit}` : ''}`;
 }
 
+// The block's weeks as a strip (DECISIONS #72): done, this week, lighter weeks and the test week
+function blockStrip(b, today) {
+  const top = (wk) => Math.max(0, ...wk.days.flatMap((d) => d.items.filter((it) => it.kind === 'pct').flatMap((it) => it.sets.map((x) => x.pct || 0))));
+  const tops = b.weeks.map(top);
+  const n = b.weeks.length;
+  const isTest = (i) => i === n - 1 && (b.templateId === 'bt-strength-12' || b.weeks[i].days.some((d) => /test/i.test(d.name)));
+  const isLight = (i) => i > 0 && !isTest(i) && tops[i] < tops[i - 1] - 0.01;
+  const cur = b.pos.w;
+  const cells = b.weeks.map((_, i) => `<i class="${i < cur ? 'd' : i === cur ? 'c' : isTest(i) ? 't' : isLight(i) ? 'l' : ''}"></i>`).join('');
+  const mon = addDays(today, -((parseKey(today).getDay() + 6) % 7));
+  const nextLight = b.weeks.findIndex((_, i) => i > cur && isLight(i));
+  const test = isTest(n - 1) ? n - 1 : -1;
+  const facts = [
+    isLight(cur) ? 'Lighter week now' : nextLight > 0 && `Lighter week ${nextLight - cur === 1 ? 'next week' : `in ${nextLight - cur} weeks`}`,
+    test > cur && `test week starts ${fmtDate(addDays(mon, (test - cur) * 7), false)}`,
+    test === cur && 'Test week',
+  ].filter(Boolean);
+  return `<div class="tc-block"><span>Week ${cur + 1} of ${n}</span><span class="tc-weeks">${cells}</span></div>
+    ${facts.length ? `<div class="tc-facts">${facts.join(' · ')}</div>` : ''}`;
+}
+
+// The main lift of a block day, big: "Deadlift 3 × 5 · 155 kg" + the warm-up weights
+function mainLiftHtml(b, it) {
+  const ex = getExercise(it.ex);
+  const work = it.sets.filter((x) => !x.amrap);
+  const w = setWeight(b, it.ex, it.sets[0]);
+  const wu = warmupSets(it.ex, Math.max(0, ...it.sets.map((x) => setWeight(b, it.ex, x) || 0)));
+  const pct = it.sets[0].pct;
+  return `<div class="tc-lift"><div class="tc-kick2">Main lift</div>
+    <div class="tc-big">${esc(ex.name)} ${esc(blockItemText(b, it))}</div>
+    <div class="tc-sub">${pct ? `${fmtNum(pct, 1)} %` : ''}${wu.length && state.settings.autoWarmup !== false ? ` · warm-up ${wu.map((x) => fmtNum(x.w, 2)).join(', ')}` : ''}${work.length < it.sets.length ? ' · last set AMRAP' : ''}</div></div>`;
+}
+
 function todayCardHtml(today) {
   const day = getDay(today);
   const wd = WD[parseKey(today).getDay()].toUpperCase();
+  const block = (state.blocks || []).find((b) => !b.finished);
   if (day?.entries.length) {
-    const sets = day.entries.flatMap((e) => e.sets);
+    const sets = day.entries.flatMap((e) => e.sets).filter((s) => s.lvl !== 'warmup' && setHasData(s));
     const done = sets.filter((s) => s.done).length;
+    const main = day.entries.find((e) => e.block);
+    const mw = main && main.sets.filter((s) => s.lvl !== 'warmup');
+    const mainTxt = mw?.length ? `${getExercise(main.ex).name} ${mw.length} × ${mw[0].r} · ${fmtNum(mw[0].w, 2)} ${state.settings.unit}` : '';
     return `<section class="today-card">
-      <div class="tc-kicker">Today · ${wd}</div>
-      <h2 class="tc-title">${esc(workoutName(day) || 'Workout')}</h2>
+      <div class="tc-kicker">Today · ${wd}${main ? ` · Week ${main.block.w + 1} Day ${main.block.d + 1}` : ''}</div>
+      <h2 class="tc-title">${esc((workoutName(day) || 'Workout').replace(/^[A-Za-zæøåÆØÅ]{3,8}\s*·\s*/, ''))}</h2>
+      ${mainTxt ? `<div class="tc-sub">Main lift: <b>${esc(mainTxt)}</b></div>` : ''}
       <div class="tc-row"><span>${day.entries.length} exercise${day.entries.length === 1 ? '' : 's'}</span><b>${done} of ${sets.length} sets done</b></div>
-      <button class="btn primary block tc-btn" data-go="log">${icon('right')} Continue workout</button>
+      <button class="btn primary block tc-btn" data-go="log">${icon('right')} ${done && done === sets.length ? 'Open workout' : 'Continue workout'}</button>
+      ${block ? blockStrip(block, today) : ''}
     </section>`;
   }
   const plan = todayPlan(today);
+  const pctItems = plan.bd ? plan.bd.day.items.filter((it) => it.kind === 'pct') : [];
   const rows = [];
   if (plan.bd) {
     for (const it of plan.bd.day.items) {
-      rows.push(`<div class="tc-row"><span>${esc(getExercise(it.ex).name)} <span class="muted">· block W${plan.bd.w + 1}</span></span>
+      if (pctItems[0] === it) continue;
+      rows.push(`<div class="tc-row"><span>${esc(getExercise(it.ex).name)} <span class="muted">· block</span></span>
         <b>${esc(blockItemText(plan.block, it))}</b></div>`);
     }
   }
   if (plan.workout) {
     const n = plan.workout.exercises.length;
-    rows.push(`<div class="tc-row"><span>${esc(plan.workout.name)} <span class="muted">· ${esc(plan.program.name)}</span></span>
+    rows.push(`<div class="tc-row"><span>then <b>${esc(plan.workout.name.replace(/^\S+\s*[·.:-]?\s*/, ''))}</b> <span class="muted">· ${esc(plan.program.name)}</span></span>
       <b>${n} exercise${n === 1 ? '' : 's'}</b></div>`);
   }
   const title = plan.workout || plan.bd
     ? [plan.bd?.day.name.replace(/^[A-Za-zæøåÆØÅ]{3,8}\s*·\s*/, ''), plan.workout?.name.replace(/^\S+\s*/, '')].filter(Boolean).join(' + ')
     : 'Nothing planned';
-  return `<section class="today-card ${rows.length ? '' : 'quiet'}">
-    <div class="tc-kicker">Today · ${wd}</div>
-    <h2 class="tc-title">${esc(title)}</h2>
-    ${rows.join('') || '<p class="muted tc-empty">A rest day – or add exercises yourself.</p>'}
-    ${rows.length ? `<button class="btn primary block tc-btn" data-go="start">${icon('plus')} Start today’s workout</button>`
+  const has = rows.length || pctItems.length;
+  return `<section class="today-card ${has ? '' : 'quiet'}">
+    <div class="tc-kicker">Today · ${wd}${plan.bd ? ` · Week ${plan.bd.w + 1} Day ${plan.bd.d + 1}` : ''}</div>
+    ${pctItems.length ? mainLiftHtml(plan.block, pctItems[0]) : `<h2 class="tc-title">${esc(title)}</h2>`}
+    ${rows.join('') || (has ? '' : '<p class="muted tc-empty">A rest day – or add exercises yourself.</p>')}
+    ${has ? `<button class="btn primary block tc-btn" data-go="start">${icon('plus')} Start today’s workout</button>`
     : `<button class="btn ghost block tc-btn" data-go="log">${icon('plus')} Open today’s log</button>`}
+    ${block ? blockStrip(block, today) : ''}
   </section>`;
 }
 

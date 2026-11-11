@@ -84,7 +84,7 @@ android-app/          Android app (Capacitor 8, appId app.loadlog): loads the li
 {
   customExercises: [{ id: 'c-…', name, group, equip, type, desc }],
   customPrograms:  [{ id: 'cp-…', name, desc, level, days, workouts: [{ id, name, exercises: [{ ex, sets, reps }] }] }],
-  log:  { 'YYYY-MM-DD': { title, workout?, note?, duration?, entries: [{ id, ex, note?, block?, deload?, sets: [{ w, r, t, d, done, lvl, c?, tags?, at?, last?, pct?, amrap?, goal? }] }] } },
+  log:  { 'YYYY-MM-DD': { title, workout?, note?, duration?, finished?, readiness?, entries: [{ id, ex, note?, block?, deload?, ss?, sets: [{ w, r, t, d, done, lvl, c?, tags?, at?, last?, pct?, amrap?, goal? }] }] } },
   body: [{ date: 'YYYY-MM-DD', weight?, chest?, waist?, armL?, armR?, thighL?, thighR? }],
   food?: { … },   // left over from the removed Food tab (v39–v40, DECISIONS #59); nothing reads it, keep it untouched
   profile: { name, username, passHash?, salt?, iterations?, created },   // or profileSkipped: true (DECISIONS #45)
@@ -93,7 +93,7 @@ android-app/          Android app (Capacitor 8, appId app.loadlog): loads the li
   blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],
   blockTemplates: [ /* the user's own templates, compact items */ ],
   lastBackup, backupSnooze, lastAutoBackup,   // backup files add backupVersion: 2 and photos: [...] (not stored in state)
-  settings: { unit: 'kg'|'lb', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst, myProgram?, trendLifts?, sheetUrl? }
+  settings: { unit: 'kg'|'lb', rest: 90, restMain: 180, autoWarmup: true, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst, myProgram?, trendLifts?, sheetUrl? }
 }
 ```
 

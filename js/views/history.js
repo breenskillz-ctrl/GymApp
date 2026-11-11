@@ -1,10 +1,10 @@
 // History: earlier workouts as compact cards, newest first (DECISIONS #36). The app opens here.
 import {
-  state, save, getExercise, dayHasWork, dayDone, daySummary, dayDuration, isPR, getDay,
+  state, save, getExercise, dayHasWork, dayDone, daySummary, dayDuration, isPR, getDay, isBigLift,
 } from '../store.js';
 import { workoutName, todayPlan, startToday } from '../today.js';
 import {
-  esc, icon, dateKey, fmtDate, fmtNum, e1rm, MONTHS, parseKey, go, menuDialog, confirmDialog, toast,
+  esc, icon, dateKey, fmtDate, fmtNum, e1rm, MONTHS, parseKey, go, menuDialog, confirmDialog, toast, addDays,
 } from '../utils.js';
 import { logState, copyToToday, openCalendar } from './log.js';
 import { setText } from './exercises.js';
@@ -25,7 +25,7 @@ function bestSet(ex, sets) {
 // The program day or block day ("Tirsdag Chest+Tri"), else the time of day from the first logged set (DECISIONS #70)
 function title(day) {
   const named = workoutName(day);
-  if (named) return esc(named);
+  if (named) return esc(named.replace(/^[A-Za-zæøåÆØÅ]{3,8}\s*·\s*/, ''));
   const first = Math.min(...day.entries.flatMap((e) => e.sets.filter((s) => s.at).map((s) => s.at)));
   if (!Number.isFinite(first)) return 'Workout';
   const h = new Date(first).getHours();
@@ -83,6 +83,42 @@ function weekCount() {
 
 const fmtDuration = (min) => (min >= 60 ? `${Math.floor(min / 60)}h ${min % 60}m` : `${min}m`);
 
+// "3 × 5 · 155" / "155 × 5, 5, 4" / best set: the day's main lift in one line (DECISIONS #72)
+function liftLine(ex, sets) {
+  const w = sets.filter((s) => s.lvl !== 'warmup');
+  if (!w.length) return '';
+  if (ex.type === 'wr' && w[0].w && w.every((s) => s.w === w[0].w)) {
+    return w.every((s) => s.r === w[0].r) ? `${w.length} × ${w[0].r} · ${fmtNum(w[0].w, 2)}` : `${fmtNum(w[0].w, 2)} × ${w.map((s) => s.r).join(', ')}`;
+  }
+  return setText(ex, bestSet(ex, w));
+}
+
+function mainOf(day) {
+  const done = (e) => e.sets.filter((s) => s.done && s.lvl !== 'warmup' && [s.w, s.r, s.t, s.d].some(Boolean));
+  const e = day.entries.find((x) => x.block && done(x).length) || day.entries.find((x) => isBigLift(x.ex) && done(x).length)
+    || day.entries.find((x) => done(x).length);
+  if (!e) return '';
+  const ex = getExercise(e.ex);
+  return `${ex.name} ${liftLine(ex, done(e))}`;
+}
+
+const open = new Set(); // rows opened to show details
+
+function rowHtml(key) {
+  const day = getDay(key);
+  const mins = dayDuration(day);
+  const d = parseKey(key);
+  const prs = day.entries.reduce((n, e) => n + (e.sets.some((s) => s.done && isPR(e.ex, key, s)) ? 1 : 0), 0);
+  const info = [mins && fmtDuration(mins), prs && `<span class="gold">${prs} record${prs === 1 ? '' : 's'}</span>`].filter(Boolean).join(' · ');
+  return `<div class="hr ${open.has(key) ? 'open' : ''}" data-row="${key}">
+    <button class="hr-main" data-toggle="${key}">
+      <span class="hr-l"><span class="hr-date">${d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}</span><b>${title(day)}</b></span>
+      <span class="hr-r"><b>${esc(mainOf(day))}</b><span>${info}</span></span>
+    </button>
+    ${open.has(key) ? cardHtml(key) : ''}
+  </div>`;
+}
+
 function cardHtml(key) {
   const day = getDay(key);
   const sum = daySummary(day);
@@ -90,25 +126,26 @@ function cardHtml(key) {
   const u = state.settings.unit;
   let prs = 0;
   const rows = day.entries.map((e) => {
-    const done = e.sets.filter((s) => s.done && [s.w, s.r, s.t, s.d].some(Boolean));
+    const done = e.sets.filter((s) => s.done && s.lvl !== 'warmup' && [s.w, s.r, s.t, s.d].some(Boolean));
     if (!done.length) return '';
     const ex = getExercise(e.ex);
     const best = bestSet(ex, done);
-    if (isPR(e.ex, key, best)) prs++;
+    if (done.some((s) => isPR(e.ex, key, s))) prs++;
     return `<div class="h-row"><span class="h-ex">${done.length} × ${esc(exLabel(ex))}</span><span class="h-best">${esc(ex.type === 'wr' && !best.w ? `${best.r} reps` : setText(ex, best))}</span></div>`;
   }).join('');
-  return `<article class="h-card" data-day="${key}">
+  return `<article class="h-card h-detail">
     <div class="h-head">
-      <div class="grow"><h3>${title(day)}</h3>
-        ${day.title && !day.title.endsWith(workoutName(day) || '\u0000') ? `<div class="h-comment">${esc(day.title)}</div>` : ''}<div class="sub">${fmtDate(key)}</div></div>
+      <div class="grow">${day.title && !day.title.endsWith(workoutName(day) || '\u0000') ? `<div class="h-comment">${esc(day.title)}</div>` : ''}
+        ${day.note ? `<div class="h-comment">${esc(day.note)}</div>` : ''}</div>
       <button class="icon-btn h-more" data-more="${key}" aria-label="Workout menu">${icon('more')}</button>
     </div>
     <div class="h-stats">
       ${mins ? `<span>${icon('timer')}${fmtDuration(mins)}</span>` : ''}
       ${sum.vol ? `<span>${icon('dumbbell')}${fmtNum(sum.vol, 0)} ${u}</span>` : `<span>${icon('check')}${sum.sets} sets</span>`}
-      <span class="${prs ? 'gold' : ''}">${icon('trophy')}${prs} PR${prs === 1 ? '' : 's'}</span>
+      ${prs ? `<span class="gold">${icon('trophy')}${prs} record${prs === 1 ? '' : 's'}</span>` : ''}
     </div>
     <div class="h-table"><div class="h-row h-th"><span>Exercise</span><span>Best set</span></div>${rows}</div>
+    <button class="btn ghost block h-open" data-day="${key}">${icon('edit')} Open workout</button>
   </article>`;
 }
 
@@ -119,7 +156,17 @@ export function renderHistory(root) {
   const plan = hasToday ? null : todayPlan(today);
   const canStart = plan && (plan.bd || plan.workout);
   let shown = 0;
-  let lastMonth = '';
+  let lastWeek = '';
+  const mondayOf = (k) => addDays(k, -((parseKey(k).getDay() + 6) % 7));
+  const thisMon = mondayOf(today);
+  const perWeek = {};
+  for (const k of days) perWeek[mondayOf(k)] = (perWeek[mondayOf(k)] || 0) + 1;
+  const weekLabel = (mon) => {
+    const n = perWeek[mon];
+    const name = mon === thisMon ? 'This week' : mon === addDays(thisMon, -7) ? 'Last week'
+      : `Week of ${parseKey(mon).getDate()} ${MONTHS[parseKey(mon).getMonth()].slice(0, 3)}${mon.slice(0, 4) !== today.slice(0, 4) ? ` ${mon.slice(0, 4)}` : ''}`;
+    return `${name} · ${n} workout${n === 1 ? '' : 's'}`;
+  };
 
   root.innerHTML = `
     <header class="topbar">
@@ -137,13 +184,20 @@ export function renderHistory(root) {
   const more = () => {
     const next = days.slice(shown, shown + PAGE);
     shown += next.length;
-    list.insertAdjacentHTML('beforeend', next.map((k) => {
-      const d = parseKey(k);
-      const m = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-      const head = m !== lastMonth ? `<h2 class="h-month">${m}</h2>` : '';
-      lastMonth = m;
-      return head + cardHtml(k);
-    }).join(''));
+    if (!next.length) return;
+    // One group per week; a week that continues from the previous page gets a new group without a heading
+    let html = '';
+    let group = null;
+    for (const k of next) {
+      const mon = mondayOf(k);
+      if (mon !== group) {
+        html += `${group ? '</div>' : ''}${mon !== lastWeek ? `<h2 class="h-month">${weekLabel(mon)}</h2>` : ''}<div class="hr-list">`;
+        group = mon;
+        lastWeek = mon;
+      }
+      html += rowHtml(k);
+    }
+    list.insertAdjacentHTML('beforeend', `${html}</div>`);
   };
   more();
   // Load older workouts as the list scrolls
@@ -154,7 +208,7 @@ export function renderHistory(root) {
   }, { rootMargin: '600px' });
   io.observe(sentinel);
 
-  const open = (key) => { logState.date = key; go('log'); };
+  const openDay = (key) => { logState.date = key; go('log'); };
 
   root.onclick = async (e) => {
     const m = e.target.closest('[data-more]');
@@ -164,8 +218,8 @@ export function renderHistory(root) {
       if (key !== today) items.push({ value: 'copy', label: 'Repeat today', icon: 'copy' });
       items.push({ value: 'del', label: 'Delete workout', icon: 'trash', danger: true });
       const v = await menuDialog(fmtDate(key), items);
-      if (v === 'open') open(key);
-      if (v === 'copy') { copyToToday(key); open(today); toast('Copied to today – tap a set to log it'); }
+      if (v === 'open') openDay(key);
+      if (v === 'copy') { copyToToday(key); openDay(today); toast('Copied to today – tap a set to log it'); }
       if (v === 'del' && await confirmDialog(`Delete the workout from ${fmtDate(key)}?`)) {
         delete state.log[key];
         save();
@@ -181,10 +235,17 @@ export function renderHistory(root) {
     }
     if (a === 'start') {
       if (canStart) { startToday(today); toast('Today’s workout is ready – tap a set to log it'); }
-      return open(today);
+      return openDay(today);
     }
     if (a === 'calendar') return openCalendar();
+    const t = e.target.closest('[data-toggle]');
+    if (t) {
+      const key = t.dataset.toggle;
+      if (open.has(key)) open.delete(key); else open.add(key);
+      t.closest('[data-row]').outerHTML = rowHtml(key);
+      return;
+    }
     const card = e.target.closest('[data-day]');
-    if (card) open(card.dataset.day);
+    if (card) openDay(card.dataset.day);
   };
 }

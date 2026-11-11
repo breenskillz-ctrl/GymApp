@@ -1,6 +1,6 @@
 // Set editor dialog: add or edit one set (weight/reps/time/distance, comment, intensity level).
 import { LEVELS, SET_TAGS } from '../data.js';
-import { state, save, getExercise, history, lastSets, isPR, getRest } from '../store.js';
+import { state, save, getExercise, history, lastSets, isPR, restFor } from '../store.js';
 import { esc, icon, openModal, num, parseTime, fmtTime, fmtNum, e1rm, toast, dateKey, fmtDate } from '../utils.js';
 import { startRest } from '../timer.js';
 import { setText } from './exercises.js';
@@ -38,16 +38,25 @@ const shortDate = (k) => { const [y, mo, d] = k.split('-').map(Number); return `
 export const levelColor = (id) => LEVELS.find((l) => l.id === id)?.color;
 export const exLabel = (ex) => (ex.equip && !['Other', 'Bodyweight'].includes(ex.equip) ? `${ex.name} · ${ex.equip}` : ex.name);
 
-function platesHtml(total) {
+// Plates per side for a total on a standard bar: { bar, used: [25, 25, 15, 2.5], side: what can't be made }
+export function platesPerSide(total) {
   const lb = state.settings.unit === 'lb';
   const bar = lb ? 45 : 20;
   const plates = lb ? [45, 35, 25, 10, 5, 2.5] : [25, 20, 15, 10, 5, 2.5, 1.25];
-  if (!total || total < bar) return `<p class="muted">Enter a weight of at least ${bar} ${state.settings.unit} (the bar).</p>`;
+  if (!total || total < bar) return null;
   let side = (total - bar) / 2;
   const used = [];
   for (const p of plates) {
     while (side >= p - 1e-9) { used.push(p); side -= p; }
   }
+  return { bar, used, side };
+}
+
+function platesHtml(total) {
+  const bar = state.settings.unit === 'lb' ? 45 : 20;
+  const p = platesPerSide(total);
+  if (!p) return `<p class="muted">Enter a weight of at least ${bar} ${state.settings.unit} (the bar).</p>`;
+  const { used, side } = p;
   return `<div class="muted small">Per side (bar ${bar} ${state.settings.unit}):</div>
     <div>${used.length ? used.map((p) => `<span class="pill">${fmtNum(p, 2)}</span>`).join('') : 'Just the bar'}</div>
     ${side > 0.01 ? `<div class="muted small">${fmtNum(side * 2, 2)} ${state.settings.unit} can't be made with standard plates.</div>` : ''}`;
@@ -247,8 +256,9 @@ export function openSetEditor(date, entry, index, onDone) {
         if (editing) entry.sets[index] = set; else entry.sets.push(set);
         save();
         close();
-        if (done && isPR(entry.ex, date, set)) toast('🏆 New personal record!');
-        if (done && !existing?.done && state.settings.autoRest && date === dateKey() && lvl !== 'warmup') startRest(getRest(entry.ex));
+        if (done && isPR(entry.ex, date, set)) toast('🏆 New record!');
+        const sec = restFor(entry, date);
+        if (done && !existing?.done && sec && state.settings.autoRest && date === dateKey() && lvl !== 'warmup') startRest(sec);
         onDone?.();
       });
     },

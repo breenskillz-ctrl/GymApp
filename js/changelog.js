@@ -2,10 +2,24 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 54;
+export const APP_VERSION = 55;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 55, date: '2026-11-11', items: [
+    'Planned sets are white with a dashed edge, done sets are filled, and the next set has a blue ring.',
+    'The main lift comes first on Home and in the log, with plates per side under it.',
+    'Block lifts get warm-up sets automatically. Warm-ups don’t count as work.',
+    'Rest is 3 minutes after squat, bench, deadlift, press and block sets, 90 seconds after the rest. Change it in Settings.',
+    'Finished exercises fold into one line while you train. Tap to open them again.',
+    'Superset two exercises from the ⋮ menu: the rest starts after both.',
+    'Each exercise shows its rep range and when the weight goes up.',
+    'A summary when the last set is done, compared with last time.',
+    'Home shows where you are in the block, with the lighter weeks and the test week.',
+    'History is one line per workout, grouped by week. Tap a line for details.',
+    'Progress: plan against what you lifted in the block, and your top set per week.',
+    'Trophies only for real records on the big barbell lifts (a heavier 5RM, 3RM …).',
+  ] },
   { v: 54, date: '2026-11-10', items: [
     'Coach sync shows how many items are left while it sends.',
     'Your programs and blocks are sent to the coach sheet first, not last.',

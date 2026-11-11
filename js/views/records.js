@@ -1,5 +1,5 @@
 // Records page (DECISIONS #49): every exercise's personal records in one place, the latest PRs on top.
-import { state, getExercise, setHasData } from '../store.js';
+import { state, getExercise, setHasData, isMainLift, recordInfo } from '../store.js';
 import { GROUPS, GROUP_COLORS, SET_TAGS } from '../data.js';
 import { esc, icon, topBar, fmtDate, fmtNum, fmtTime, e1rm } from '../utils.js';
 import { openExerciseDetail } from './exercises.js';
@@ -25,15 +25,20 @@ function collect() {
   const events = [];
   for (const [id, days] of Object.entries(byEx)) {
     const ex = getExercise(id);
-    const rec = { id, ex, best: null, heaviest: null, rm: {}, variants: {}, sessions: days.length };
+    const rec = { id, ex, best: null, heaviest: null, rm: {}, variants: {}, sessions: days.length, main: isMainLift(id) };
     let top = 0;
     days.forEach(({ date, sets }, i) => {
       const best = sets.reduce((a, b) => (score(ex, b) > score(ex, a) ? b : a));
       const v = score(ex, best);
       if (v > top) {
-        if (i > 0) events.push({ id, ex, date, set: best });
         top = v;
         rec.best = { set: best, date };
+      }
+      // Trophies only for real records on main lifts: a new rep max (DECISIONS #72)
+      if (rec.main && i > 0) {
+        let hit = null;
+        for (const s of sets) { const r = recordInfo(id, date, s); if (r && (!hit || s.w > hit.set.w)) hit = { set: s, ...r }; }
+        if (hit) events.push({ id, ex, date, set: hit.set, reps: hit.reps, old: hit.old });
       }
       for (const s of sets) {
         // Best set per variant (paused, beltless …), shown on its own line (DECISIONS #51)
@@ -64,13 +69,13 @@ function setText(ex, s) {
 // The big number on the right: estimated 1RM for weighted lifts, otherwise the best set
 function headline(r) {
   const s = r.best.set;
-  if (r.ex.type === 'wr' && s.w) return `<b>${fmtNum(e1rm(s.w, s.r), 1)}</b><small>${u()} e1RM</small>`;
-  return `<b>${esc(setText(r.ex, s))}</b>`;
+  if (r.main && s.w) return `<b>${fmtNum(e1rm(s.w, s.r), 1)}</b><small>${u()} e1RM</small>`;
+  return `<b class="rec-best">${esc(setText(r.ex, s))}</b><small>best</small>`;
 }
 
 function rowHtml(r) {
   // Always 1RM, 3RM, 5RM and 10RM for weighted lifts (the user's choice); "–" when not lifted for that many reps yet
-  const rms = r.heaviest
+  const rms = r.heaviest && r.main
     ? REP_MAXES.map((n) => `<span>${n}RM <b>${r.rm[n] ? fmtNum(r.rm[n].w, 2) : '–'}</b></span>`).join('')
     : '';
   const sub = r.ex.type === 'wr' && r.best.set.w ? `Best set ${setText(r.ex, r.best.set)}` : `${r.sessions} session${r.sessions === 1 ? '' : 's'}`;
@@ -106,11 +111,11 @@ export function renderRecords(root) {
   root.innerHTML = `
     ${topBar('Records')}
     <section class="rec-top">
-      <div class="hello-stats"><span><b>${list.length}</b> exercises</span><span><b>${thisYear}</b> PRs this year</span></div>
-      ${latest.length ? `<h3 class="rec-head">Latest PRs</h3>
+      <div class="hello-stats"><span><b>${list.length}</b> exercises</span><span><b>${thisYear}</b> record${thisYear === 1 ? '' : 's'} this year</span></div>
+      ${latest.length ? `<h3 class="rec-head">Latest records</h3>
       <div class="rec-latest">${latest.map((x) => `<button class="rec-new" data-ex="${esc(x.id)}">
         ${icon('trophy')}<span class="grow"><span class="title">${esc(exLabel(x.ex))}</span>
-        <span class="sub">${fmtDate(x.date, false)}</span></span><strong>${esc(setText(x.ex, x.set))}</strong></button>`).join('')}</div>` : ''}
+        <span class="sub">${x.reps}RM · ${fmtDate(x.date, false)}${x.old ? ` · was ${fmtNum(x.old, 2)} ${u()}` : ''}</span></span><strong>${esc(setText(x.ex, x.set))}</strong></button>`).join('')}</div>` : ''}
     </section>
     <input class="input search rec-search" type="search" placeholder="Search records…" value="${esc(query)}">
     <div class="rec-all">${listHtml(list)}</div>`;

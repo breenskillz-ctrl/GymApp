@@ -4,7 +4,7 @@
 //   { slot|ex, kind: 'normal', sets: n, reps: r }                       – accessory with normal rep-range suggestions
 // Custom templates store pct items compactly as { count, reps, pct, amrapLast } and are expanded when a block starts.
 import {
-  state, save, getDay, addEntry, getExercise, getProgression, history, cleanupDay,
+  state, save, getDay, addEntry, getExercise, getProgression, history, cleanupDay, warmupSets,
 } from './store.js';
 import { uid, e1rm, dateKey } from './utils.js';
 
@@ -333,6 +333,11 @@ export function addBlockWorkout(b, date, w = b.pos.w, d = b.pos.d) {
       ...(it.note && i === 0 && !s.amrap ? { c: it.note } : {}), // note on the first set only
       ...(s.amrap ? { amrap: true, goal: s.reps, c: 'AMRAP – as many reps as possible' } : {}),
     }));
+    // Warm-up sets in front of the main lift (DECISIONS #72); they are not counted as work
+    if (state.settings.autoWarmup !== false) {
+      const top = Math.max(0, ...entry.sets.map((s) => s.w || 0));
+      entry.sets = [...warmupSets(it.ex, top), ...entry.sets];
+    }
   }
   syncBlock(b);
   save();

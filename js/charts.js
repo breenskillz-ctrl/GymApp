@@ -1,7 +1,7 @@
 import { textScale } from './utils.js';
 // Simple charts drawn on <canvas>, with no external libraries.
 
-function css(name) {
+export function css(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
@@ -187,7 +187,7 @@ export function multiLineChart(canvas, labels, series, { height = 200, format = 
   const { ctx, w, h } = setup(canvas, height);
   const vals = series.flatMap((s) => s.values.filter((v) => v != null));
   if (vals.length < 2) { empty(ctx, w, h, 'Not enough data yet'); return; }
-  const pad = { l: 40, r: 10, t: 12, b: 24 };
+  const pad = { l: 40, r: 20, t: 12, b: 24 };
   let min = Math.min(...vals);
   let max = Math.max(...vals);
   const range = max - min || 10;
@@ -204,12 +204,14 @@ export function multiLineChart(canvas, labels, series, { height = 200, format = 
     ctx.fillStyle = s.color;
     ctx.lineWidth = 2.2;
     ctx.lineJoin = 'round';
+    ctx.setLineDash(s.dash ? [5, 4] : []); // dashed = the plan
     // Lines join the known points across gaps (a month without the lift), dots mark real data
     const pts = s.values.map((v, i) => (v == null ? null : [xAt(i), y(v)])).filter(Boolean);
     ctx.beginPath();
     pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
     ctx.stroke();
-    pts.forEach(([px, py]) => { ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2); ctx.fill(); });
+    ctx.setLineDash([]);
+    if (!s.dash) pts.forEach(([px, py]) => { ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2); ctx.fill(); });
   }
 }
 

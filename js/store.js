@@ -16,7 +16,7 @@ const defaults = () => ({
   blocks: [], // running and finished training blocks (js/blocks.js)
   blockTemplates: [], // the user's own block templates
   lastBackup: 0, // time of the last exported backup (weekly reminder)
-  settings: { unit: 'kg', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst: false },
+  settings: { unit: 'kg', rest: 90, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst: false, restMain: 180, autoWarmup: true },
 });
 
 export let state = defaults();
@@ -216,7 +216,7 @@ export const doneSets = (entry) => entry.sets.filter((s) => s.done);
 // A day counts as a workout once at least one set is done; days with only planned sets don't (DECISIONS #70)
 export function dayDone(key) {
   const d = state.log[key];
-  return !!d && d.entries.some((e) => e.sets.some((s) => s.done && [s.w, s.r, s.t, s.d].some((v) => v != null && v !== '')));
+  return !!d && d.entries.some((e) => e.sets.some((s) => s.done && s.lvl !== 'warmup' && [s.w, s.r, s.t, s.d].some((v) => v != null && v !== '')));
 }
 
 export const setHasData = (s) => [s.w, s.r, s.t, s.d].some((v) => v != null && v !== '');
@@ -370,21 +370,29 @@ export function records(exId) {
 }
 
 // Is this set a new personal record compared with previous days?
-export function isPR(exId, key, set) {
-  if (!set.w && !set.r && !set.t && !set.d) return false;
-  const prev = history(exId, key);
-  if (!prev.length) return false;
+// Main lifts (DECISIONS #72): barbell compound lifts for legs, chest, back and shoulders. Only these get record trophies,
+// a longer rest and the plate line; everything else shows its best set without a trophy.
+const MAIN_GROUPS = ['Legs', 'Chest', 'Back', 'Shoulders'];
+export function isMainLift(exId) {
   const ex = getExercise(exId);
-  const all = prev.flatMap((h) => h.sets);
-  if (ex.type === 'wr') {
-    const best = Math.max(...all.map((s) => e1rm(s.w, s.r)));
-    return e1rm(set.w, set.r) > best;
-  }
-  if (ex.type === 'r') return (set.r || 0) > Math.max(...all.map((s) => s.r || 0));
-  if (ex.type === 't') return (set.t || 0) > Math.max(...all.map((s) => s.t || 0));
-  if (ex.type === 'dt') return (set.d || 0) > Math.max(...all.map((s) => s.d || 0));
-  return false;
+  return ex.type === 'wr' && ex.equip === 'Barbell' && MAIN_GROUPS.includes(ex.group);
 }
+
+// The big four (squat, bench, deadlift, overhead press) get the "main lift" look and 3 min rest even outside a block
+const BIG = ['squat', 'bench-press', 'deadlift', 'overhead-press'];
+export const isBigLift = (exId) => BIG.includes(exId);
+
+// A real record: a main-lift work set of 1–10 reps that is heavier than anything lifted before for at least as many reps
+// (a new 5RM, 3RM …) that beats an earlier set. Returns { reps, old } or null.
+export function recordInfo(exId, key, set) {
+  if (!set?.w || !set.r || set.r > 10 || set.lvl === 'warmup' || !isMainLift(exId)) return null;
+  const prev = history(exId, key);
+  if (!prev.length) return null;
+  const old = Math.max(0, ...prev.flatMap((h) => h.sets).filter((x) => x.lvl !== 'warmup' && x.w && (x.r || 0) >= set.r).map((x) => x.w));
+  return old && set.w > old ? { reps: set.r, old } : null; // a rep count never done before is not a record yet
+}
+
+export const isPR = (exId, key, set) => !!recordInfo(exId, key, set);
 
 // ---------- Day and group helpers ----------
 export function daySummary(day) {
@@ -395,6 +403,7 @@ export function daySummary(day) {
     const g = getExercise(e.ex).group;
     if (g && !groups.includes(g)) groups.push(g);
     for (const st of doneSets(e)) {
+      if (st.lvl === 'warmup') continue; // warm-ups are not work (DECISIONS #72)
       sets++;
       vol += setVolume(st);
     }
@@ -455,7 +464,22 @@ export function bestE1rmOf(exId) {
 
 // ---------- Rest time per exercise ----------
 // Seconds of rest after a set of this exercise (exercise settings), else the default from Settings
-export const getRest = (exId) => state.progression[exId]?.rest || state.settings.rest;
+// Rest to start after a set on this card: in a superset only after the round's last card (DECISIONS #72)
+export function restFor(entry, key) {
+  const day = state.log[key];
+  if (entry.ss && day) {
+    // A round goes down the cards in order: rest only after the last card that still has sets to do
+    const group = day.entries.filter((e) => e.ss === entry.ss);
+    const later = group.slice(group.indexOf(entry) + 1);
+    if (later.some((e) => e.sets.some((x) => !x.done && setHasData(x)))) return 0;
+    return Math.max(...group.map((e) => getRest(e.ex, e)));
+  }
+  return getRest(entry.ex, entry);
+}
+
+// Rest after a set (DECISIONS #72): the exercise's own rest if set, else 3 min after the big four and block sets, else the default
+export const getRest = (exId, entry) => state.progression[exId]?.rest
+  || (entry?.block || isBigLift(exId) ? state.settings.restMain || 180 : state.settings.rest);
 
 // ---------- Warm-up sets ----------
 // Planned warm-up sets up to a working weight: (empty bar × 10), 50 % × 5, 70 % × 3, 85 % × 1, rounded to the weight step
@@ -465,7 +489,9 @@ export function warmupSets(exId, workW) {
   const step = getProgression(exId).inc || 2.5;
   const barbell = ['Barbell', 'Smith Machine'].includes(ex.equip);
   if (!workW || (barbell && workW <= bar)) return [];
-  const out = barbell && workW > bar * 1.5 ? [{ w: bar, r: 10 }] : [];
+  // Deadlifts start from the floor with plates on, so their first warm-up is 60 kg (135 lb) instead of the empty bar
+  const floor = /deadlift/i.test(exId) && !/romanian|stiff/i.test(exId) ? (state.settings.unit === 'lb' ? 135 : 60) : 0;
+  const out = floor ? (workW > floor * 1.4 ? [{ w: floor, r: 5 }] : []) : barbell && workW > bar * 1.5 ? [{ w: bar, r: 10 }] : [];
   for (const [pct, reps] of [[0.5, 5], [0.7, 3], [0.85, 1]]) {
     const w = Math.round((workW * pct) / step) * step;
     const prev = out.length ? out[out.length - 1].w : 0;

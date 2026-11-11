@@ -27,6 +27,7 @@
   --accent-ink: #ffffff; /* text on --accent */
   --red: #e53935;
   --gold: #f2b705;
+  --green: #4cc38a;      /* "went up" in summaries and the progression rule */
   --blue: #3d8bff;
   --radius: 16px;
   --safe-b: env(safe-area-inset-bottom, 0px);
@@ -1004,3 +1005,99 @@ body.auth-open { overflow: hidden; }
 .rd-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
 .rd-facts { margin-top: 4px; color: var(--muted); font-size: calc(12.5px * var(--fs)); }
 .rd-apply { margin-top: 6px; padding: 4px 0; }
+
+/* ---------- v55: gym-floor readability (DECISIONS #72) ---------- */
+/* 1 · Planned sets in full white with a clear dashed edge; done sets filled; the next set ringed */
+.set-col.planned { border: 1.5px dashed color-mix(in srgb, var(--text) 50%, transparent); }
+.set-col.planned .v { color: var(--text); }
+.set-col.planned .u { color: var(--muted); }
+.set-col.next { border-color: var(--accent-hi); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 32%, transparent); }
+/* 3 · Warm-ups: smaller and grey, in their own row */
+.sets-lab { font-size: calc(11px * var(--fs)); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 8px 0 4px; }
+.set-col.wu { min-width: 46px; border-color: var(--line2); border-style: dotted; }
+.set-col.wu .v { font-size: calc(14px * var(--fs)); color: var(--muted); }
+.set-col.wu.done { border-style: solid; background: var(--card2); }
+.set-col.wu.done .v { color: var(--text2); }
+.set-col.wu.next { border-color: var(--accent-hi); border-style: dashed; }
+/* 2 · Main lifts: accent edge and a small kicker */
+.ex-card.main-lift { box-shadow: inset 3px 0 0 var(--accent); }
+.ex-kicker { font-size: calc(11px * var(--fs)); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-hi); margin-bottom: 2px; }
+/* 14 · Plates per side (plate colours are the standard IWF colours, like the set-level colours) */
+.plates-line { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: calc(13px * var(--fs)); color: var(--muted); }
+.plates-line b { color: var(--text); font-weight: 600; }
+.pl-bars { display: inline-flex; align-items: center; gap: 2px; }
+.pl { display: inline-block; width: 6px; border-radius: 2px; background: var(--muted2); }
+.pl-25 { background: #d9453b; } .pl-20 { background: #2f6fd6; } .pl-15 { background: #e0b62e; } .pl-10 { background: #3aa364; }
+/* 13 · Double progression rule */
+.rule-line { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: calc(12px * var(--fs)); color: var(--muted); }
+.rule-line b { color: var(--text); font-weight: 600; }
+.rule-line.up { color: var(--green); font-weight: 600; }
+.rule-line .ico { width: 14px; height: 14px; }
+.rule-bar { flex: 1; min-width: 30px; height: 5px; border-radius: 3px; background: var(--card2); overflow: hidden; display: block; }
+.rule-bar i { display: block; height: 100%; background: var(--accent); }
+/* 15 · Four numbers on top of the day */
+.day-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 4px 0 10px; }
+.day-tiles div { background: var(--card); border-radius: 10px; padding: 7px 4px 6px; text-align: center; }
+.day-tiles b { display: block; font-family: var(--f-num); font-size: calc(19px * var(--fs)); font-weight: 700; line-height: 1.1; }
+.day-tiles b.gold { color: var(--gold); }
+.day-tiles span { font-size: calc(11px * var(--fs)); color: var(--muted); }
+/* 5 · Finished cards fold into one line while the workout goes on */
+.done-line { display: flex; align-items: center; gap: 10px; width: 100%; background: var(--card); border-radius: 12px; padding: 10px 14px; margin-bottom: 6px;
+  text-align: left; color: var(--muted); font-size: calc(14px * var(--fs)); }
+.done-line b { color: var(--text); font-weight: 600; }
+.dl-ck { width: 22px; height: 22px; flex: none; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; }
+.dl-ck .ico { width: 14px; height: 14px; }
+/* 12 · Supersets */
+.ss-group { border-left: 3px solid var(--accent-hi); padding-left: 8px; margin-bottom: 10px; }
+.ss-group .ex-card, .ss-group .done-line { margin-bottom: 6px; }
+.ss-lab { font-size: calc(11px * var(--fs)); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-hi); margin: 2px 0 6px; }
+/* 9 · Summary after the workout */
+.sum-kick { font-size: calc(11px * var(--fs)); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-hi); }
+.sum-title { font-family: var(--f-num); font-size: calc(24px * var(--fs)); margin: 4px 0 0; }
+.sum-sheet .day-tiles { margin-top: 12px; }
+.sum-sheet .day-tiles div { background: var(--card2); }
+.sum-head { font-size: calc(11px * var(--fs)); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; }
+.sum-cmp { display: grid; grid-template-columns: 1fr auto auto; gap: 5px 12px; font-size: calc(14px * var(--fs)); }
+.sum-cmp span:nth-child(3n+1) { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sum-cmp b { font-family: var(--f-num); text-align: right; white-space: nowrap; }
+.sum-cmp .up { color: var(--green); text-align: right; }
+.sum-cmp .down { color: var(--red); text-align: right; }
+.sum-cmp .muted { text-align: right; }
+.sum-rec { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
+.sum-rec .ico { width: 18px; height: 18px; }
+.sum-sheet .btn.block { margin-top: 10px; }
+.sum-sheet .btn.primary { margin-top: 16px; }
+/* 2 · 10 · Home: the main lift first, the block as a strip of weeks */
+.tc-lift { margin-top: 8px; }
+.tc-kick2 { font-size: calc(11px * var(--fs)); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.tc-big { font-family: var(--f-num); font-weight: 700; font-size: calc(28px * var(--fs)); line-height: 1.1; margin: 2px 0 2px; }
+.tc-sub { color: var(--muted); font-size: calc(13px * var(--fs)); margin: 2px 0 6px; }
+.tc-sub b { color: var(--text); font-weight: 600; }
+.tc-block { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: calc(13px * var(--fs)); white-space: nowrap; }
+.tc-weeks { display: flex; gap: 3px; flex: 1; }
+.tc-weeks i { flex: 1; height: 8px; border-radius: 2px; background: var(--card2); }
+.tc-weeks i.d { background: var(--accent); }
+.tc-weeks i.c { background: var(--accent-hi); }
+.tc-weeks i.l { background: color-mix(in srgb, var(--accent) 30%, var(--card2)); }
+.tc-weeks i.t { background: var(--gold); }
+.tc-facts { color: var(--muted); font-size: calc(12px * var(--fs)); margin-top: 6px; }
+/* 8 · History: one line per workout, grouped by week; tap to see the details */
+.hr-list { background: var(--card); border-radius: 14px; overflow: hidden; margin-bottom: 6px; }
+.hr + .hr { border-top: 1px solid var(--line); }
+.hr-main { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; padding: 11px 14px; text-align: left; background: none; color: var(--text); }
+.hr-main:active { background: var(--card2); }
+.hr-l { display: flex; flex-direction: column; min-width: 0; }
+.hr-date { font-size: calc(12px * var(--fs)); color: var(--muted); }
+.hr-l b { font-weight: 600; font-size: calc(15px * var(--fs)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hr-r { display: flex; flex-direction: column; align-items: flex-end; text-align: right; font-size: calc(12px * var(--fs)); color: var(--muted); }
+.hr-r b { font-family: var(--f-num); font-size: calc(16px * var(--fs)); color: var(--text); white-space: nowrap; }
+.hr.open { background: color-mix(in srgb, var(--card2) 40%, var(--card)); }
+.h-detail { background: transparent; box-shadow: none; border: 0; margin: 0; padding: 0 14px 12px; }
+.h-open { margin-top: 8px; }
+.h-list { padding-bottom: 90px; }
+/* 6 · Block chart: one lift at a time */
+[data-block-lift].trend-chip { --c: var(--muted2); }
+[data-block-lift].trend-chip.on { --c: var(--accent-hi); }
+.chart-note { margin: 6px 0 0; font-size: calc(12px * var(--fs)); }
+/* 7 · Records: other exercises show their best set without a trophy */
+.rec-val .rec-best { font-size: calc(16px * var(--fs)); }
