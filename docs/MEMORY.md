@@ -25,7 +25,7 @@ _Last updated: 2026-11-10 (v53 published: readiness on Home, DECISIONS #71. Kode
 
 ## Current status
 
-- **v57 (2026-11-11, published):** plate colours as at his gym: 20 blue, 15 yellow, 10 green, 5 white, 2.5 black.
+- **v58 (2026-11-11, published):** plate colours and sizes as at his gym: 20 blue, 15 yellow, 10 green (full size), 5 white (smaller), 2.5 black, 1.25 (smallest).
 - **v56 (2026-11-11, published):** heaviest plate 20 kg by default (setting), DECISIONS #73.
 - **v55 (2026-11-11, published):** review → 14 changes (DECISIONS #72): clearer sets, main lift first, auto warm-ups, 3 min rest for main lifts, focus mode, supersets, rule line, plates, day tiles, finish summary, block strip, compact history, block/top-set charts, real records only. Coach arbeidsmaks now 152/130/190/85 (Loadlog 1RM 160/137.5/200/90).
 - **v54 (2026-11-10):** coach sync sends the setup row first, keeps a skipped setup row pending, shows "Sending… N left". Published.

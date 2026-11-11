@@ -1026,7 +1026,11 @@ body.auth-open { overflow: hidden; }
 .plates-line { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: calc(13px * var(--fs)); color: var(--muted); }
 .plates-line b { color: var(--text); font-weight: 600; }
 .pl-bars { display: inline-flex; align-items: center; gap: 2px; }
-.pl { display: inline-block; width: 6px; border-radius: 2px; background: var(--muted2); }
+.pl { display: inline-block; width: 6px; height: 14px; border-radius: 2px; background: var(--muted2); }
+/* Sizes as on the bar: 25/20/15/10 kg bumpers share the full diameter (thicker for heavier), 5 kg is smaller,
+   2.5 and 1.25 kg smaller still */
+.pl-25 { height: 28px; width: 8px; } .pl-20 { height: 28px; width: 7px; } .pl-15 { height: 28px; width: 6px; }
+.pl-10 { height: 28px; width: 5px; } .pl-5 { height: 18px; width: 5px; } .pl-2_5 { height: 13px; width: 4px; } .pl-1_25 { height: 11px; width: 3px; }
 .pl-25 { background: #d9453b; } .pl-20 { background: #2f6fd6; } .pl-15 { background: #e0b62e; } .pl-10 { background: #3aa364; }
 .pl-5 { background: #f2f2f2; } .pl-2_5 { background: #0b0d10; box-shadow: inset 0 0 0 1px var(--line2); } .pl-1_25 { background: #a9b0b8; }
 /* 13 · Double progression rule */

@@ -115,8 +115,7 @@ function platesLine(entry) {
   const s = entry.sets.find((x) => !x.done && x.lvl !== 'warmup' && x.w) || [...entry.sets].reverse().find((x) => x.lvl !== 'warmup' && x.w);
   const p = s && platesPerSide(s.w);
   if (!p || !p.used.length) return '';
-  const h = (w) => Math.round(10 + Math.min(1, w / 25) * 14);
-  return `<div class="plates-line"><span class="pl-bars">${p.used.map((w) => `<i class="pl pl-${String(w).replace('.', '_')}" style="height:${h(w)}px"></i>`).join('')}</span>
+  return `<div class="plates-line"><span class="pl-bars">${p.used.map((w) => `<i class="pl pl-${String(w).replace('.', '_')}"></i>`).join('')}</span>
     <span><b>${fmtNum(s.w, 2)}:</b> ${p.used.map((w) => fmtNum(w, 2)).join(' + ')} per side</span></div>`;
 }
 
