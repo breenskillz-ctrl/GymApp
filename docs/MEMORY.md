@@ -25,7 +25,7 @@ _Last updated: 2026-11-10 (v53 published: readiness on Home, DECISIONS #71. Kode
 
 ## Current status
 
-- **v55 (2026-11-11):** review → 14 changes (DECISIONS #72): clearer sets, main lift first, auto warm-ups, 3 min rest for main lifts, focus mode, supersets, rule line, plates, day tiles, finish summary, block strip, compact history, block/top-set charts, real records only. Coach arbeidsmaks now 152/130/190/85 (Loadlog 1RM 160/137.5/200/90).
+- **v55 (2026-11-11, published):** review → 14 changes (DECISIONS #72): clearer sets, main lift first, auto warm-ups, 3 min rest for main lifts, focus mode, supersets, rule line, plates, day tiles, finish summary, block strip, compact history, block/top-set charts, real records only. Coach arbeidsmaks now 152/130/190/85 (Loadlog 1RM 160/137.5/200/90).
 - **v54 (2026-11-10):** coach sync sends the setup row first, keeps a skipped setup row pending, shows "Sending… N left". Published.
 - **2026-11-10 (Makrologg, not Loadlog):** content 21 (dishes + weekly budget) and content 22 (shared weekly menu + shopping list,
   `menu` doc, "Fra ukemenyen" card on Day) published to Makrologg main. Sleep plan doc: https://claude.ai/artifact/6JJTfrBpcYwpyBHuSoCJ9g.
