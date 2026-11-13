@@ -60,7 +60,7 @@ js/photodb.js         Progress photos in IndexedDB (addPhoto/allPhotos/deletePho
 js/wakelock.js        Screen wake lock while today has exercises (settings.keepAwake)
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart(), barChart(), multiLineChart(), stackedBarChart() on canvas
-js/today.js           Today's workout: weekdayOf(), myProgram(), todayPlan(), startToday(), startTodayFlow(), workoutName() (DECISIONS #70, #75)
+js/today.js           Today's workout: weekdayOf(), myProgram(), todayPlan(), startToday(), startTodayFlow(), myBlock(), workoutName() (DECISIONS #70, #75, #76)
 js/readiness.js       Readiness from the watch via the coach sheet (GET ?read=garmin): garminRows(), readiness(), applyReadiness() (#71)
 js/views/home.js      Home (start page, back-button root): today card + Start button, this week, latest record, backup reminder (#57, #70)
 js/views/history.js   History: workout count + muscle-group mix, compact workout cards, "Start workout" → today's log
@@ -93,7 +93,7 @@ android-app/          Android app (Capacitor 8, appId app.loadlog): loads the li
   blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],
   blockTemplates: [ /* the user's own templates, compact items */ ],
   lastBackup, backupSnooze, lastAutoBackup,   // backup files add backupVersion: 2 and photos: [...] (not stored in state)
-  settings: { unit: 'kg'|'lb', rest: 90, restMain: 180, autoWarmup: true, maxPlate: 20, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst, myProgram?, trendLifts?, sheetUrl? }
+  settings: { unit: 'kg'|'lb', rest: 90, restMain: 180, autoWarmup: true, maxPlate: 20, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst, myProgram?, myBlock?, trendLifts?, sheetUrl? }
 }
 ```
 

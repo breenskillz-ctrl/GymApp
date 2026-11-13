@@ -29,13 +29,20 @@ export const weekdayShort = (i) => SHORT[i];
 // The user's program: the one picked with "Use for Start today's workout" (own or built-in), else the first own program
 // with weekday names, else the only own program (DECISIONS #75)
 export function myProgram() {
+  if (state.settings.myProgram === 'none') return null; // "No program" in Settings
   const own = state.customPrograms || [];
   return allPrograms().find((p) => p.id === state.settings.myProgram)
     || own.find((p) => p.workouts.some((w) => weekdayOf(w.name) != null))
     || (own.length === 1 ? own[0] : null);
 }
 
-const activeBlock = () => (state.blocks || []).find((b) => !b.finished) || null;
+// The block for "Start today's workout": the one picked in Settings, else the first running block; 'none' = no block
+export function myBlock() {
+  const running = (state.blocks || []).filter((b) => !b.finished);
+  if (state.settings.myBlock === 'none') return null;
+  return running.find((b) => b.id === state.settings.myBlock) || running[0] || null;
+}
+const activeBlock = myBlock;
 
 // The first open block day for this weekday, in the current block week (or the next one)
 function blockDayFor(b, wd) {

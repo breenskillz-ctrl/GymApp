@@ -2,10 +2,13 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 60;
+export const APP_VERSION = 61;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 61, date: '2026-11-13', items: [
+    'Settings → Start today’s workout: choose which program and which block the Start button uses, or none.',
+  ] },
   { v: 60, date: '2026-11-13', items: [
     '“Start today’s workout” now finds your program even when its days aren’t named after weekdays: it asks which day you want.',
     'Built-in programs can be used for “Start today’s workout” too (⋮ on the program).',

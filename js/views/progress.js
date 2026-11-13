@@ -1,7 +1,7 @@
 // Progress: statistics, charts, records, body weight and settings.
 import { GROUPS, GROUP_COLORS } from '../data.js';
 import {
-  state, save, dayHasWork, dayDone, getExercise, records, setVolume, resetState,
+  state, save, dayHasWork, dayDone, getExercise, records, setVolume, resetState, allPrograms,
 } from '../store.js';
 import {
   esc, icon, topBar, applyTextScale, dateKey, addDays, weekStart, parseKey, fmtDate, fmtNum, num, toast, confirmDialog, openModal,
@@ -19,6 +19,7 @@ import { openExerciseDetail } from './exercises.js';
 import { exLabel } from './seteditor.js';
 import { updateWakeLock } from '../wakelock.js';
 import { sheetUrl, syncStatus, syncSoon, resendAll, onSyncChange } from '../sync.js';
+import { myProgram, myBlock } from '../today.js';
 
 function stats() {
   const days = Object.keys(state.log).filter(dayDone).sort();
@@ -407,6 +408,17 @@ export function openSettings(onChange) {
         </div>
         <span class="scale-preview">Bench Press · Barbell &nbsp; <span class="v">110</span><span class="u">kg</span> <span class="v">4</span><span class="u">rep</span></span>
       </label>
+      <h3 class="section-title">Start today’s workout</h3>
+      <p class="muted small">What the Start button on Home adds for the day.</p>
+      <label>Program<select class="input" data-my-program>
+        <option value="none" ${st.myProgram === 'none' ? 'selected' : ''}>No program</option>
+        ${allPrograms().map((p) => `<option value="${esc(p.id)}" ${myProgram()?.id === p.id ? 'selected' : ''}>${esc(p.name)}${p.builtin ? ' (built-in)' : ''}</option>`).join('')}
+      </select></label>
+      <label>Block<select class="input" data-my-block>
+        <option value="none" ${st.myBlock === 'none' ? 'selected' : ''}>No block</option>
+        ${(state.blocks || []).filter((b) => !b.finished).map((b) => `<option value="${esc(b.id)}" ${myBlock()?.id === b.id ? 'selected' : ''}>${esc(b.name)} · week ${b.pos.w + 1} of ${b.weeks.length}</option>`).join('')}
+      </select></label>
+      <h3 class="section-title">Training</h3>
       <label>Default rest time (seconds)<input class="input" type="number" min="5" step="5" data-rest value="${st.rest}"></label>
       <label>Rest after squat, bench, deadlift, press and block sets (seconds)<input class="input" type="number" min="5" step="15" data-rest-main value="${st.restMain || 180}"></label>
       <label class="switch"><input type="checkbox" data-warmup ${st.autoWarmup !== false ? 'checked' : ''}> Add warm-up sets to block lifts</label>
@@ -459,6 +471,8 @@ export function openSettings(onChange) {
       m.querySelector('[data-rest-main]').addEventListener('change', (e) => { const v = num(e.target.value); if (v > 0) { st.restMain = v; save(); } });
       m.querySelector('[data-warmup]').addEventListener('change', (e) => { st.autoWarmup = e.target.checked; save(); });
       m.querySelector('[data-max-plate]')?.addEventListener('change', (e) => { st.maxPlate = Number(e.target.value); save(); });
+      m.querySelector('[data-my-program]').addEventListener('change', (e) => { st.myProgram = e.target.value; save(); onChange?.(); });
+      m.querySelector('[data-my-block]').addEventListener('change', (e) => { st.myBlock = e.target.value; save(); onChange?.(); });
       m.querySelector('[data-sound]').addEventListener('change', (e) => { st.sound = e.target.checked; save(); });
       m.querySelector('[data-plan]').addEventListener('change', (e) => { st.planFirst = e.target.checked; save(); });
       m.querySelector('[data-awake]').addEventListener('change', (e) => { st.keepAwake = e.target.checked; save(); updateWakeLock(); });

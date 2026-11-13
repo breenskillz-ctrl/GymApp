@@ -5,6 +5,13 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #76 · 2026-11-13 · Pick the program and block in Settings
+**Decision:** Settings get a "Start today's workout" section with two selects: Program (`settings.myProgram`: a program id,
+own or built-in, or 'none') and Block (`settings.myBlock`: a running block id or 'none'; empty = the first running block).
+`myBlock()` in today.js is used by todayPlan() and the Home card.
+**Why:** the user wanted to switch program and block himself without the ⋮ menu or guessing which one the app picks.
+**Status:** Active.
+
 ## #75 · 2026-11-13 · Start today's workout with any program
 **Decision:** `myProgram()` = the program picked with "Use for Start today's workout" (now also built-ins), else the first
 own program with weekday names, else the only own program. When that program has no weekday names at all ("Push", "Day 1"),

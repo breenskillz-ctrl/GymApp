@@ -7,7 +7,7 @@ import { profileName } from '../profile.js';
 import { logState } from './log.js';
 import { exLabel } from './seteditor.js';
 import { setWeight } from '../blocks.js';
-import { todayPlan, startTodayFlow, workoutName, weekdayOf } from '../today.js';
+import { todayPlan, startTodayFlow, workoutName, weekdayOf, myBlock, myProgram } from '../today.js';
 import { backupDue, shareBackup, downloadBackup, canShareFiles } from '../backup.js';
 import { save } from '../store.js';
 import {
@@ -67,7 +67,7 @@ function mainLiftHtml(b, it) {
 function todayCardHtml(today) {
   const day = getDay(today);
   const wd = WD[parseKey(today).getDay()].toUpperCase();
-  const block = (state.blocks || []).find((b) => !b.finished);
+  const block = myBlock();
   if (day?.entries.length) {
     const sets = day.entries.flatMap((e) => e.sets).filter((s) => s.lvl !== 'warmup' && setHasData(s));
     const done = sets.filter((s) => s.done).length;
@@ -121,9 +121,9 @@ function weekHtml(today) {
   const mon = addDays(today, -((d.getDay() + 6) % 7));
   const keys = Array.from({ length: 7 }, (_, i) => addDays(mon, i));
   const doneN = keys.filter(dayDone).length;
-  const block = (state.blocks || []).find((b) => !b.finished);
+  const block = myBlock();
   const target = block ? block.weeks[block.pos.w].days.length
-    : (state.customPrograms || []).find((p) => p.id === state.settings.myProgram)?.workouts.filter((w) => weekdayOf(w.name) != null).length || 0;
+    : myProgram()?.workouts.filter((w) => weekdayOf(w.name) != null && w.exercises.some((x) => x.ex !== 'walking')).length || 0;
   return `<section class="home-card week-card">
     <div class="wc-head"><b>This week</b><span class="muted">${doneN}${target ? ` of ${target}` : ''} workout${(target || doneN) === 1 ? '' : 's'}</span></div>
     <div class="wc-days">${keys.map((k) => {
