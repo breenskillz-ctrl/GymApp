@@ -1106,3 +1106,8 @@ body.auth-open { overflow: hidden; }
 .chart-note { margin: 6px 0 0; font-size: calc(12px * var(--fs)); }
 /* 7 · Records: other exercises show their best set without a trophy */
 .rec-val .rec-best { font-size: calc(16px * var(--fs)); }
+/* Minimise a card by hand (DECISIONS #74) */
+.fold-btn .ico { width: 18px; height: 18px; }
+.done-line > .ico { width: 18px; height: 18px; color: var(--muted); flex: none; }
+.done-line.part .dl-ck { background: transparent; border: 2px solid var(--line2); }
+.dl-left { color: var(--accent-hi); }

@@ -24,7 +24,7 @@ let rootEl;
 
 export function goToDate(key) {
   logState.date = key;
-  logState.open = null;
+  logState.folded = null;
   if (rootEl && document.body.dataset.screen === 'log') renderLog(rootEl);
   else go('log');
 }
@@ -106,7 +106,6 @@ const plannedSets = (entry) => entry.sets.filter((s) => !s.done && setHasData(s)
 
 // Work sets ignore warm-ups; a card is finished when all its sets with numbers are done
 const workSets = (entry) => entry.sets.filter((s) => s.lvl !== 'warmup' && setHasData(s));
-const cardDone = (entry) => dataSets(entry).length > 0 && dataSets(entry).every((s) => s.done);
 
 // "Per side: 25 + 25 + 15 + 2.5" for the next work set of a barbell main lift (DECISIONS #72)
 function platesLine(entry) {
@@ -161,6 +160,7 @@ function entryHtml(entry, nextIdx = -1) {
           <button class="ex-title" data-act="info">${esc(exLabel(ex))}</button>
           ${planMode() && dataSets(entry).length ? `<button class="ex-check ${entryDone(entry) ? 'on' : ''}" data-act="tick-entry" role="checkbox"
             aria-checked="${entryDone(entry)}" aria-label="Exercise done">${icon('check')}</button>` : ''}
+          ${entry.sets.some((s) => s.done) ? `<button class="icon-btn fold-btn" data-act="fold" aria-label="Minimise">${icon('up')}</button>` : ''}
           <button class="icon-btn" data-act="entry-menu" aria-label="Menu">${icon('more')}</button>
         </div>
         ${entry.note ? `<button class="ex-note" data-act="entry-note">${esc(entry.note)}</button>` : ''}
@@ -175,25 +175,25 @@ function entryHtml(entry, nextIdx = -1) {
     </section>`;
 }
 
-// A finished card while the workout is going on: one line, tap to open it again (focus mode, DECISIONS #72)
+// A card minimised with its ^ button: one line, tap to open it again (DECISIONS #72, #74)
 function doneLineHtml(entry) {
   const ex = getExercise(entry.ex);
   const w = workSets(entry).filter((s) => s.done);
+  const left = workSets(entry).length - w.length;
   const u = state.settings.unit;
   let txt = '';
   if (ex.type === 'wr' && w.length && w.every((s) => s.w === w[0].w)) {
     txt = `${w.every((s) => s.r === w[0].r) ? `${w.length} × ${w[0].r}` : `${w.map((s) => s.r).join(', ')}`} · ${w[0].w != null ? `${fmtNum(w[0].w, 2)} ${u}` : 'BW'}`;
   } else txt = w.slice(0, 4).map((s) => setText(ex, s)).join(', ');
-  return `<button class="done-line" data-entry="${entry.id}" data-act="expand"><i class="dl-ck">${icon('check')}</i>
-    <span><b>${esc(ex.name)}</b> · ${esc(txt)}</span></button>`;
+  return `<button class="done-line ${left ? 'part' : ''}" data-entry="${entry.id}" data-act="expand"><i class="dl-ck">${left ? '' : icon('check')}</i>
+    <span class="grow"><b>${esc(ex.name)}</b>${txt ? ` · ${esc(txt)}` : ''}${left ? ` <span class="dl-left">· ${left} left</span>` : ''}</span>${icon('down')}</button>`;
 }
 
-// Cards, with supersets wrapped together and finished cards folded while the workout is going on
+// Cards, with supersets wrapped together; cards the user minimised show as one line (DECISIONS #74)
 function entriesHtml(entries) {
-  const live = entries.some((e) => plannedSets(e).length) && entries.some((e) => e.sets.some((s) => s.done));
-  const first = entries.find((e) => plannedSets(e).length);
+  const first = entries.find((e) => plannedSets(e).length && !logState.folded?.has(e.id));
   const nextOf = (e) => (e === first && !planMode() ? e.sets.findIndex((s) => !s.done && setHasData(s)) : -1);
-  const card = (e) => (live && !planMode() && cardDone(e) && !logState.open?.has(e.id) ? doneLineHtml(e) : entryHtml(e, nextOf(e)));
+  const card = (e) => (logState.folded?.has(e.id) ? doneLineHtml(e) : entryHtml(e, nextOf(e)));
   let out = '';
   for (let i = 0; i < entries.length; i++) {
     const e = entries[i];
@@ -418,7 +418,10 @@ function onClick(e) {
     case 'info': return openExerciseDetail(entry.ex);
     case 'entry-menu': return openEntryMenu(entry);
     case 'expand':
-      (logState.open ||= new Set()).add(b.dataset.entry);
+      logState.folded?.delete(b.dataset.entry);
+      return rerender();
+    case 'fold':
+      (logState.folded ||= new Set()).add(entry.id);
       return rerender();
     case 'add-set': return openSetEditor(date, entry, null, afterLog);
     case 'log-all': return logAll(entry);

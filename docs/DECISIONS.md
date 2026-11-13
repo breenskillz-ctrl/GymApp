@@ -5,6 +5,13 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #74 · 2026-11-13 · Cards fold by hand, not automatically
+**Decision:** finished cards no longer fold up on their own (part of #72). Each card with a done set gets a ^ button that
+minimises it to one line (`logState.folded`, reset when the date changes); tapping the line opens it. A minimised card that
+still has sets left shows "N left" and an empty circle. The blue "next set" ring skips minimised cards.
+**Why:** the user often adds an extra set or logs warm-ups by hand, and the card folded away before he was finished.
+**Status:** Active. Supersedes the automatic folding in #72.
+
 ## #73 · 2026-11-11 · Heaviest plate 20 kg by default
 **Decision:** the plate line and plate tool use `settings.maxPlate` (default 20, choice 25/20 in Settings, kg only).
 **Why:** the user's gym has no 25 kg plates; 100 kg showed "25 + 15" instead of "20 + 20".
