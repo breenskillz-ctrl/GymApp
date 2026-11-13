@@ -5,6 +5,15 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #75 · 2026-11-13 · Start today's workout with any program
+**Decision:** `myProgram()` = the program picked with "Use for Start today's workout" (now also built-ins), else the first
+own program with weekday names, else the only own program. When that program has no weekday names at all ("Push", "Day 1"),
+`todayPlan()` returns `pick` and `startTodayFlow()` asks which day to add (or "Only the block today") before adding the
+block day and that program day. Home, Log and History use `startTodayFlow()`.
+**Why:** the user's girlfriend got only the block, not her program, from the Start button. Her program days most likely
+aren't named after weekdays (or she uses a built-in program), which the weekday matching from #70 needed.
+**Status:** Active.
+
 ## #74 · 2026-11-13 · Cards fold by hand, not automatically
 **Decision:** finished cards no longer fold up on their own (part of #72). Each card with a done set gets a ^ button that
 minimises it to one line (`logState.folded`, reset when the date changes); tapping the line opens it. A minimised card that

@@ -2,7 +2,7 @@
 import {
   state, save, getExercise, dayHasWork, dayDone, daySummary, dayDuration, isPR, getDay, isBigLift,
 } from '../store.js';
-import { workoutName, todayPlan, startToday } from '../today.js';
+import { workoutName, todayPlan, startTodayFlow } from '../today.js';
 import {
   esc, icon, dateKey, fmtDate, fmtNum, e1rm, MONTHS, parseKey, go, menuDialog, confirmDialog, toast, addDays,
 } from '../utils.js';
@@ -154,7 +154,7 @@ export function renderHistory(root) {
   const today = dateKey();
   const hasToday = dayHasWork(today);
   const plan = hasToday ? null : todayPlan(today);
-  const canStart = plan && (plan.bd || plan.workout);
+  const canStart = plan && (plan.bd || plan.workout || plan.pick);
   let shown = 0;
   let lastWeek = '';
   const mondayOf = (k) => addDays(k, -((parseKey(k).getDay() + 6) % 7));
@@ -234,7 +234,7 @@ export function renderHistory(root) {
       return;
     }
     if (a === 'start') {
-      if (canStart) { startToday(today); toast('Today’s workout is ready – tap a set to log it'); }
+      if (canStart) return startTodayFlow(today, () => { toast('Today’s workout is ready – tap a set to log it'); openDay(today); });
       return openDay(today);
     }
     if (a === 'calendar') return openCalendar();

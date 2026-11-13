@@ -186,7 +186,7 @@ function openProgramDetail(p, ctx, focusId = null) {
 async function programMenu(p, ctx) {
   const items = [];
   if (!p.builtin) items.push({ value: 'rename', label: 'Rename', icon: 'edit' }, { value: 'edit', label: 'Edit', icon: 'list' });
-  if (!p.builtin && myProgram()?.id !== p.id) items.push({ value: 'mine', label: 'Use for “Start today’s workout”', icon: 'check' });
+  if (myProgram()?.id !== p.id) items.push({ value: 'mine', label: 'Use for “Start today’s workout”', icon: 'check' });
   items.push({ value: 'copy', label: p.builtin ? 'Copy and customise' : 'Duplicate', icon: 'copy' });
   items.push({ value: 'export', label: 'Export to file', icon: 'download' });
   if (!p.builtin) items.push({ value: 'delete', label: 'Delete', icon: 'trash', danger: true });

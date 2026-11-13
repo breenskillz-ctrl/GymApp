@@ -4,7 +4,7 @@ import {
   warmupSets, restFor, dayDuration, isStalled, deloadEntry, setHasData, history, isMainLift, recordInfo,
   getProgression, isBigLift,
 } from '../store.js';
-import { todayPlan, startToday, workoutName } from '../today.js';
+import { todayPlan, startTodayFlow, workoutName } from '../today.js';
 import { startRest } from '../timer.js';
 import {
   esc, icon, openModal, confirmDialog, dateKey, addDays, fmtTime, fmtNum, toast,
@@ -238,10 +238,10 @@ function emptyDayHtml(key) {
     [head, sub] = PUSH_LINES[n].map((t) => t.replace('{name}', name ? `, ${name}` : ''));
   }
   const plan = key >= today ? todayPlan(key) : null;
-  const can = plan && (plan.bd || plan.workout);
+  const can = plan && (plan.bd || plan.workout || plan.pick);
   return `<div class="empty-day log-empty"><h2>${esc(head)}</h2><p>${esc(sub)}</p>
     ${can ? `<button class="btn primary log-start" data-act="start-today">${icon('plus')} Start ${key === today ? 'today’s' : 'this day’s'} workout</button>
-      <p class="muted log-start-sub">${esc([plan.bd?.day.name, plan.workout?.name].filter(Boolean).join(' + '))}</p>` : ''}</div>`;
+      <p class="muted log-start-sub">${esc([plan.bd?.day.name, plan.workout?.name, plan.pick && `a day from ${plan.pick.name}`].filter(Boolean).join(' + '))}</p>` : ''}</div>`;
 }
 
 // Minutes from the first done set: to now while the workout is going on today, else to the last set
@@ -400,9 +400,7 @@ function onClick(e) {
     case 'next-day': return goToDate(addDays(logState.date, 1));
     case 'timers': return go('timers');
     case 'start-today':
-      startToday(date);
-      toast('Workout ready – tap a set to log it');
-      return rerender();
+      return startTodayFlow(date, () => { toast('Workout ready – tap a set to log it'); rerender(); });
     case 'day-menu': return openDayMenu();
     case 'records': return openDayRecords();
     case 'comment': return editComment();

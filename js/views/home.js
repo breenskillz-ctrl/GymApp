@@ -7,7 +7,7 @@ import { profileName } from '../profile.js';
 import { logState } from './log.js';
 import { exLabel } from './seteditor.js';
 import { setWeight } from '../blocks.js';
-import { todayPlan, startToday, workoutName, weekdayOf } from '../today.js';
+import { todayPlan, startTodayFlow, workoutName, weekdayOf } from '../today.js';
 import { backupDue, shareBackup, downloadBackup, canShareFiles } from '../backup.js';
 import { save } from '../store.js';
 import {
@@ -93,6 +93,9 @@ function todayCardHtml(today) {
         <b>${esc(blockItemText(plan.block, it))}</b></div>`);
     }
   }
+  if (plan.pick) {
+    rows.push(`<div class="tc-row"><span>then a day from <b>${esc(plan.pick.name)}</b></span><b>you choose</b></div>`);
+  }
   if (plan.workout) {
     const n = plan.workout.exercises.length;
     rows.push(`<div class="tc-row"><span>then <b>${esc(plan.workout.name.replace(/^\S+\s*[·.:-]?\s*/, ''))}</b> <span class="muted">· ${esc(plan.program.name)}</span></span>
@@ -101,7 +104,7 @@ function todayCardHtml(today) {
   const title = plan.workout || plan.bd
     ? [plan.bd?.day.name.replace(/^[A-Za-zæøåÆØÅ]{3,8}\s*·\s*/, ''), plan.workout?.name.replace(/^\S+\s*/, '')].filter(Boolean).join(' + ')
     : 'Nothing planned';
-  const has = rows.length || pctItems.length;
+  const has = rows.length || pctItems.length || plan.pick;
   return `<section class="today-card ${has ? '' : 'quiet'}">
     <div class="tc-kicker">Today · ${wd}${plan.bd ? ` · Week ${plan.bd.w + 1} Day ${plan.bd.d + 1}` : ''}</div>
     ${pctItems.length ? mainLiftHtml(plan.block, pctItems[0]) : `<h2 class="tc-title">${esc(title)}</h2>`}
@@ -198,10 +201,11 @@ export function renderHome(root) {
     const b = e.target.closest('[data-go]');
     if (!b) return;
     if (b.dataset.go === 'start') {
-      startToday(today);
-      logState.date = today;
-      go('log');
-      toast('Today’s workout is ready – tap a set to log it');
+      startTodayFlow(today, () => {
+        logState.date = today;
+        go('log');
+        toast('Today’s workout is ready – tap a set to log it');
+      });
     }
     if (b.dataset.go === 'log') { logState.date = today; go('log'); }
     if (b.dataset.go === 'records') go('records');

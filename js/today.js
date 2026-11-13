@@ -1,8 +1,8 @@
 // Today's workout (DECISIONS #70): the running block's day and the user's own program day that belong to today's
 // weekday, added with one tap ("Start today's workout"). Weekdays are read from the workout names ("Tue · Bench",
 // "Tirsdag Chest+Tri", "Monday legs" …), in English or Norwegian.
-import { state, save, getDay, addEntry } from './store.js';
-import { dateKey, parseKey } from './utils.js';
+import { state, save, getDay, addEntry, allPrograms } from './store.js';
+import { dateKey, parseKey, menuDialog } from './utils.js';
 import { addBlockWorkout, syncBlock, loggedDays, isMarked } from './blocks.js';
 
 // Index = JS getDay() (0 = Sunday)
@@ -26,11 +26,13 @@ export function weekdayOf(name) {
 const SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const weekdayShort = (i) => SHORT[i];
 
-// The user's own program: the one picked with "Use as my program", else the first own program with weekday names
+// The user's program: the one picked with "Use for Start today's workout" (own or built-in), else the first own program
+// with weekday names, else the only own program (DECISIONS #75)
 export function myProgram() {
   const own = state.customPrograms || [];
-  return own.find((p) => p.id === state.settings.myProgram)
-    || own.find((p) => p.workouts.some((w) => weekdayOf(w.name) != null)) || null;
+  return allPrograms().find((p) => p.id === state.settings.myProgram)
+    || own.find((p) => p.workouts.some((w) => weekdayOf(w.name) != null))
+    || (own.length === 1 ? own[0] : null);
 }
 
 const activeBlock = () => (state.blocks || []).find((b) => !b.finished) || null;
@@ -57,7 +59,9 @@ export function todayPlan(key = dateKey()) {
   const bd = blockDayFor(block, wd);
   const program = myProgram();
   const workout = program?.workouts.find((w) => weekdayOf(w.name) === wd) || null;
-  return { block: bd ? block : null, bd, program: workout ? program : null, workout };
+  // A program without weekday names ("Push", "Day 1" …): the user picks the day when starting
+  const pick = !workout && program && program.workouts.length && !program.workouts.some((w) => weekdayOf(w.name) != null) ? program : null;
+  return { block: bd ? block : null, bd, program: workout ? program : null, workout, pick };
 }
 
 // The day's name for history and cards: the program workout, else the block day, else null
@@ -77,8 +81,13 @@ export function workoutName(day) {
 }
 
 // Add today's block day and program day (exercises already on the day are skipped). Returns what was added.
-export function startToday(key = dateKey()) {
+// workoutId: a program day the user picked for a program without weekday names.
+export function startToday(key = dateKey(), workoutId = null) {
   const plan = todayPlan(key);
+  if (workoutId && plan.pick) {
+    plan.workout = plan.pick.workouts.find((w) => w.id === workoutId) || null;
+    plan.program = plan.workout ? plan.pick : null;
+  }
   if (plan.bd) addBlockWorkout(plan.block, key, plan.bd.w, plan.bd.d);
   if (plan.workout) {
     const day = getDay(key, true);
@@ -89,4 +98,20 @@ export function startToday(key = dateKey()) {
   }
   save();
   return plan;
+}
+
+// "Start today's workout" from any screen: asks which program day first when the program has no weekday names,
+// then adds everything and calls done(plan). Returns false when there was nothing to start.
+export async function startTodayFlow(key = dateKey(), done = () => {}) {
+  const plan = todayPlan(key);
+  let id = null;
+  if (plan.pick) {
+    const items = plan.pick.workouts.map((w) => ({ value: w.id, label: w.name, icon: 'dumbbell' }));
+    if (plan.bd) items.push({ value: '-', label: 'Only the block today', icon: 'close' });
+    id = await menuDialog(`${plan.pick.name}: which day?`, items);
+    if (!id) return false;
+    if (id === '-') id = null;
+  } else if (!plan.bd && !plan.workout) return false;
+  done(startToday(key, id));
+  return true;
 }
