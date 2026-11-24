@@ -2,10 +2,18 @@
 // After an update the app shows the entries the user has not seen yet, once.
 import { esc, icon, openModal } from './utils.js';
 
-export const APP_VERSION = 61;
+export const APP_VERSION = 62;
 const SEEN = 'gymapp.seenVersion'; // per device, not part of backups
 
 export const CHANGELOG = [
+  { v: 62, date: '2026-11-24', items: [
+    'Each set shows what you did last time underneath (“100×5”). Turn it off in Settings if you don’t want it.',
+    'Share a workout as an image: from the summary or the day menu.',
+    'Search exercises straight from the top of the exercise list.',
+    'A new barbell exercise starts at the empty bar instead of 0 kg.',
+    'Replace exercise now plans sets for the new exercise instead of keeping the old one’s weights and reps. Sets you’ve already done stay.',
+    'Bigger buttons for levels and variants, whole numbers on the workout charts, and text fields that don’t zoom on iPhone.',
+  ] },
   { v: 61, date: '2026-11-13', items: [
     'Settings → Start today’s workout: choose which program and which block the Start button uses, or none.',
   ] },

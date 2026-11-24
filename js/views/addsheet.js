@@ -106,6 +106,7 @@ export function openAddSheet(date, onAdded, { mode = 'add', page: startPage = nu
         const back = page !== home && !(startPage && page === startPage && mode === 'browse');
         if (page.kind === 'home') {
           body.innerHTML = `${header('Exercises', false)}
+            <input class="input search home-search" type="search" placeholder="Search exercises…" value="">
             <div class="scroll">
               ${mode === 'add' ? `<div class="quick-pills">
                 <button class="quick-pill" data-q="recent">${icon('history')}Recent</button>
@@ -115,6 +116,8 @@ export function openAddSheet(date, onAdded, { mode = 'add', page: startPage = nu
               </div>` : ''}
               <div class="group-list">${groupRowsHtml(date)}</div>
             </div>`;
+          // Typing in the search field on the first page opens the search results (DECISIONS #77)
+          body.querySelector('.home-search').oninput = (ev) => { query = ev.target.value; page = { kind: 'search' }; draw(); };
           return;
         }
         const last = lastDoneMap();

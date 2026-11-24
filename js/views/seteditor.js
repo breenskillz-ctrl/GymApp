@@ -110,6 +110,8 @@ export function openSetEditor(date, entry, index, onDone) {
     ? existing
     : entry.sets[entry.sets.length - 1] || prevSession[n - 1] || prevSession[prevSession.length - 1] || {};
   const values = { w: src.w ?? null, r: src.r ?? null, t: src.t ?? null, d: src.d ?? null };
+  // A brand-new barbell exercise starts at the empty bar instead of 0 (DECISIONS #77)
+  if (values.w == null && ex.type === 'wr' && ex.equip === 'Barbell' && !editing) values.w = state.settings.unit === 'lb' ? 45 : 20;
   let lvl = existing?.lvl || src.lvl || 'normal';
   const tags = new Set(existing?.tags || src.tags || []); // a new set keeps the variant of the set before it
   const fields = fieldsFor(ex.type);

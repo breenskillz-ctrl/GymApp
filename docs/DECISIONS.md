@@ -5,6 +5,42 @@ Add an entry whenever the user decides something or a non-trivial technical choi
 
 ---
 
+## #77 · 2026-11-24 · Fixes from an outside review; the app stays in English
+**Decision:** after a review by an outside tester the user picked five small fixes:
+- `.input` gets `font: inherit` and at least 16 px (inputs don't inherit the font; under 16 px iPhone zooms on focus).
+- A new barbell exercise with no history starts at the empty bar (20 kg / 45 lb) in the set editor.
+- `barChart` uses whole numbers on the axis when all values are whole (no "0.5 workouts" on an empty chart).
+- Level, variant, filter and segment buttons are at least 40 px high.
+- The exercise picker has a search field at the top of the first page (typing opens the results); the quick pills wrap.
+**Also decided:** the app UI stays in **English** – the user said that is how it is meant to be (not Norwegian like
+Makrologg). Not done from the review: Home before the profile screen (a "Skip for now" button already exists), shorter backup
+reminder on iPhone, automatic tests, deleting the "Main" branch, Loadlog training calories into Makrologg (declined).
+**Status:** Active.
+
+## #78 · 2026-11-24 · Last time under each set (easy to undo)
+**Decision:** each set chip shows the matching set from the previous session in small text ("100×5"; warm-ups next to
+warm-ups, work sets next to work sets, by position). On by default; Settings → "Show last time under each set"
+(`settings.lastPerSet = false`) hides it. The "Last: …" line per exercise stays.
+**Why:** the most used feature in Strong/Hevy, suggested by the tester. The user asked for it but wants to be able to go back:
+**to undo, turn the setting off, or remove `prevFor`/`prevText` and the `.set-prev` span in js/views/log.js and the CSS rule.**
+**Status:** Active, on trial.
+
+## #80 · 2026-11-24 · Replace exercise rebuilds the sets
+**Decision:** "Replace exercise" keeps the sets already marked done and replaces the rest with the new exercise's plan:
+its last session with progression (warm-ups included, unless sets are already done), else the old card's number of work
+sets and reps (barbell with no history starts at the empty bar). Block and deload marks are removed from the card.
+**Why:** the user swapped cable row for bent-over barbell row and the cable row's weights and reps stayed on the card.
+**Status:** Active
+
+## #79 · 2026-11-24 · Share a workout as an image
+**Decision:** js/shareimg.js draws a 1080 px wide card (1080–1350 high) on canvas: Loadlog, date, block week/day, workout
+name, four tiles (time, sets, volume, records), up to 9 exercises with a one-line summary (records in gold) and the block
+name. The sheet shows the image with Share (Web Share with a file, where supported) and Save image (download). Opened from
+the workout summary ("Share as image") and the day menu.
+**Why:** the user thought it would be fun to share workouts. The Android app's web view supports neither Web Share nor
+downloads, so the sheet says to take a screenshot there; native sharing would need a new APK.
+**Status:** Active.
+
 ## #76 · 2026-11-13 · Pick the program and block in Settings
 **Decision:** Settings get a "Start today's workout" section with two selects: Program (`settings.myProgram`: a program id,
 own or built-in, or 'none') and Block (`settings.myBlock`: a running block id or 'none'; empty = the first running block).

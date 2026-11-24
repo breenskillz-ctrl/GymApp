@@ -151,6 +151,8 @@ body.resting .fab-wrap { transform: translateY(-64px); }
 
 /* ---------- Inputs ---------- */
 .input {
+  /* Inputs don't inherit the font; under 16px iPhone zooms in on every tap (DECISIONS #77) */
+  font: inherit; font-size: max(16px, calc(15px * var(--fs)));
   width: 100%; padding: 11px 13px; border-radius: 10px;
   background: var(--card2); border: 1px solid transparent; outline: none;
 }
@@ -1111,3 +1113,15 @@ body.auth-open { overflow: hidden; }
 .done-line > .ico { width: 18px; height: 18px; color: var(--muted); flex: none; }
 .done-line.part .dl-ck { background: transparent; border: 2px solid var(--line2); }
 .dl-left { color: var(--accent-hi); }
+
+/* v62: bigger tap targets and a picker that fits (DECISIONS #77) */
+.tag-btn, .lvl-btn, .fchip, .chip, .seg button { min-height: 40px; }
+.tag-btn { padding-left: 14px; padding-right: 14px; }
+.quick-pills { flex-wrap: wrap; overflow: visible; }
+.home-search { margin: 0 0 10px; }
+/* Last time under each set (DECISIONS #78; Settings → "Show last time under each set" turns it off) */
+.set-prev { display: block; margin-top: 2px; font-size: calc(10px * var(--fs)); font-weight: 500; color: var(--muted); white-space: nowrap; letter-spacing: .02em; }
+.set-col.done .set-prev { color: color-mix(in srgb, var(--text) 55%, transparent); }
+/* Share as image (DECISIONS #79) */
+.share-img { display: block; width: 100%; max-width: 360px; margin: 4px auto 12px; border-radius: 12px; border: 1px solid var(--line); }
+.share-hint { text-align: center; margin: 8px 0 0; }

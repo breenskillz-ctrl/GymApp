@@ -421,6 +421,7 @@ export function openSettings(onChange) {
       <h3 class="section-title">Training</h3>
       <label>Default rest time (seconds)<input class="input" type="number" min="5" step="5" data-rest value="${st.rest}"></label>
       <label>Rest after squat, bench, deadlift, press and block sets (seconds)<input class="input" type="number" min="5" step="15" data-rest-main value="${st.restMain || 180}"></label>
+      <label class="switch"><input type="checkbox" data-lastset ${st.lastPerSet !== false ? 'checked' : ''}> Show last time under each set</label>
       <label class="switch"><input type="checkbox" data-warmup ${st.autoWarmup !== false ? 'checked' : ''}> Add warm-up sets to block lifts</label>
       ${st.unit === 'kg' ? `<label>Heaviest plate at your gym<select class="input" data-max-plate>
         ${[25, 20].map((v) => `<option value="${v}" ${(st.maxPlate || 20) === v ? 'selected' : ''}>${v} kg</option>`).join('')}</select></label>` : ''}
@@ -470,6 +471,7 @@ export function openSettings(onChange) {
       m.querySelector('[data-auto]').addEventListener('change', (e) => { st.autoRest = e.target.checked; save(); });
       m.querySelector('[data-rest-main]').addEventListener('change', (e) => { const v = num(e.target.value); if (v > 0) { st.restMain = v; save(); } });
       m.querySelector('[data-warmup]').addEventListener('change', (e) => { st.autoWarmup = e.target.checked; save(); });
+      m.querySelector('[data-lastset]').addEventListener('change', (e) => { st.lastPerSet = e.target.checked; save(); });
       m.querySelector('[data-max-plate]')?.addEventListener('change', (e) => { st.maxPlate = Number(e.target.value); save(); });
       m.querySelector('[data-my-program]').addEventListener('change', (e) => { st.myProgram = e.target.value; save(); onChange?.(); });
       m.querySelector('[data-my-block]').addEventListener('change', (e) => { st.myBlock = e.target.value; save(); onChange?.(); });

@@ -25,6 +25,7 @@ _Last updated: 2026-11-10 (v53 published: readiness on Home, DECISIONS #71. Kode
 
 ## Current status
 
+- **v62 (2026-11-24):** tester fixes (16 px inputs, bar start 20 kg, whole-number axes, 40 px buttons, search on top), last time under each set (on trial, setting to turn off), share workout as image (DECISIONS #77–#79), Replace exercise rebuilds the sets (#80). App stays English. Published 2026-11-24.
 - **v61 (2026-11-13, published):** Settings → Start today's workout: program and block selects (DECISIONS #76).
 - **v60 (2026-11-13, published):** Start today's workout works for programs without weekday names (asks which day) and for built-ins (DECISIONS #75). Synnøve's exact setup not confirmed.
 - **v59 (2026-11-13, published):** cards fold by hand with a ^ button instead of automatically (DECISIONS #74).

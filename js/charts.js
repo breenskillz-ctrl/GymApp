@@ -115,7 +115,9 @@ export function lineChart(canvas, points, { height = 200, format: fmt = (v) => v
 export function barChart(canvas, bars, { height = 180, format = (v) => v } = {}) {
   const { ctx, w, h } = setup(canvas, height);
   const pad = { l: 30, r: 8, t: 14, b: 24 };
-  const max = niceMax(Math.max(1, ...bars.map((b) => b.value)));
+  let max = niceMax(Math.max(1, ...bars.map((b) => b.value)));
+  // Counts (workouts, sets) get whole numbers on the axis: no "0.5 workouts" (DECISIONS #77)
+  if (bars.every((b) => Number.isInteger(b.value))) max = Math.max(2, Math.ceil(max / 2) * 2);
   const cw = w - pad.l - pad.r;
   const ch = h - pad.t - pad.b;
   const bw = cw / bars.length;

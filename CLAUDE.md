@@ -18,7 +18,7 @@ if you made or were given a decision. Keep entries short and dated (YYYY-MM-DD).
 - **Never commit secrets, API keys, tokens or passwords.** Use GitHub Secrets (`${{ secrets.NAME }}` in
   workflows) instead. `.env` and key files are git-ignored. Anything shipped to the browser is public,
   so a key that must stay secret belongs on a server, never in the front-end code.
-- **The app UI is in English.** The user writes in Norwegian: reply to the user in Norwegian, but
+- **The app UI is in English** (confirmed by the user 2026-11-24, DECISIONS #77; don't translate it). The user writes in Norwegian: reply to the user in Norwegian, but
   write all app text, code, comments, commit messages and docs in English.
 - **The deploy branch is `claude/gymkeeper-app-pq7o0u`.** It is the only branch the `github-pages` environment accepts.
   Every push to it deploys to https://breenskillz-ctrl.github.io/GymApp/ (see DECISIONS #12).
@@ -60,6 +60,7 @@ js/photodb.js         Progress photos in IndexedDB (addPhoto/allPhotos/deletePho
 js/wakelock.js        Screen wake lock while today has exercises (settings.keepAwake)
 js/timer.js           Global rest timer (bottom bar; adds body.resting so the FAB moves up)
 js/charts.js          lineChart(), barChart(), multiLineChart(), stackedBarChart() on canvas
+js/shareimg.js        Share a workout as an image: drawWorkout() on canvas, openShareImage() sheet (DECISIONS #79)
 js/today.js           Today's workout: weekdayOf(), myProgram(), todayPlan(), startToday(), startTodayFlow(), myBlock(), workoutName() (DECISIONS #70, #75, #76)
 js/readiness.js       Readiness from the watch via the coach sheet (GET ?read=garmin): garminRows(), readiness(), applyReadiness() (#71)
 js/views/home.js      Home (start page, back-button root): today card + Start button, this week, latest record, backup reminder (#57, #70)
@@ -93,7 +94,7 @@ android-app/          Android app (Capacitor 8, appId app.loadlog): loads the li
   blocks: [{ id, name, templateId, base, maxes: { exId: kg }, weeks, pos: { w, d }, started, finished }],
   blockTemplates: [ /* the user's own templates, compact items */ ],
   lastBackup, backupSnooze, lastAutoBackup,   // backup files add backupVersion: 2 and photos: [...] (not stored in state)
-  settings: { unit: 'kg'|'lb', rest: 90, restMain: 180, autoWarmup: true, maxPlate: 20, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst, myProgram?, myBlock?, trendLifts?, sheetUrl? }
+  settings: { unit: 'kg'|'lb', rest: 90, restMain: 180, autoWarmup: true, maxPlate: 20, sound: true, autoRest: true, textScale: 100, keepAwake: true, planFirst, myProgram?, myBlock?, lastPerSet?, trendLifts?, sheetUrl? }
 }
 ```
 

@@ -5,6 +5,7 @@ import {
   getProgression, isBigLift,
 } from '../store.js';
 import { todayPlan, startTodayFlow, workoutName } from '../today.js';
+import { openShareImage, shareDateText } from '../shareimg.js';
 import { startRest } from '../timer.js';
 import {
   esc, icon, openModal, confirmDialog, dateKey, addDays, fmtTime, fmtNum, toast,
@@ -54,7 +55,7 @@ const entryDone = (entry) => dataSets(entry).length > 0 && dataSets(entry).every
 const tagLabel = (id) => SET_TAGS.find((t) => t.id === id)?.label || id;
 
 // One set as a compact two-line column: "120 KG / 2 REP"
-function setColHtml(ex, s, i, next = false) {
+function setColHtml(ex, s, i, next = false, prev = null) {
   const u = state.settings.unit;
   const val = (v, unit, fmt = (x) => fmtNum(x, 2)) => `<span class="v">${v == null ? '-' : fmt(v)}</span><span class="u">${unit}</span>`;
   let l1;
@@ -78,6 +79,7 @@ function setColHtml(ex, s, i, next = false) {
     ${s.tags?.length ? `<span class="set-tags">${s.tags.map(tagLabel).join(' · ')}</span>` : ''}
     ${s.c ? `<span class="set-note">${esc(s.c)}</span>` : ''}
     ${suggestionDelta(s) ? `<span class="set-delta">${esc(suggestionDelta(s))}</span>` : ''}
+    ${prev ? `<span class="set-prev">${esc(prevText(ex, prev))}</span>` : ''}
     ${planMode() && setHasData(s) ? `<span class="set-tick ${s.done ? 'on' : ''}" data-act="tick-set" data-set="${i}" role="checkbox"
       aria-checked="${s.done}" aria-label="Set done">${icon('check')}</span>` : s.done ? `<span class="set-ok">${icon('check')}</span>` : ''}
   </button>`;
@@ -136,6 +138,14 @@ function ruleLine(entry, ex) {
     <span>at ${work.length} × ${p.max}: <b>+${fmtNum(p.inc, 2)} ${u}</b></span></div>`;
 }
 
+// "80×8": a set from last time in short form, shown under the matching set (DECISIONS #78)
+function prevText(ex, s) {
+  const u = state.settings.unit;
+  if (ex.type === 'wr') return s.w != null ? `${fmtNum(s.w, 2)}×${s.r ?? '–'}` : `${s.r ?? '–'} reps`;
+  if (ex.type === 'r') return s.w ? `+${fmtNum(s.w, 2)}×${s.r ?? '–'}` : `${s.r ?? '–'} reps`;
+  return setText(ex, s).replace(` ${u}`, '');
+}
+
 function entryHtml(entry, nextIdx = -1) {
   const ex = getExercise(entry.ex);
   const planned = plannedSets(entry).length;
@@ -146,7 +156,17 @@ function entryHtml(entry, nextIdx = -1) {
   const idx = entry.sets.map((s, i) => i);
   const wu = idx.filter((i) => entry.sets[i].lvl === 'warmup');
   const work = idx.filter((i) => entry.sets[i].lvl !== 'warmup');
-  const chips = (list) => list.map((i) => setColHtml(ex, entry.sets[i], i, i === nextIdx)).join('');
+  // Last time, set by set: warm-ups next to warm-ups, work sets next to work sets (settings.lastPerSet, DECISIONS #78)
+  const last = state.settings.lastPerSet !== false ? history(entry.ex, logState.date)[0] : null;
+  const lastWu = last ? last.sets.filter((s) => s.lvl === 'warmup') : [];
+  const lastWork = last ? last.sets.filter((s) => s.lvl !== 'warmup') : [];
+  const prevFor = (i) => {
+    const s = entry.sets[i];
+    const list = s.lvl === 'warmup' ? lastWu : lastWork;
+    const pos = entry.sets.slice(0, i).filter((x) => (x.lvl === 'warmup') === (s.lvl === 'warmup')).length;
+    return list[pos] || null;
+  };
+  const chips = (list) => list.map((i) => setColHtml(ex, entry.sets[i], i, i === nextIdx, prevFor(i))).join('');
   const pct = entry.block && entry.sets.find((s) => s.lvl !== 'warmup' && s.pct)?.pct;
   const rows = wu.length
     ? `<div class="sets-lab">Warm-up</div><div class="sets wu-row">${chips(wu)}</div>
@@ -303,6 +323,43 @@ function topSet(ex, sets) {
   return w.reduce((a, b) => ((b.w || 0) > (a.w || 0) || ((b.w || 0) === (a.w || 0) && (b.r || 0) > (a.r || 0)) ? b : a));
 }
 
+// One line per exercise for the share image: "3 × 5 · 155 kg", "155 × 5, 5, 4" or the best set
+function shareLine(ex, sets) {
+  const u = state.settings.unit;
+  if (ex.type === 'wr' && sets[0].w != null && sets.every((s) => s.w === sets[0].w)) {
+    return sets.every((s) => s.r === sets[0].r) ? `${sets.length} × ${sets[0].r} · ${fmtNum(sets[0].w, 2)} ${u}` : `${fmtNum(sets[0].w, 2)} ${u} × ${sets.map((s) => s.r).join(', ')}`;
+  }
+  if (ex.type === 'r' && sets.every((s) => (s.w || 0) === (sets[0].w || 0))) return `${sets[0].w ? `+${fmtNum(sets[0].w, 2)} ${u} × ` : ''}${sets.map((s) => s.r).join(', ')}${sets[0].w ? '' : ' reps'}`;
+  return setText(ex, topSet(ex, sets));
+}
+
+// Share the day as an image (DECISIONS #79)
+export function shareWorkout(key = logState.date) {
+  const day = getDay(key);
+  if (!day) return;
+  const sum = daySummary(day);
+  const mins = dayDuration(day);
+  const recs = dayRecords(key, day);
+  const block = day.entries.find((e) => e.block)?.block;
+  const bl = block && (state.blocks || []).find((b) => b.id === block.id);
+  const rows = day.entries.map((e) => {
+    const ex = getExercise(e.ex);
+    const done = e.sets.filter((s) => s.done && s.lvl !== 'warmup' && setHasData(s));
+    if (!done.length) return null;
+    return { name: ex.name, sets: shareLine(ex, done), rec: recs.some((r) => r.ex.id === ex.id) };
+  }).filter(Boolean);
+  if (!rows.length) { toast('Log a set first'); return; }
+  openShareImage({
+    title: (workoutName(day) || day.title || 'Workout').replace(/^[A-Za-zæøåÆØÅ]{3,8}\s*·\s*/, ''),
+    date: shareDateText(key),
+    kicker: block ? `Week ${block.w + 1} · Day ${block.d + 1}` : '',
+    tiles: [[mins ? hm(mins) : '–', mins >= 60 ? 'time' : 'min'], [String(sum.sets), 'sets'], [sum.vol ? tonnes(sum.vol) : '–', 'volume'],
+      [String(recs.length), recs.length === 1 ? 'record' : 'records']],
+    rows,
+    footer: bl ? bl.name : '',
+  }, `loadlog-${key}.png`);
+}
+
 export function openSummary(key = logState.date) {
   const day = getDay(key);
   if (!day) return;
@@ -339,12 +396,14 @@ export function openSummary(key = logState.date) {
       ${recs.length ? `<h3 class="sum-head">Record${recs.length === 1 ? '' : 's'}</h3>${recs.map((r) => `<p class="sum-rec"><span class="gold">${icon('trophy')}</span>
         ${esc(r.ex.name)} ${r.reps}RM · <b>${fmtNum(r.set.w, 2)} ${u} × ${r.set.r}</b>${r.old ? ` <span class="muted">(was ${fmtNum(r.old, 2)})</span>` : ''}</p>`).join('')}` : ''}
       <button class="btn primary block" data-close>Done</button>
+      <button class="btn ghost block" data-share>${icon('upload')} Share as image</button>
       <button class="btn ghost block" data-note>${day.note ? 'Edit workout note' : 'Add a note for the coach'}</button>
     </div>`, {
     className: 'small',
     onMount(m, close) {
       m.querySelector('[data-close]').onclick = close;
       m.querySelector('[data-note]').onclick = () => { close(); editDayNote(); };
+      m.querySelector('[data-share]').onclick = () => { close(); shareWorkout(key); };
     },
   });
 }
@@ -541,7 +600,10 @@ async function openDayMenu() {
     { value: 'comment', label: day?.title ? 'Rename workout' : 'Name workout', icon: 'edit' },
     { value: 'note', label: day?.note ? 'Edit workout note' : 'Add workout note', icon: 'comment' },
   ];
-  if (day?.entries.some((e) => e.sets.some((s) => s.done))) items.push({ value: 'summary', label: 'Workout summary', icon: 'chart' });
+  if (day?.entries.some((e) => e.sets.some((s) => s.done))) {
+    items.push({ value: 'summary', label: 'Workout summary', icon: 'chart' });
+    items.push({ value: 'share', label: 'Share as image', icon: 'upload' });
+  }
   if (key !== dateKey()) items.push({ value: 'today', label: 'Go to today', icon: 'calendar' });
   if (day?.entries.length && key !== dateKey()) items.push({ value: 'copy', label: 'Copy workout to today', icon: 'copy' });
   if (day?.entries.length) items.push({ value: 'clear', label: 'Clear this day', icon: 'trash', danger: true });
@@ -549,6 +611,7 @@ async function openDayMenu() {
   if (v === 'comment') editComment();
   if (v === 'note') editDayNote();
   if (v === 'summary') openSummary(key);
+  if (v === 'share') shareWorkout(key);
   if (v === 'today') goToDate(dateKey());
   if (v === 'copy') {
     copyToToday(key);
@@ -619,7 +682,22 @@ async function openEntryMenu(entry) {
       title: 'Replace with',
       multi: false,
       onPick([id]) {
+        if (id === entry.ex) return;
+        // The old exercise's weights don't fit the new one: keep the sets already done, plan the rest from the
+        // new exercise's last session (warm-ups included), else the old card's set count and reps.
+        const done = entry.sets.filter((s) => s.done);
+        const work = entry.sets.filter((s) => !s.done && s.lvl !== 'warmup');
+        const target = { sets: Math.max(1, work.length || 3), reps: work.find((s) => s.r != null)?.r ?? null };
+        let plan = makeSets(id, logState.date, target);
+        if (done.length) plan = plan.filter((s) => s.lvl !== 'warmup');
+        const nex = getExercise(id);
+        if (nex.type === 'wr' && ['Barbell', 'Smith Machine'].includes(nex.equip) && plan.every((s) => s.w == null)) {
+          plan = plan.map((s) => ({ ...s, w: state.settings.unit === 'lb' ? 45 : 20 }));
+        }
         entry.ex = id;
+        entry.sets = [...done, ...plan];
+        delete entry.block;
+        delete entry.deload;
         save();
         rerender();
       },
