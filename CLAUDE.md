@@ -21,7 +21,7 @@ if you made or were given a decision. Keep entries short and dated (YYYY-MM-DD).
 - **The app UI is in English** (confirmed by the user 2026-11-24, DECISIONS #77; don't translate it). The user writes in Norwegian: reply to the user in Norwegian, but
   write all app text, code, comments, commit messages and docs in English.
 - **The deploy branch is `claude/gymkeeper-app-pq7o0u`.** It is the only branch the `github-pages` environment accepts.
-  Every push to it deploys to https://breenskillz-ctrl.github.io/GymApp/ (see DECISIONS #12).
+  Every push to it deploys to https://breenskillz-ctrl.github.io/GymApp/ through GitHub's built-in "pages build and deployment" run (DECISIONS #12, #81; pages.yml is manual only).
   `Main` and `main` are leftovers that neither the user nor Claude can delete. Keep them fast-forwarded to the same
   commit so they don't confuse anyone, but never rely on them. Do not open a pull request unless the user asks.
 - The sandbox cannot reach `*.github.io`. Verify a deploy through the GitHub API instead (workflow run steps and

@@ -25,6 +25,13 @@ warm-ups, work sets next to work sets, by position). On by default; Settings →
 **to undo, turn the setting off, or remove `prevFor`/`prevText` and the `.set-prev` span in js/views/log.js and the CSS rule.**
 **Status:** Active, on trial.
 
+## #81 · 2026-11-24 · Pages workflow runs only by hand
+**Decision:** pages.yml no longer runs on push (workflow_dispatch only). The site is published by GitHub's built-in
+"pages build and deployment" run, which deploys the branch on every push. Partly supersedes #12 (the branch stays the same).
+**Why:** from v62 the workflow's deploy-pages step failed every time ("No artifacts named github-pages") and sent the user
+failure e-mails, while the built-in build deployed the same commit successfully.
+**Status:** Active
+
 ## #80 · 2026-11-24 · Replace exercise rebuilds the sets
 **Decision:** "Replace exercise" keeps the sets already marked done and replaces the rest with the new exercise's plan:
 its last session with progression (warm-ups included, unless sets are already done), else the old card's number of work
